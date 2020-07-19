@@ -5,6 +5,11 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 
 ![Screenshot](https://i.imgur.com/VtnZmB0.jpg)
 
+# Installation
+* Copy all files in the repo to Windower4/addons/XivParty
+* Load using //lua load xivparty
+* RECOMMENDED: Download and install the free font '[Grammara](https://www.fontspace.com/grammara-font-f4454)' for a more authentic FF14 look of the numbers
+
 # Commands
 
 | Command | Action |

@@ -114,7 +114,7 @@ function listitem:pos(x, y)
 	self.cursor:pos(hpPosX - layout.cursor.imgWidth + layout.cursor.offsetX, y + layout.cursor.offsetY)
 	
 	-- right aligned text coordinates start at the right side of the screen
-	local screenResX = windower.get_windower_settings().x_res
+	local screenResX = windower.get_windower_settings().ui_x_res
 	
     self.hpText:pos(hpPosX - screenResX + self.hpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
 	self.mpText:pos(mpPosX - screenResX + self.hpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)

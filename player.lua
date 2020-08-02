@@ -73,11 +73,13 @@ function player:updateBuffs(buffs, filters)
 	self.filteredBuffs = T{}
 	for i = 1, 32 do
 		buff = buffs[i]
-		if filters[buff] then
+		if (settings.buffs.filterMode == 'blacklist' and filters[buff]) or 
+		   (settings.buffs.filterMode == 'whitelist' and not filters[buff]) then
 			buff = 1000
 		end
 		self.filteredBuffs[i] = buff
 	end
+	
 	if settings.buffs.customOrder then
 		self.filteredBuffs:sort(buffOrderCompare)
 	else

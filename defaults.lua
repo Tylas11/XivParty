@@ -37,6 +37,7 @@ defaults.rangeIndicator = 0 -- if party members are closer than this distance, t
 
 defaults.buffs = {}
 defaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
+defaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
 defaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
 
 return defaults

@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.0.0.0'
+_addon.version = '1.1.0.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
@@ -369,23 +369,14 @@ windower.register_event('addon command', function(...)
 	end
 	
 	if command == 'move' then
-		ret = handleCommand('move', view:moveEnabled(), args[2], 'Mouse dragging')
-		if ret == true then
-			view:moveEnabled(true)
-		elseif ret == false then
-			view:moveEnabled(false)
-		end
+		local ret = handleCommandOnOff(view:moveEnabled(), args[2], 'Mouse dragging')
+		view:moveEnabled(ret)
 	elseif command == 'hidesolo' then
-		ret = handleCommand('hideSolo', settings.hideSolo, args[2], 'Party list hiding while solo')
-		if ret == true then
-			settings.hideSolo = true
-			settings:save()
-		elseif ret == false then
-			settings.hideSolo = false
-			settings:save()
-		end
+		local ret = handleCommandOnOff(settings.hideSolo, args[2], 'Party list hiding while solo')
+		settings.hideSolo = ret
+		settings:save()
 	elseif command == 'customorder' then
-		ret = handleCommand('customOrder', settings.buffs.customOrder, args[2], 'Custom buff ordering')
+		local ret = handleCommandOnOff(settings.buffs.customOrder, args[2], 'Custom buff ordering')
 		settings.buffs.customOrder = ret
 		settings:save()
 	elseif command == 'range' then
@@ -425,12 +416,17 @@ windower.register_event('addon command', function(...)
 			refreshFilteredBuffs()
 			log('All buff filters cleared.')
 		elseif subCommand == 'list' then
-			log('Currently active buff filters:')
+			log('Currently active buff filters (' .. settings.buffs.filterMode .. '):')
 			for buffId, doFilter in pairs(model.buffFilters) do
 				if doFilter then
 					log(getBuffText(buffId))
 				end
 			end
+		elseif subCommand == 'mode' then
+			local ret = handleCommand(settings.buffs.filterMode, args[3], 'Filter mode', 'blacklist', 'blacklist', 'whitelist', 'whitelist')
+			settings.buffs.filterMode = ret
+			settings:save()
+			refreshFilteredBuffs()
 		end
 	elseif command == 'buffs' then
 		local playerName = args[2]
@@ -458,22 +454,33 @@ windower.register_event('addon command', function(...)
 	end
 end)
 
-function handleCommand(commandName, currentValue, argsValue, text)
+function handleCommandOnOff(currentValue, argsString, text)
+	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false)
+end
+
+function handleCommand(currentValue, argsString, text, option1String, option1Value, option2String, option2Value)
 	local setValue
 
-	if argsValue and string.lower(argsValue) == 'on' then
-		setValue = true
-	elseif argsValue and string.lower(argsValue) == 'off' then
-		setValue = false
+	if argsString and string.lower(argsString) == option1String then
+		setValue = option1Value
+	elseif argsString and string.lower(argsString) == option2String then
+		setValue = option2Value
+	elseif not argsString or argsString == '' then
+		if currentValue == option1Value then
+			setValue = option2Value
+		else
+			setValue = option1Value
+		end
 	else
-		setValue = not currentValue
+		log('Unknown parameter \'' .. argsString .. '\'')
+		return currentValue
 	end
 	
-	if setValue then
-		log(text .. ' is now ON.')
-	else
-		log(text .. ' is now OFF.')
+	local setString = option1String
+	if setValue == option2Value then
+		setString = option2String
 	end
+	log(text .. ' is now ' .. setString .. '.')
 	
 	return setValue
 end
@@ -484,10 +491,11 @@ function showHelp()
 	log('   add <ID> - adds filter for a buff (e.g. //xp filter add 123)')
 	log('   remove <ID> - removes filter for a buff')
 	log('   clear - removes all filters')
-	log('   list - show list of currently set filters')
-	log('buffs <name> - show list of currently active buffs and their IDs for a party member')
+	log('   list - shows list of currently set filters')
+	log('   mode blacklist | whitelist - switches between hiding and showing only filtered buffs (both use same filter list)')
+	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
 	log('range <distance> - shows a marker for each party member closer than the set distance (off or 0 to disable)')
-	log('customOrder on | off - enable/disable custom buff ordering (customize in bufforder.lua)')
-	log('hideSolo on | off - hide the party list while solo')
+	log('customOrder on | off - enables/disables custom buff ordering (customize in bufforder.lua)')
+	log('hideSolo on | off - hides the party list while solo')
 	log('move on | off - move the UI via drag and drop, mouse wheel to adjust space between party members')
 end

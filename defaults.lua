@@ -28,9 +28,11 @@
 
 local defaults = {}
 
+defaults.layout = 'auto' -- active UI layout, found in XivParty/layouts directory. use 'auto' for automatic resolution based selection
+
 defaults.posX = 50 -- x screen position of the party list
-defaults.posY = 450 -- y screen position of the party list
-defaults.rowSpacingY = 44 -- distance between party list rows
+defaults.posY = 400 -- y screen position of the party list
+defaults.spacingY = 4 -- distance between party list items
 
 defaults.hideSolo = false -- hides the party list when you are not in a party
 defaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off

@@ -35,15 +35,15 @@ function bar:init()
 	local obj = {}
 	setmetatable(obj, bar) -- make handle lookup
 	
-	obj.imgBg = utils:createImage(layout.bar.imgBgPath)
-	obj.imgFg = utils:createImage(layout.bar.imgFgPath)
+	obj.imgBg = img:init(windower.addon_path .. layout.bar.imgBgPath, layout.bar.imgBgWidth, layout.bar.imgBgHeight, layout.scale)
+	obj.imgFg = img:init(windower.addon_path .. layout.bar.imgFgPath, layout.bar.imgFgWidth, layout.bar.imgFgHeight, layout.scale)
 	
-	obj.value = nil
+	obj.value = 1
 	obj.exactValue = 1
 	
 	obj.size = {}
-	obj.size.width = layout.bar.imgBgWidth
-	obj.size.height = layout.bar.imgBgHeight
+	obj.size.width = obj.imgBg:scaledSize().width -- this assumes the BG is larger than the FG
+	obj.size.height = obj.imgBg:scaledSize().height
 	
 	return obj
 end
@@ -51,16 +51,17 @@ end
 function bar:dispose()
 	utils:log('Disposing bar', 1)
 
-	images.destroy(self.imgBg)
-	images.destroy(self.imgFg)
+	self.imgBg:dispose()
+	self.imgFg:dispose()
 
 	setmetatable(self, nil)
 end
 
 function bar:pos(x, y)
-	local fgOffsetX = (layout.bar.imgBgWidth - layout.bar.imgFgWidth) / 2
-	local fgOffsetY = (layout.bar.imgBgHeight - layout.bar.imgFgHeight) / 2
-
+	-- this centers the foreground image inside the background image, background assumed to be larger
+	local fgOffsetX = (layout.bar.imgBgWidth - layout.bar.imgFgWidth) / 2 * layout.scale
+    local fgOffsetY = (layout.bar.imgBgHeight - layout.bar.imgFgHeight) / 2 * layout.scale
+	
 	self.imgBg:pos(x, y)
 	self.imgFg:pos(x + fgOffsetX, y + fgOffsetY)
 end
@@ -68,13 +69,11 @@ end
 -- must be called every frame for a smooth animation
 function bar:update(targetValue)
 	if self.value ~= targetValue then
-		self.exactValue = self.exactValue + (targetValue - self.exactValue) * 0.1
+		self.exactValue = self.exactValue + (targetValue - self.exactValue) * layout.bar.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
 	
-		-- NOTE: image size changes before the image is shown seem to be ignored
 		self.imgFg:size(layout.bar.imgFgWidth * self.value, layout.bar.imgFgHeight)
-		--utils:log('target: ' .. targetValue .. ' value: ' .. self.value .. ' exact: ' .. self.exactValue)
 	end
 end
 
@@ -88,8 +87,8 @@ function bar:show()
 end
 
 function bar:hide()
-	self.imgBg:hide();
-	self.imgFg:hide();
+	self.imgBg:hide()
+	self.imgFg:hide()
 end
 
 return bar

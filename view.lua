@@ -44,8 +44,7 @@ function view:init()
 	utils:log('Initializing view')
 	bg:init()
 	
-	dragImage = utils:createImage()
-	dragImage:size(bg.size.width, bg.size.height)
+	dragImage = img:init('', bg.size.width, bg.size.height)
 	dragImage:alpha(0)
 	dragImage:show()
 	
@@ -62,7 +61,7 @@ function view:dispose()
 	isInitialized = false
 
 	bg:dispose()
-	images.destroy(dragImage)
+	dragImage:dispose()
 	
 	for item in listItems:it() do
 		item:dispose()
@@ -93,7 +92,9 @@ function view:pos(x, y)
 		local item = listItems[i]
 		
 		if item then
-			item:pos(x + 30, y + layout.bg.imgTopBottomHeight + i * settings.rowSpacingY)
+			item:pos(
+				x + layout.list.offsetX, 
+				y + layout.list.offsetY + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
 		end
 	end
 end
@@ -173,8 +174,8 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 		
 		-- mouse left click
 		elseif type == 1 then
-			if dragImage:hover(x, y) then
-				dragged = {image = dragImage, x = x - dragImage:pos_x(), y = y - dragImage:pos_y()}
+			if dragImage.image:hover(x, y) then
+				dragged = {image = dragImage.image, x = x - dragImage:pos().x, y = y - dragImage:pos().y}
 				return true
 			end
 		
@@ -185,7 +186,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 				settings.posY = view.posY
 				
 				utils:log('Saving position: ' .. view.posX .. ', ' .. view.posY)
-				config.save(settings)
+				settings:save()
 				
 				dragged = nil
 				return true
@@ -193,9 +194,9 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 		
 		-- mouse scroll
 		elseif type == 10 then
-			if dragImage:hover(x, y) then
-				settings.rowSpacingY = math.max(layout.rowSpacingYMin, settings.rowSpacingY + delta)
-				config.save(settings)
+			if dragImage.image:hover(x, y) then
+				settings.spacingY = math.max(0, settings.spacingY + delta)
+				settings:save()
 				
 				view:update(true) -- force a redraw
 			end

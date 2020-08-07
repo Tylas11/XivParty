@@ -28,18 +28,25 @@
 
 local layout = {}
 
-layout.rowSpacingYMin = 42
+layout.scale = 1 -- image scale factor. does not affect offsets, spacings or font sizes. intended for easier creation of multi resolution layouts
+
+layout.list = {}
+layout.list.itemHeight = 40 -- overall height of a party list item (top to bottom, including all texts, images). not affected by scale
+layout.list.offsetX = 30 -- distance between left edge of the background and party list items
+layout.list.offsetY = 0
 
 layout.bg = {}
-layout.bg.imgTopPath = windower.addon_path .. 'assets/BgTop.png'
-layout.bg.imgMidPath = windower.addon_path .. 'assets/BgMid.png'
-layout.bg.imgBottomPath = windower.addon_path .. 'assets/BgBottom.png'
+layout.bg.alpha = 255
+layout.bg.imgTopPath = 'assets/BgTop.png'
+layout.bg.imgMidPath = 'assets/BgMid.png' -- this texture is repeated vertically when the list resizes
+layout.bg.imgBottomPath = 'assets/BgBottom.png'
 layout.bg.imgWidth = 377 -- width of all background images in pixels
-layout.bg.imgTopBottomHeight = 21 -- height of the top and bottom bg image in pixels
+layout.bg.imgTopBottomHeight = 21 -- height of the top and bottom background image in pixels
+layout.bg.imgMidHeight = 12
 
 layout.bar = {}
-layout.bar.imgBgPath = windower.addon_path .. 'assets/BarBG.png'
-layout.bar.imgFgPath = windower.addon_path .. 'assets/BarFG.png'
+layout.bar.imgBgPath = 'assets/BarBG.png'
+layout.bar.imgFgPath = 'assets/BarFG.png'
 layout.bar.imgBgWidth = 107
 layout.bar.imgFgWidth = 103
 layout.bar.imgBgHeight = 10
@@ -47,28 +54,30 @@ layout.bar.imgFgHeight = 6
 layout.bar.offsetX = 0
 layout.bar.offsetY = 20
 layout.bar.spacingX = 24 -- distance between hp, mp and tp bars
+layout.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
 
 layout.range = {}
-layout.range.imgPath = windower.addon_path .. 'assets/RangeIndicator.png'
+layout.range.imgPath = 'assets/RangeIndicator.png'
 layout.range.imgWidth = 10
 layout.range.imgHeight = 10
 layout.range.offsetX = 0
 layout.range.offsetY = 30
 
 layout.cursor = {}
-layout.cursor.imgPath = windower.addon_path .. 'assets/Cursor.png'
+layout.cursor.imgPath = 'assets/Cursor.png'
 layout.cursor.imgWidth = 46 -- cursor is right aligned, this will be used to offset it to the left
 layout.cursor.imgHeight = 36
 layout.cursor.offsetX = 0
 layout.cursor.offsetY = 0
 
 layout.buffIcons = {}
-layout.buffIcons.path = windower.addon_path .. 'assets/buffIcons/'
+layout.buffIcons.path = 'assets/buffIcons/'
 layout.buffIcons.width = 20
 layout.buffIcons.height = 20
 layout.buffIcons.offsetX = 1
 layout.buffIcons.offsetY = 0
 layout.buffIcons.spacingX = 0
+layout.buffIcons.spacingY = 1 -- this is only used when buffs wrap around to a second row
 
 layout.text = {}
 layout.text.color = {}

@@ -53,12 +53,12 @@ function listitem:init()
 	obj.jobText = utils:createText(layout.text.job.font, layout.text.job.size)
 	obj.subJobText = utils:createText(layout.text.subJob.font, layout.text.subJob.size)
 	
-	obj.rangeInd = utils:createImage(layout.range.imgPath)
+	obj.rangeInd = img:init(windower.addon_path .. layout.range.imgPath, layout.range.imgWidth, layout.range.imgHeight, layout.scale)
 	obj.rangeInd:alpha(0)
 	obj.rangeInd:show()
 	obj.isInRange = false
 	
-	obj.cursor = utils:createImage(layout.cursor.imgPath)
+	obj.cursor = img:init(windower.addon_path .. layout.cursor.imgPath, layout.cursor.imgWidth, layout.cursor.imgHeight, layout.scale)
 	obj.cursor:alpha(0)
 	obj.cursor:show()
 	obj.isSelected = false
@@ -66,7 +66,7 @@ function listitem:init()
 	
 	obj.buffImages = {}
 	for i = 1, 32 do
-		obj.buffImages[i] = utils:createImage(nil, false)
+		obj.buffImages[i] = img:init('', layout.buffIcons.width, layout.buffIcons.height, layout.scale)
 		obj.buffImages[i]:alpha(0)
 		obj.buffImages[i]:show()
 	end
@@ -92,11 +92,11 @@ function listitem:dispose()
 	texts.destroy(self.jobText)
 	texts.destroy(self.subJobText)
 	
-	images.destroy(self.rangeInd)
-	images.destroy(self.cursor)
+	self.rangeInd:dispose()
+	self.cursor:dispose()
 	
 	for i = 1, 32 do
-		images.destroy(self.buffImages[i])
+		self.buffImages[i]:dispose()
 	end
 
 	setmetatable(self, nil)
@@ -111,14 +111,14 @@ function listitem:pos(x, y)
 	self.mpBar:pos(mpPosX, y + layout.bar.offsetY)
 	self.tpBar:pos(tpPosX, y + layout.bar.offsetY)
 
-	self.cursor:pos(hpPosX - layout.cursor.imgWidth + layout.cursor.offsetX, y + layout.cursor.offsetY)
+	self.cursor:pos(hpPosX - self.cursor:scaledSize().width + layout.cursor.offsetX, y + layout.cursor.offsetY)
 	
 	-- right aligned text coordinates start at the right side of the screen
 	local screenResX = windower.get_windower_settings().ui_x_res
 	
     self.hpText:pos(hpPosX - screenResX + self.hpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
-	self.mpText:pos(mpPosX - screenResX + self.hpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
-	self.tpText:pos(tpPosX - screenResX + self.hpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
+	self.mpText:pos(mpPosX - screenResX + self.mpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
+	self.tpText:pos(tpPosX - screenResX + self.tpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
 	
 	self.nameText:pos(hpPosX + layout.text.name.offsetX, y + layout.text.name.offsetY)
 	self.zoneText:pos(tpPosX + layout.text.zone.offsetX, y + layout.text.zone.offsetY)
@@ -129,11 +129,13 @@ function listitem:pos(x, y)
 	
 	for i = 1, 32 do
 		if i < 20 then -- wrap buffs to next line
-			self.buffImages[i]:pos(tpPosX + (i - 1) * (layout.buffIcons.width + layout.buffIcons.spacingX) + layout.buffIcons.offsetX, 
-			y + layout.buffIcons.offsetY)
+			self.buffImages[i]:pos(
+				tpPosX + (i - 1) * (self.buffImages[i]:scaledSize().width + layout.buffIcons.spacingX) + layout.buffIcons.offsetX, 
+				y + layout.buffIcons.offsetY)
 		else
-			self.buffImages[i]:pos(tpPosX + (i - 14) * (layout.buffIcons.width + layout.buffIcons.spacingX) + layout.buffIcons.offsetX, 
-			y + layout.buffIcons.offsetY + layout.buffIcons.height + 1)
+			self.buffImages[i]:pos(
+				tpPosX + (i - 14) * (self.buffImages[i]:scaledSize().width + layout.buffIcons.spacingX) + layout.buffIcons.offsetX, 
+				y + layout.buffIcons.offsetY + self.buffImages[i]:scaledSize().height + layout.buffIcons.spacingY)
 		end
 	end
 end
@@ -232,8 +234,7 @@ function listitem:updateBuffs(buffs)
 				image:path('')
 				image:alpha(0)
 			else
-				image:path(layout.buffIcons.path .. tostring(buff) .. '.png')
-				image:size(layout.buffIcons.width, layout.buffIcons.height)
+				image:path(windower.addon_path .. layout.buffIcons.path .. tostring(buff) .. '.png')
 				image:alpha(255)
 			end
 			

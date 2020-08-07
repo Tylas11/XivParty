@@ -36,23 +36,6 @@ local utils = {}
 -- 4 ... error
 utils.level = 3
 
-function utils:createImage(path, fit)
-	if fit == nil then
-		fit = true
-	end
-
-	local img = images.new()
-	
-	if path then
-		img:path(path)
-	end
-	
-    img:draggable(false)
-    img:fit(fit)
-	
-	return img
-end
-
 function utils:createText(font, size, right)
 	if right == nil then
 		right = false

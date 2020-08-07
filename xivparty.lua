@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.1.0.0'
+_addon.version = '1.1.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
@@ -37,12 +37,14 @@ images = require('images')
 packets = require('packets')
 res = require('resources')
 logger = require('logger')
+file = require('files')
 require('strings')
 
 local defaults = require('defaults')
+local layoutDefaults = require('layout')
 
-layout = require('layout')
 utils = require('utils')
+img = require('img')
 model = require('model')
 
 local bo = require('buffOrder')
@@ -56,11 +58,18 @@ local isInitialized = false
 local zoning = false
 local hidden = false
 
+-- constants
+
+local layoutAuto = 'auto'
+local layout1080 = '1080p'
+local layout1440 = '1440p'
+
 -- initialization / dispose / events
 
 windower.register_event('load', function()
     if windower.ffxi.get_info().logged_in then
         settings = config.load(defaults)
+		loadLayout(settings.layout)
 		isLoaded = true
     end
 end)
@@ -68,6 +77,7 @@ end)
 windower.register_event('login', function()
 	if not isLoaded then
 		settings = config.load(defaults)
+		loadLayout(settings.layout)
 		isLoaded = true
 	end
 end)
@@ -308,6 +318,21 @@ function isSolo()
 	return windower.ffxi.get_party().party1_leader == nil
 end
 
+function loadLayout(layoutName)
+	if layoutName == layoutAuto then
+		local resY = windower.get_windower_settings().ui_y_res
+		if resY <= 1080 then
+			layoutName = layout1080
+		else
+			layoutName = layout1440
+		end
+		
+		--print('Detected Y resolution ' .. tostring(resY) .. '. Loading layout \'' .. layoutName .. '\'.')
+	end
+
+	layout = config.load('layouts/' .. layoutName .. '.xml', layoutDefaults)
+end
+
 function loadFilters()
 	-- why use a custom CSV parser? because config.lua does not detect a list with a single element as a list >_>
 	if settings.buffs.filters ~= '' then
@@ -380,7 +405,7 @@ windower.register_event('addon command', function(...)
 		settings.buffs.customOrder = ret
 		settings:save()
 	elseif command == 'range' then
-		if (args[2]) then
+		if args[2] then
 			local range = string.lower(args[2])
 			if range == 'off' then
 				range = 0
@@ -449,6 +474,29 @@ windower.register_event('addon command', function(...)
 				log(getBuffText(buffs[i]))
 			end
 		end
+	elseif command == 'layout' then
+		if args[2] then
+			local isAuto = args[2] == layoutAuto
+			local filename = 'layouts/' .. args[2] .. '.xml'
+			
+			if isAuto or file.exists(filename) then
+				if isAuto then
+					log('Enabled automatic resolution based layout selection.')
+				else
+					log('Loading layout \'' .. args[2] .. '\'.')
+				end
+				
+				dispose()
+				loadLayout(args[2])
+				settings.layout = args[2]
+				settings:save()
+				init()
+			else
+				log('The layout file \'' .. filename .. '\' does not exist!')
+			end
+		else
+			showHelp()
+		end
 	else
 		showHelp()
 	end
@@ -492,10 +540,11 @@ function showHelp()
 	log('   remove <ID> - removes filter for a buff')
 	log('   clear - removes all filters')
 	log('   list - shows list of currently set filters')
-	log('   mode blacklist | whitelist - switches between hiding and showing only filtered buffs (both use same filter list)')
+	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
 	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
 	log('range <distance> - shows a marker for each party member closer than the set distance (off or 0 to disable)')
-	log('customOrder on | off - enables/disables custom buff ordering (customize in bufforder.lua)')
-	log('hideSolo on | off - hides the party list while solo')
-	log('move on | off - move the UI via drag and drop, mouse wheel to adjust space between party members')
+	log('customOrder - toggles custom buff ordering (customize in bufforder.lua)')
+	log('hideSolo - hides the party list while solo')
+	log('move - move the UI via drag and drop, mouse wheel to adjust space between party members')
+	log('layout <file> - loads a UI layout file. Use \'auto\' to enable resolution based selection.')
 end

@@ -29,17 +29,20 @@
 local bar = {}
 bar.__index = bar
 
-function bar:init()
+function bar:init(barInfo)
 	utils:log('Initializing bar', 1)
 
 	local obj = {}
 	setmetatable(obj, bar) -- make handle lookup
 	
-	obj.imgBg = img:init(windower.addon_path .. layout.bar.imgBgPath, layout.bar.imgBgWidth, layout.bar.imgBgHeight, layout.scale)
-	obj.imgFg = img:init(windower.addon_path .. layout.bar.imgFgPath, layout.bar.imgFgWidth, layout.bar.imgFgHeight, layout.scale)
+	obj.imgBg = utils:createImage(barInfo.imgBg, layout.scale)
+	obj.imgFg = utils:createImage(barInfo.imgFg, layout.scale)
 	
 	obj.value = 1
 	obj.exactValue = 1
+	
+	obj.sizeBg = utils:coord(barInfo.imgBg.size)
+	obj.sizeFg = utils:coord(barInfo.imgFg.size)
 	
 	obj.size = {}
 	obj.size.width = obj.imgBg:scaledSize().width -- this assumes the BG is larger than the FG
@@ -59,8 +62,8 @@ end
 
 function bar:pos(x, y)
 	-- this centers the foreground image inside the background image, background assumed to be larger
-	local fgOffsetX = (layout.bar.imgBgWidth - layout.bar.imgFgWidth) / 2 * layout.scale
-    local fgOffsetY = (layout.bar.imgBgHeight - layout.bar.imgFgHeight) / 2 * layout.scale
+	local fgOffsetX = (self.sizeBg.x - self.sizeFg.x) / 2 * layout.scale
+    local fgOffsetY = (self.sizeBg.y - self.sizeFg.y) / 2 * layout.scale
 	
 	self.imgBg:pos(x, y)
 	self.imgFg:pos(x + fgOffsetX, y + fgOffsetY)
@@ -73,12 +76,12 @@ function bar:update(targetValue)
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
 	
-		self.imgFg:size(layout.bar.imgFgWidth * self.value, layout.bar.imgFgHeight)
+		self.imgFg:size(self.sizeFg.x * self.value, self.sizeFg.y)
 	end
 end
 
-function bar:alpha(alpha)
-	self.imgFg:alpha(alpha)
+function bar:opacity(o)
+	self.imgFg:opacity(o)
 end
 
 function bar:show()

@@ -39,35 +39,51 @@ function listitem:init()
 	
 	obj.hidden = false
 	
-	obj.hpBar = bar:init()
-	obj.mpBar = bar:init()
-	obj.tpBar = bar:init()
+	obj.hpBar = bar:init(layout.bar.hp)
+	obj.mpBar = bar:init(layout.bar.mp)
+	obj.tpBar = bar:init(layout.bar.tp)
 	
-	obj.hpText = utils:createText(layout.text.numbers.font, layout.text.numbers.size, true)
-	obj.mpText = utils:createText(layout.text.numbers.font, layout.text.numbers.size, true)
-	obj.tpText = utils:createText(layout.text.numbers.font, layout.text.numbers.size, true)
+	obj.hpText = utils:createText(layout.text.numbers, true)
+	obj.mpText = utils:createText(layout.text.numbers, true)
+	obj.tpText = utils:createText(layout.text.numbers, true)
 	
-	obj.nameText = utils:createText(layout.text.name.font, layout.text.name.size)
-	obj.zoneText = utils:createText(layout.text.zone.font, layout.text.zone.size)
+	obj.nameText = utils:createText(layout.text.name)
+	obj.zoneText = utils:createText(layout.text.zone)
 	
-	obj.jobText = utils:createText(layout.text.job.font, layout.text.job.size)
-	obj.subJobText = utils:createText(layout.text.subJob.font, layout.text.subJob.size)
+	obj.jobText = utils:createText(layout.text.job)
+	obj.subJobText = utils:createText(layout.text.subJob)
 	
-	obj.rangeInd = img:init(windower.addon_path .. layout.range.imgPath, layout.range.imgWidth, layout.range.imgHeight, layout.scale)
-	obj.rangeInd:alpha(0)
+	obj.rangeInd = utils:createImage(layout.range.img, layout.scale)
+	obj.rangeInd:opacity(0)
 	obj.rangeInd:show()
 	obj.isInRange = false
 	
-	obj.cursor = img:init(windower.addon_path .. layout.cursor.imgPath, layout.cursor.imgWidth, layout.cursor.imgHeight, layout.scale)
-	obj.cursor:alpha(0)
+	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
+	obj.cursor:opacity(0)
 	obj.cursor:show()
 	obj.isSelected = false
 	obj.isSubTarget = false
 	
+	obj.numbersColor = utils:colorFromHex(layout.text.numbers.color)
+	obj.tpFullColor = utils:colorFromHex(layout.text.tpFullColor)
+	
+	obj.barOffset = utils:coord(layout.bar.offset)
+	obj.rangeOffset = utils:coord(layout.range.offset)
+	obj.cursorOffset = utils:coord(layout.cursor.offset)
+	obj.buffOffset = utils:coord(layout.buffIcons.offset)
+	obj.buffSpacing = utils:coord(layout.buffIcons.spacing)
+	obj.buffSize = utils:coord(layout.buffIcons.size)
+	
+	obj.numbersOffset = utils:coord(layout.text.numbers.offset)
+	obj.nameOffset = utils:coord(layout.text.name.offset)
+	obj.zoneOffset = utils:coord(layout.text.zone.offset)
+	obj.jobOffset = utils:coord(layout.text.job.offset)
+	obj.subJobOffset = utils:coord(layout.text.subJob.offset)
+	
 	obj.buffImages = {}
 	for i = 1, 32 do
-		obj.buffImages[i] = img:init('', layout.buffIcons.width, layout.buffIcons.height, layout.scale)
-		obj.buffImages[i]:alpha(0)
+		obj.buffImages[i] = img:init('', obj.buffSize.x, obj.buffSize.y, layout.scale)
+		obj.buffImages[i]:opacity(0)
 		obj.buffImages[i]:show()
 	end
 	obj.currentBuffs = {}
@@ -103,39 +119,39 @@ function listitem:dispose()
 end
 
 function listitem:pos(x, y)
-	local hpPosX = x + layout.bar.offsetX
+	local hpPosX = x + self.barOffset.x
 	local mpPosX = hpPosX + self.hpBar.size.width + layout.bar.spacingX
 	local tpPosX = mpPosX + self.mpBar.size.width + layout.bar.spacingX
 	
-	self.hpBar:pos(hpPosX, y + layout.bar.offsetY)
-	self.mpBar:pos(mpPosX, y + layout.bar.offsetY)
-	self.tpBar:pos(tpPosX, y + layout.bar.offsetY)
+	self.hpBar:pos(hpPosX, y + self.barOffset.y)
+	self.mpBar:pos(mpPosX, y + self.barOffset.y)
+	self.tpBar:pos(tpPosX, y + self.barOffset.y)
 
-	self.cursor:pos(hpPosX - self.cursor:scaledSize().width + layout.cursor.offsetX, y + layout.cursor.offsetY)
+	self.cursor:pos(hpPosX - self.cursor:scaledSize().width + self.cursorOffset.x, y + self.cursorOffset.y)
 	
 	-- right aligned text coordinates start at the right side of the screen
 	local screenResX = windower.get_windower_settings().ui_x_res
 	
-    self.hpText:pos(hpPosX - screenResX + self.hpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
-	self.mpText:pos(mpPosX - screenResX + self.mpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
-	self.tpText:pos(tpPosX - screenResX + self.tpBar.size.width + layout.text.numbers.offsetX, y + layout.text.numbers.offsetY)
+    self.hpText:pos(hpPosX - screenResX + self.hpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
+	self.mpText:pos(mpPosX - screenResX + self.mpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
+	self.tpText:pos(tpPosX - screenResX + self.tpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
 	
-	self.nameText:pos(hpPosX + layout.text.name.offsetX, y + layout.text.name.offsetY)
-	self.zoneText:pos(tpPosX + layout.text.zone.offsetX, y + layout.text.zone.offsetY)
-	self.jobText:pos(hpPosX + layout.text.job.offsetX, y + layout.text.job.offsetY)
-	self.subJobText:pos(hpPosX + layout.text.subJob.offsetX, y + layout.text.subJob.offsetY)
+	self.nameText:pos(hpPosX + self.nameOffset.x, y + self.nameOffset.y)
+	self.zoneText:pos(tpPosX + self.zoneOffset.x, y + self.zoneOffset.y)
+	self.jobText:pos(hpPosX + self.jobOffset.x, y + self.jobOffset.y)
+	self.subJobText:pos(hpPosX + self.subJobOffset.x, y + self.subJobOffset.y)
 	
-	self.rangeInd:pos(hpPosX + layout.range.offsetX, y + layout.range.offsetY)
+	self.rangeInd:pos(hpPosX + self.rangeOffset.x, y + self.rangeOffset.y)
 	
 	for i = 1, 32 do
 		if i < 20 then -- wrap buffs to next line
 			self.buffImages[i]:pos(
-				tpPosX + (i - 1) * (self.buffImages[i]:scaledSize().width + layout.buffIcons.spacingX) + layout.buffIcons.offsetX, 
-				y + layout.buffIcons.offsetY)
+				tpPosX + (i - 1) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
+				y + self.buffOffset.y)
 		else
 			self.buffImages[i]:pos(
-				tpPosX + (i - 14) * (self.buffImages[i]:scaledSize().width + layout.buffIcons.spacingX) + layout.buffIcons.offsetX, 
-				y + layout.buffIcons.offsetY + self.buffImages[i]:scaledSize().height + layout.buffIcons.spacingY)
+				tpPosX + (i - 14) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
+				y + self.buffOffset.y + self.buffImages[i]:scaledSize().height + self.buffSpacing.y)
 		end
 	end
 end
@@ -178,21 +194,25 @@ function listitem:updateBarAndText(bar, text, val, valPercent, distance, isTp)
 		text:text(tostring(val))
 	end
 	
-	if isTp and val >= 1000 then
-		text:color(layout.text.fullTpColor.red, layout.text.fullTpColor.green, layout.text.fullTpColor.blue)
-		text:alpha(layout.text.fullTpColor.alpha)
-	else
-		text:color(layout.text.color.red, layout.text.color.green, layout.text.color.blue)
-		text:alpha(layout.text.color.alpha)
+	if isTp then
+		local color
+		if val >= 1000 then
+			color = self.tpFullColor
+		else
+			color = self.numbersColor
+		end
+		
+		text:color(color.r, color.g, color.b)
+		text:alpha(color.a)
 	end
 	
 	-- distance indication
 	if distance:sqrt() > 50 then -- cannot target, over 50 distance, mob table not set
-		bar:alpha(64)
+		bar:opacity(0.25)
 	elseif distance:sqrt() > 20.79 then -- out of heal range
-		bar:alpha(128)
+		bar:opacity(0.5)
 	else
-		bar:alpha(255)
+		bar:opacity(1)
 	end
 end
 
@@ -207,19 +227,19 @@ end
 
 function listitem:updateRange()
 	if self.isInRange then
-		self.rangeInd:alpha(255)
+		self.rangeInd:opacity(1)
 	else
-		self.rangeInd:alpha(0)
+		self.rangeInd:opacity(0)
 	end
 end
 
 function listitem:updateCursor()
 	if self.isSelected then
-		self.cursor:alpha(255)
+		self.cursor:opacity(1)
 	elseif self.isSubTarget then
-		self.cursor:alpha(128)
+		self.cursor:opacity(0.5)
 	else
-		self.cursor:alpha(0)
+		self.cursor:opacity(0)
 	end
 end
 
@@ -232,10 +252,10 @@ function listitem:updateBuffs(buffs)
 		if current ~= buff then -- only update if actually changed
 			if not buff or buff == 1000 or buff == 255 then
 				image:path('')
-				image:alpha(0)
+				image:opacity(0)
 			else
 				image:path(windower.addon_path .. layout.buffIcons.path .. tostring(buff) .. '.png')
-				image:alpha(255)
+				image:opacity(1)
 			end
 			
 			self.currentBuffs[i] = buff

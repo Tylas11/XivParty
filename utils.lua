@@ -36,7 +36,22 @@ local utils = {}
 -- 4 ... error
 utils.level = 3
 
-function utils:createText(font, size, right)
+function utils:createImage(imageInfo, scaleX, scaleY)
+	if not scaleY then
+		scaleY = scaleX
+	end
+	
+	local size = utils:coord(imageInfo.size)
+	local image = img:init(windower.addon_path .. imageInfo.path, size.x, size.y, scaleX, scaleY)
+	
+	local color = utils:colorFromHex(imageInfo.color)
+	image:color(color.r, color.g, color.b)
+	image:alpha(color.a)
+	
+	return image
+end
+
+function utils:createText(textInfo, right)
 	if right == nil then
 		right = false
 	end
@@ -50,16 +65,55 @@ function utils:createText(font, size, right)
 	
 	local text = texts.new(textSettings)
 	
-	text:font(font, 'Arial') -- Arial is the fallback font
-	text:size(size)
+	text:font(textInfo.font, 'Arial') -- Arial is the fallback font
+	text:size(textInfo.size)
 	text:bg_visible(false)
-	text:color(layout.text.color.red, layout.text.color.green, layout.text.color.blue)
-	text:alpha(layout.text.color.alpha)
-	text:stroke_color(layout.text.stroke.red, layout.text.stroke.green, layout.text.stroke.blue)
-    text:stroke_alpha(layout.text.stroke.alpha)
-    text:stroke_width(layout.text.stroke.width)
+	
+	local color = utils:colorFromHex(textInfo.color)
+	local stroke = utils:colorFromHex(textInfo.stroke)
+	
+	text:color(color.r, color.g, color.b)
+	text:alpha(color.a)
+	text:stroke_color(stroke.r, stroke.g, stroke.b)
+    text:stroke_alpha(stroke.a)
+    text:stroke_width(textInfo.strokeWidth)
 	
 	return text
+end
+
+function utils:colorFromHex(hexString)
+	local length = string.length(hexString)
+
+	if not string.startswith(hexString, '#') or length < 7 or length > 9 then
+		utils:log('Invalid hexadecimal color code. Expected format #RRGGBB or #RRGGBBAA', 4)
+		return nil
+	end
+	
+	local color = {}
+	color.r = tonumber(string.slice(hexString, 2, 3), 16)
+	color.g = tonumber(string.slice(hexString, 4, 5), 16)
+	color.b = tonumber(string.slice(hexString, 6, 7), 16)
+	if length > 7 then
+		color.a = tonumber(string.slice(hexString, 8, 9), 16)
+	else
+		color.a = 255
+	end
+	
+	return color
+end
+
+function utils:coord(coordList)
+	local coord = {}
+	
+	if coordList then
+		coord.x = coordList[1]
+		coord.y = coordList[2]
+	end
+	
+	if not coord.x then coord.x = 0 end
+	if not coord.y then coord.y = 0 end
+	
+	return coord
 end
 
 function utils:round(num, numDecimalPlaces)

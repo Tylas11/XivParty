@@ -40,24 +40,21 @@ function bg:init()
 	bg.size.height = 0
 	bg.posX = 0
 	bg.posY = 0
+	bg.sizeMid = utils:coord(layout.bg.imgMid.size)
 	
-	if not isDebug then
-		bg.top = img:init(windower.addon_path .. layout.bg.imgTopPath, layout.bg.imgWidth, layout.bg.imgTopBottomHeight, layout.scale)
-		bg.mid = img:init(windower.addon_path .. layout.bg.imgMidPath, layout.bg.imgWidth, bg.contentHeight, layout.scale)
-		bg.bottom = img:init(windower.addon_path .. layout.bg.imgBottomPath, layout.bg.imgWidth, layout.bg.imgTopBottomHeight, layout.scale)
-	else -- debug background
-		bg.top = img:init('', layout.bg.imgWidth, layout.bg.imgTopBottomHeight, layout.scale)
-		bg.mid = img:init('', layout.bg.imgWidth, bg.contentHeight, layout.scale)
-		bg.bottom = img:init('', layout.bg.imgWidth, layout.bg.imgTopBottomHeight, layout.scale)
+	bg.top = utils:createImage(layout.bg.imgTop, layout.scale)
+	bg.mid = utils:createImage(layout.bg.imgMid, layout.scale)
+	bg.bottom = utils:createImage(layout.bg.imgBottom, layout.scale)
 		
-		bg.top.image:color(255,0,0)
-		bg.mid.image:color(0,255,0)
-		bg.bottom.image:color(0,0,255)
+	if isDebug then -- debug background
+		bg.top:path('')
+		bg.mid:path('')
+		bg.bottom:path('')
+		
+		bg.top:color(255,0,0)
+		bg.mid:color(0,255,0)
+		bg.bottom:color(0,0,255)
 	end
-	
-	bg.top:alpha(layout.bg.alpha)
-	bg.mid:alpha(layout.bg.alpha)
-	bg.bottom:alpha(layout.bg.alpha)
 	
 	isInitialized = true
 end
@@ -81,11 +78,11 @@ function bg:pos(x, y)
 end
 
 function bg:resize(rowCount)
-	utils:log('BG setting row count: ' .. rowCount)
+	utils:log('BG setting row count: ' .. rowCount, 1)
 
 	self.contentHeight = rowCount * (layout.list.itemHeight + settings.spacingY) / layout.scale
-	self.mid:size(layout.bg.imgWidth, self.contentHeight)
-	self.mid.image:repeat_xy(1, self.contentHeight / layout.bg.imgMidHeight)
+	self.mid:size(self.sizeMid.x, self.contentHeight)
+	self.mid.image:repeat_xy(1, self.contentHeight / self.sizeMid.y)
 	self:pos(self.posX, self.posY) -- refresh position of bottom tile
 	
 	-- visible size of the whole background area

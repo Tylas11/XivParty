@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.1.0'
+_addon.version = '1.2.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')

@@ -51,6 +51,8 @@ function img:init(path, width, height, scaleX, scaleY)
 
 	-- private data fields, do not change from outside the class!
 	obj.data = {}
+	obj.data.alpha = 255
+	obj.data.opacity = 1.0
 	obj.data.pos = {}
 	obj.data.pos.x = 0
 	obj.data.pos.y = 0
@@ -137,12 +139,31 @@ function img:scale(sx, sy)
 	self.image:size(self.data.scaledSize.width, self.data.scaledSize.height)
 end
 
-function img:alpha(a)
-	if not a then
-		return self.image:alpha()
+function img:color(r,g,b)
+	if not r then
+		return self.image:color()
 	end
 	
-	self.image:alpha(a)
+	self.image:color(r,g,b)
+end
+
+function img:alpha(a)
+	if not a then
+		return self.data.alpha
+	end
+	
+	self.data.alpha = a
+	self.image:alpha(self.data.alpha * self.data.opacity)
+end
+
+-- an additional alpha value, because image alphas are now customizable via layouts. type double 0.0 .. 1.0
+function img:opacity(o)
+	if not o then
+		return self.data.opacity
+	end
+	
+	self.data.opacity = o
+	self.image:alpha(self.data.alpha * self.data.opacity)
 end
 
 function img:show()

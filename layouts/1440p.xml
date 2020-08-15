@@ -3,103 +3,130 @@
     <global>
         <bar>
             <animSpeed>0.1</animSpeed>
-            <imgBgHeight>10</imgBgHeight>
-            <imgBgPath>assets/BarBG.png</imgBgPath>
-            <imgBgWidth>107</imgBgWidth>
-            <imgFgHeight>6</imgFgHeight>
-            <imgFgPath>assets/BarFG.png</imgFgPath>
-            <imgFgWidth>103</imgFgWidth>
-            <offsetX>0</offsetX>
-            <offsetY>20</offsetY>
+            <hp>
+                <imgBg>
+                    <color>#FFFFFFFF</color>
+                    <path>assets/BarBG.png</path>
+                    <size>107,10</size>
+                </imgBg>
+                <imgFg>
+                    <color>#FFFFFFFF</color>
+                    <path>assets/BarFG.png</path>
+                    <size>103,6</size>
+                </imgFg>
+            </hp>
+            <mp>
+                <imgBg>
+                    <color>#FFFFFFFF</color>
+                    <path>assets/BarBG.png</path>
+                    <size>107,10</size>
+                </imgBg>
+                <imgFg>
+                    <color>#FFFFFFFF</color>
+                    <path>assets/BarFG.png</path>
+                    <size>103,6</size>
+                </imgFg>
+            </mp>
+            <offset>0,20</offset>
             <spacingX>24</spacingX>
+            <tp>
+                <imgBg>
+                    <color>#FFFFFFFF</color>
+                    <path>assets/BarBG.png</path>
+                    <size>107,10</size>
+                </imgBg>
+                <imgFg>
+                    <color>#FFFFFFFF</color>
+                    <path>assets/BarFG.png</path>
+                    <size>103,6</size>
+                </imgFg>
+            </tp>
         </bar>
         <bg>
-            <alpha>255</alpha>
-            <imgBottomPath>assets/BgBottom.png</imgBottomPath>
-            <imgMidHeight>12</imgMidHeight>
-            <imgMidPath>assets/BgMid.png</imgMidPath>
-            <imgTopBottomHeight>21</imgTopBottomHeight>
-            <imgTopPath>assets/BgTop.png</imgTopPath>
-            <imgWidth>377</imgWidth>
+            <imgBottom>
+                <color>#FFFFFFFF</color>
+                <path>assets/BgBottom.png</path>
+                <size>377,21</size>
+            </imgBottom>
+            <imgMid>
+                <color>#FFFFFFFF</color>
+                <path>assets/BgMid.png</path>
+                <size>377,12</size>
+            </imgMid>
+            <imgTop>
+                <color>#FFFFFFFF</color>
+                <path>assets/BgTop.png</path>
+                <size>377,21</size>
+            </imgTop>
         </bg>
         <buffIcons>
-            <height>20</height>
-            <offsetX>1</offsetX>
-            <offsetY>0</offsetY>
+            <offset>1,0</offset>
             <path>assets/buffIcons/</path>
-            <spacingX>0</spacingX>
-            <spacingY>1</spacingY>
-            <width>20</width>
+            <size>20,20</size>
+            <spacing>0,1</spacing>
         </buffIcons>
         <cursor>
-            <imgHeight>36</imgHeight>
-            <imgPath>assets/Cursor.png</imgPath>
-            <imgWidth>46</imgWidth>
-            <offsetX>0</offsetX>
-            <offsetY>0</offsetY>
+            <img>
+                <color>#FFFFFFFF</color>
+                <path>assets/Cursor.png</path>
+                <size>46,36</size>
+            </img>
+            <offset>0,0</offset>
         </cursor>
         <list>
             <itemHeight>42</itemHeight>
-            <offsetX>30</offsetX>
-            <offsetY>0</offsetY>
+            <offset>30,0</offset>
         </list>
         <range>
-            <imgHeight>10</imgHeight>
-            <imgPath>assets/RangeIndicator.png</imgPath>
-            <imgWidth>10</imgWidth>
-            <offsetX>0</offsetX>
-            <offsetY>30</offsetY>
+            <img>
+                <color>#FFFFFFFF</color>
+                <path>assets/RangeIndicator.png</path>
+                <size>10,10</size>
+            </img>
+            <offset>0,30</offset>
         </range>
         <scale>1</scale>
         <text>
-            <color>
-                <alpha>255</alpha>
-                <blue>255</blue>
-                <green>255</green>
-                <red>240</red>
-            </color>
-            <fullTpColor>
-                <alpha>255</alpha>
-                <blue>250</blue>
-                <green>180</green>
-                <red>80</red>
-            </fullTpColor>
             <job>
+                <color>#F0FFFFFF</color>
                 <font>Arial</font>
-                <offsetX>0</offsetX>
-                <offsetY>0</offsetY>
+                <offset>0,0</offset>
                 <size>8</size>
+                <stroke>#062D54C8</stroke>
+                <strokeWidth>1</strokeWidth>
             </job>
             <name>
-                <font>Meiryo</font>
-                <offsetX>65</offsetX>
-                <offsetY>-1</offsetY>
-                <size>14</size>
+                <color>#F0FFFFFF</color>
+                <font>Arial</font>
+                <offset>65,1</offset>
+                <size>15</size>
+                <stroke>#062D54C8</stroke>
+                <strokeWidth>2</strokeWidth>
             </name>
             <numbers>
+                <color>#F0FFFFFF</color>
                 <font>Grammara</font>
-                <offsetX>2</offsetX>
-                <offsetY>28</offsetY>
+                <offset>2,28</offset>
                 <size>11</size>
+                <stroke>#062D54C8</stroke>
+                <strokeWidth>2</strokeWidth>
             </numbers>
-            <stroke>
-                <alpha>200</alpha>
-                <blue>84</blue>
-                <green>45</green>
-                <red>6</red>
-                <width>2</width>
-            </stroke>
             <subJob>
+                <color>#F0FFFFFF</color>
                 <font>Arial</font>
-                <offsetX>9</offsetX>
-                <offsetY>9</offsetY>
+                <offset>9,9</offset>
                 <size>8</size>
+                <stroke>#062D54C8</stroke>
+                <strokeWidth>1</strokeWidth>
             </subJob>
+            <tpFullColor>#50B4FAFF</tpFullColor>
             <zone>
-                <font>Meiryo</font>
-                <offsetX>0</offsetX>
-                <offsetY>-1</offsetY>
-                <size>12</size>
+                <color>#F0FFFFFF</color>
+                <font>Arial</font>
+                <offset>0,1</offset>
+                <size>13</size>
+                <stroke>#062D54C8</stroke>
+                <strokeWidth>2</strokeWidth>
             </zone>
         </text>
     </global>

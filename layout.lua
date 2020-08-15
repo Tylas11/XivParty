@@ -32,101 +32,120 @@ layout.scale = 1 -- image scale factor. does not affect offsets, spacings or fon
 
 layout.list = {}
 layout.list.itemHeight = 40 -- overall height of a party list item (top to bottom, including all texts, images). not affected by scale
-layout.list.offsetX = 30 -- distance between left edge of the background and party list items
-layout.list.offsetY = 0
+layout.list.offset = L{ 30, 0 } -- distance between edge of the mid background part and party list items
 
 layout.bg = {}
-layout.bg.alpha = 255
-layout.bg.imgTopPath = 'assets/BgTop.png'
-layout.bg.imgMidPath = 'assets/BgMid.png' -- this texture is repeated vertically when the list resizes
-layout.bg.imgBottomPath = 'assets/BgBottom.png'
-layout.bg.imgWidth = 377 -- width of all background images in pixels
-layout.bg.imgTopBottomHeight = 21 -- height of the top and bottom background image in pixels
-layout.bg.imgMidHeight = 12
+layout.bg.imgTop = {}
+layout.bg.imgTop.path = 'assets/BgTop.png'
+layout.bg.imgTop.size = L{ 377, 21 }
+layout.bg.imgTop.color = '#FFFFFFFF'
+
+layout.bg.imgMid = {}
+layout.bg.imgMid.path = 'assets/BgMid.png' -- this texture is repeated vertically when the list resizes
+layout.bg.imgMid.size = L{ 377, 12 }
+layout.bg.imgMid.color = '#FFFFFFFF'
+
+layout.bg.imgBottom = {}
+layout.bg.imgBottom.path = 'assets/BgBottom.png'
+layout.bg.imgBottom.size = L{ 377, 21 }
+layout.bg.imgBottom.color = '#FFFFFFFF'
 
 layout.bar = {}
-layout.bar.imgBgPath = 'assets/BarBG.png'
-layout.bar.imgFgPath = 'assets/BarFG.png'
-layout.bar.imgBgWidth = 107
-layout.bar.imgFgWidth = 103
-layout.bar.imgBgHeight = 10
-layout.bar.imgFgHeight = 6
-layout.bar.offsetX = 0
-layout.bar.offsetY = 20
+layout.bar.offset = L{ 0, 20 }
 layout.bar.spacingX = 24 -- distance between hp, mp and tp bars
 layout.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
 
+layout.bar.hp = {}
+layout.bar.hp.imgBg = {}
+layout.bar.hp.imgBg.path = 'assets/BarBG.png'
+layout.bar.hp.imgBg.size = L{ 107, 10 }
+layout.bar.hp.imgBg.color = '#FFFFFFFF'
+layout.bar.hp.imgFg = {}
+layout.bar.hp.imgFg.path = 'assets/BarFG.png'
+layout.bar.hp.imgFg.size = L{ 103, 6 }
+layout.bar.hp.imgFg.color = '#FFFFFFFF'
+
+layout.bar.mp = {}
+layout.bar.mp.imgBg = {}
+layout.bar.mp.imgBg.path = 'assets/BarBG.png'
+layout.bar.mp.imgBg.size = L{ 107, 10 }
+layout.bar.mp.imgBg.color = '#FFFFFFFF'
+layout.bar.mp.imgFg = {}
+layout.bar.mp.imgFg.path = 'assets/BarFG.png'
+layout.bar.mp.imgFg.size = L{ 103, 6 }
+layout.bar.mp.imgFg.color = '#FFFFFFFF'
+
+layout.bar.tp = {}
+layout.bar.tp.imgBg = {}
+layout.bar.tp.imgBg.path = 'assets/BarBG.png'
+layout.bar.tp.imgBg.size = L{ 107, 10 }
+layout.bar.tp.imgBg.color = '#FFFFFFFF'
+layout.bar.tp.imgFg = {}
+layout.bar.tp.imgFg.path = 'assets/BarFG.png'
+layout.bar.tp.imgFg.size = L{ 103, 6 }
+layout.bar.tp.imgFg.color = '#FFFFFFFF'
+
 layout.range = {}
-layout.range.imgPath = 'assets/RangeIndicator.png'
-layout.range.imgWidth = 10
-layout.range.imgHeight = 10
-layout.range.offsetX = 0
-layout.range.offsetY = 30
+layout.range.offset = L{ 0, 30 }
+layout.range.img = {}
+layout.range.img.path = 'assets/RangeIndicator.png'
+layout.range.img.size = L{ 10, 10 }
+layout.range.img.color = '#FFFFFFFF'
 
 layout.cursor = {}
-layout.cursor.imgPath = 'assets/Cursor.png'
-layout.cursor.imgWidth = 46 -- cursor is right aligned, this will be used to offset it to the left
-layout.cursor.imgHeight = 36
-layout.cursor.offsetX = 0
-layout.cursor.offsetY = 0
+layout.cursor.offset = L{ 0, 0 }
+layout.cursor.img = {}
+layout.cursor.img.path = 'assets/Cursor.png'
+layout.cursor.img.size = L{ 46, 36 } -- cursor is right aligned, this will be used to offset it to the left
+layout.cursor.img.color = '#FFFFFFFF'
 
 layout.buffIcons = {}
 layout.buffIcons.path = 'assets/buffIcons/'
-layout.buffIcons.width = 20
-layout.buffIcons.height = 20
-layout.buffIcons.offsetX = 1
-layout.buffIcons.offsetY = 0
-layout.buffIcons.spacingX = 0
-layout.buffIcons.spacingY = 1 -- this is only used when buffs wrap around to a second row
+layout.buffIcons.size = L{ 20, 20 }
+layout.buffIcons.offset = L{ 1, 0 }
+layout.buffIcons.spacing = L{ 0, 1 } -- Y coordinate is only used when buffs wrap around to a second row
 
 layout.text = {}
-layout.text.color = {}
-layout.text.color.alpha = 255
-layout.text.color.red = 240
-layout.text.color.green = 255
-layout.text.color.blue = 255
-
-layout.text.stroke = {}
-layout.text.stroke.width = 2
-layout.text.stroke.alpha = 200
-layout.text.stroke.red = 6
-layout.text.stroke.green = 45
-layout.text.stroke.blue = 84
-
-layout.text.fullTpColor = {}
-layout.text.fullTpColor.alpha = 255
-layout.text.fullTpColor.red = 80
-layout.text.fullTpColor.green = 180
-layout.text.fullTpColor.blue = 250
+layout.text.tpFullColor = '#50B4FAFF'
 
 layout.text.numbers = {}
 layout.text.numbers.font = 'Grammara'
 layout.text.numbers.size = 11
-layout.text.numbers.offsetX = 2
-layout.text.numbers.offsetY = 28
+layout.text.numbers.color = '#F0FFFFFF'
+layout.text.numbers.stroke = '#062D54C8'
+layout.text.numbers.strokeWidth = 2
+layout.text.numbers.offset = L{ 2, 28 }
 
 layout.text.name = {}
-layout.text.name.font = 'Meiryo'
-layout.text.name.size = 14
-layout.text.name.offsetX = 65
-layout.text.name.offsetY = -1
+layout.text.name.font = 'Arial'
+layout.text.name.size = 15
+layout.text.name.color = '#F0FFFFFF'
+layout.text.name.stroke = '#062D54C8'
+layout.text.name.strokeWidth = 2
+layout.text.name.offset = L{ 65, 1 }
 
 layout.text.zone = {}
-layout.text.zone.font = 'Meiryo'
-layout.text.zone.size = 12
-layout.text.zone.offsetX = 0
-layout.text.zone.offsetY = -1
+layout.text.zone.font = 'Arial'
+layout.text.zone.size = 13
+layout.text.zone.color = '#F0FFFFFF'
+layout.text.zone.stroke = '#062D54C8'
+layout.text.zone.strokeWidth = 2
+layout.text.zone.offset = L{ 0, 1 }
 
 layout.text.job = {}
 layout.text.job.font = 'Arial'
 layout.text.job.size = 8
-layout.text.job.offsetX = 0
-layout.text.job.offsetY = 0
+layout.text.job.color = '#F0FFFFFF'
+layout.text.job.stroke = '#062D54C8'
+layout.text.job.strokeWidth = 2
+layout.text.job.offset = L{ 0, 0 }
 
 layout.text.subJob = {}
 layout.text.subJob.font = 'Arial'
 layout.text.subJob.size = 8
-layout.text.subJob.offsetX = 9
-layout.text.subJob.offsetY = 9
+layout.text.subJob.color = '#F0FFFFFF'
+layout.text.subJob.stroke = '#062D54C8'
+layout.text.subJob.strokeWidth = 2
+layout.text.subJob.offset = L{ 9, 9 }
 
 return layout

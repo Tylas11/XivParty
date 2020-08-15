@@ -50,6 +50,7 @@ function view:init()
 	
 	self.posX = 0
 	self.posY = 0
+	self.listOffset = utils:coord(layout.list.offset)
 	
 	isInitialized = true
 end
@@ -93,8 +94,8 @@ function view:pos(x, y)
 		
 		if item then
 			item:pos(
-				x + layout.list.offsetX, 
-				y + layout.list.offsetY + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
+				x + self.listOffset.x, 
+				y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
 		end
 	end
 end

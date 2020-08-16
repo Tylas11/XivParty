@@ -104,9 +104,14 @@ layout.buffIcons.path = 'assets/buffIcons/'
 layout.buffIcons.size = L{ 20, 20 }
 layout.buffIcons.offset = L{ 1, 0 }
 layout.buffIcons.spacing = L{ 0, 1 } -- Y coordinate is only used when buffs wrap around to a second row
+layout.buffIcons.wrap = 19 -- wrap buff icons to a second row after this many icons (max 32 icons displayed)
+layout.buffIcons.wrapOffset = 6 -- offset the second buff icon row by this many icons to the right
 
 layout.text = {}
 layout.text.tpFullColor = '#50B4FAFF'
+layout.text.hpYellowColor = '#F3F37CFF'
+layout.text.hpOrangeColor = '#F8BA80FF'
+layout.text.hpRedColor = '#FC8182FF'
 
 layout.text.numbers = {}
 layout.text.numbers.font = 'Grammara'

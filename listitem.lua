@@ -66,6 +66,9 @@ function listitem:init()
 	
 	obj.numbersColor = utils:colorFromHex(layout.text.numbers.color)
 	obj.tpFullColor = utils:colorFromHex(layout.text.tpFullColor)
+	obj.hpYellowColor = utils:colorFromHex(layout.text.hpYellowColor)
+	obj.hpOrangeColor = utils:colorFromHex(layout.text.hpOrangeColor)
+	obj.hpRedColor = utils:colorFromHex(layout.text.hpRedColor)
 	
 	obj.barOffset = utils:coord(layout.bar.offset)
 	obj.rangeOffset = utils:coord(layout.range.offset)
@@ -144,13 +147,14 @@ function listitem:pos(x, y)
 	self.rangeInd:pos(hpPosX + self.rangeOffset.x, y + self.rangeOffset.y)
 	
 	for i = 1, 32 do
-		if i < 20 then -- wrap buffs to next line
+		if i <= layout.buffIcons.wrap then -- wrap buffs to next line
 			self.buffImages[i]:pos(
 				tpPosX + (i - 1) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y)
 		else
 			self.buffImages[i]:pos(
-				tpPosX + (i - 14) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
+				tpPosX + (i - layout.buffIcons.wrap + layout.buffIcons.wrapOffset - 1) * 
+				(self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y + self.buffImages[i]:scaledSize().height + self.buffSpacing.y)
 		end
 	end
@@ -158,9 +162,9 @@ end
 
 function listitem:update(player)
 	if player then
-		self:updateBarAndText(self.hpBar, self.hpText, player.hp, player.hpp, player.distance, false)
-		self:updateBarAndText(self.mpBar, self.mpText, player.mp, player.mpp, player.distance, false)
-		self:updateBarAndText(self.tpBar, self.tpText, player.tp, player.tpp, player.distance, true)
+		self:updateBarAndText(self.hpBar, self.hpText, player.hp, player.hpp, player.distance, 'hp')
+		self:updateBarAndText(self.mpBar, self.mpText, player.mp, player.mpp, player.distance, 'mp')
+		self:updateBarAndText(self.tpBar, self.tpText, player.tp, player.tpp, player.distance, 'tp')
 		
 		self.nameText:text(player.name)
 		self.zoneText:text(player.zone)
@@ -185,7 +189,7 @@ function listitem:update(player)
 	end
 end
 
-function listitem:updateBarAndText(bar, text, val, valPercent, distance, isTp)
+function listitem:updateBarAndText(bar, text, val, valPercent, distance, barType)
 	bar:update(valPercent / 100)
 	
 	if val < 0 then
@@ -194,17 +198,25 @@ function listitem:updateBarAndText(bar, text, val, valPercent, distance, isTp)
 		text:text(tostring(val))
 	end
 	
-	if isTp then
-		local color
+	local color = self.numbersColor
+	if barType == 'hp' then
+		if val >= 0 then
+			if valPercent < 25 then
+				color = self.hpRedColor
+			elseif valPercent < 50 then
+				color = self.hpOrangeColor
+			elseif valPercent < 75 then
+				color = self.hpYellowColor
+			end
+		end
+	elseif barType == 'tp' then
 		if val >= 1000 then
 			color = self.tpFullColor
-		else
-			color = self.numbersColor
-		end
-		
-		text:color(color.r, color.g, color.b)
-		text:alpha(color.a)
+		end	
 	end
+	
+	text:color(color.r, color.g, color.b)
+	text:alpha(color.a)
 	
 	-- distance indication
 	if distance:sqrt() > 50 then -- cannot target, over 50 distance, mob table not set

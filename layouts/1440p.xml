@@ -64,6 +64,8 @@
             <path>assets/buffIcons/</path>
             <size>20,20</size>
             <spacing>0,1</spacing>
+            <wrap>19</wrap>
+            <wrapOffset>6</wrapOffset>
         </buffIcons>
         <cursor>
             <img>
@@ -87,6 +89,9 @@
         </range>
         <scale>1</scale>
         <text>
+            <hpOrangeColor>#F8BA80FF</hpOrangeColor>
+            <hpRedColor>#FC8182FF</hpRedColor>
+            <hpYellowColor>#F3F37CFF</hpYellowColor>
             <job>
                 <color>#F0FFFFFF</color>
                 <font>Arial</font>

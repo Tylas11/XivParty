@@ -5,24 +5,24 @@
             <animSpeed>0.1</animSpeed>
             <hp>
                 <imgBg>
-                    <color>#FFFFFFFF</color>
-                    <path>assets/BarBG.png</path>
+                    <color>#FF9597FF</color>
+                    <path>assets/BarBG_grey.png</path>
                     <size>107,10</size>
                 </imgBg>
                 <imgFg>
-                    <color>#FFFFFFFF</color>
+                    <color>#FF9597FF</color>
                     <path>assets/BarFG.png</path>
                     <size>103,6</size>
                 </imgFg>
             </hp>
             <mp>
                 <imgBg>
-                    <color>#FFFFFFFF</color>
-                    <path>assets/BarBG.png</path>
+                    <color>#FFFF9CFF</color>
+                    <path>assets/BarBG_grey.png</path>
                     <size>107,10</size>
                 </imgBg>
                 <imgFg>
-                    <color>#FFFFFFFF</color>
+                    <color>#FFFF9CFF</color>
                     <path>assets/BarFG.png</path>
                     <size>103,6</size>
                 </imgFg>
@@ -31,12 +31,12 @@
             <spacingX>20</spacingX>
             <tp>
                 <imgBg>
-                    <color>#FFFFFFFF</color>
-                    <path>assets/BarBG.png</path>
+                    <color>#8EB4F9FF</color>
+                    <path>assets/BarBG_grey.png</path>
                     <size>107,10</size>
                 </imgBg>
                 <imgFg>
-                    <color>#FFFFFFFF</color>
+                    <color>#8EB4F9FF</color>
                     <path>assets/BarFG.png</path>
                     <size>103,6</size>
                 </imgFg>
@@ -45,18 +45,18 @@
         <bg>
             <imgBottom>
                 <color>#FFFFFFFF</color>
-                <path>assets/BgBottom.png</path>
-                <size>377,21</size>
+                <path>assets/FfxiBgBottom_small.png</path>
+                <size>420,13</size>
             </imgBottom>
             <imgMid>
                 <color>#FFFFFFFF</color>
-                <path>assets/BgMid.png</path>
-                <size>377,12</size>
+                <path>assets/FfxiBgMid_small.png</path>
+                <size>420,5</size>
             </imgMid>
             <imgTop>
                 <color>#FFFFFFFF</color>
-                <path>assets/BgTop.png</path>
-                <size>377,21</size>
+                <path>assets/FfxiBgTop_small.png</path>
+                <size>420,16</size>
             </imgTop>
         </bg>
         <buffIcons>
@@ -77,7 +77,7 @@
         </cursor>
         <list>
             <itemHeight>34</itemHeight>
-            <offset>22,0</offset>
+            <offset>10,0</offset>
         </list>
         <range>
             <img>

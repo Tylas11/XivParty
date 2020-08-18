@@ -86,7 +86,7 @@ function bg:resize(rowCount)
 	self:pos(self.posX, self.posY) -- refresh position of bottom tile
 	
 	-- visible size of the whole background area
-	self.size.width = self.top:scaledSize().width
+	self.size.width = math.max(math.max(self.top:scaledSize().width, self.bottom:scaledSize().width), self.mid:scaledSize().width)
 	self.size.height = self.top:scaledSize().height + self.mid:scaledSize().height + self.bottom:scaledSize().height
 end
 

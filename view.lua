@@ -83,19 +83,33 @@ end
 function view:pos(x, y)
 	if not isInitialized then return end
 
+	-- top/left corner, when aligned to bottom: bottom/left corner
 	self.posX = x
 	self.posY = y
 
-	bg:pos(x, y)
-	dragImage:pos(x, y)
+	if settings.alignBottom then
+		bg:pos(x, y - bg.size.height)
+		dragImage:pos(x, y - bg.size.height)
+	else
+		bg:pos(x, y)
+		dragImage:pos(x, y)
+	end
+	
+	local count = listItems:length()
 	
 	for i = 0, 5 do
 		local item = listItems[i]
 		
 		if item then
-			item:pos(
-				x + self.listOffset.x, 
-				y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
+			if settings.alignBottom then
+				item:pos(
+					x + self.listOffset.x, 
+					y + self.listOffset.y - bg.bottom:scaledSize().height - (count - i) * (layout.list.itemHeight + settings.spacingY))
+			else
+				item:pos(
+					x + self.listOffset.x, 
+					y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
+			end
 		end
 	end
 end
@@ -169,7 +183,11 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 		-- mouse drag
 		if type == 0 then
 			if dragged then
-				view:pos(x - dragged.x, y - dragged.y)
+				if settings.alignBottom then
+					view:pos(x - dragged.x, y - (dragged.y - dragImage:size().height))
+				else
+					view:pos(x - dragged.x, y - dragged.y)
+				end
 				return true
 			end
 		

@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.2.0'
+_addon.version = '1.3.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
@@ -400,6 +400,11 @@ windower.register_event('addon command', function(...)
 		local ret = handleCommandOnOff(settings.hideSolo, args[2], 'Party list hiding while solo')
 		settings.hideSolo = ret
 		settings:save()
+	elseif command == 'alignbottom' then
+		local ret = handleCommandOnOff(settings.alignBottom, args[2], 'Bottom alignment')
+		settings.alignBottom = ret
+		settings:save()
+		view:pos(settings.posX, settings.posY)
 	elseif command == 'customorder' then
 		local ret = handleCommandOnOff(settings.buffs.customOrder, args[2], 'Custom buff ordering')
 		settings.buffs.customOrder = ret
@@ -545,6 +550,7 @@ function showHelp()
 	log('range <distance> - shows a marker for each party member closer than the set distance (off or 0 to disable)')
 	log('customOrder - toggles custom buff ordering (customize in bufforder.lua)')
 	log('hideSolo - hides the party list while solo')
+	log('alignBottom - expands the party list from bottom to top')
 	log('move - move the UI via drag and drop, mouse wheel to adjust space between party members')
 	log('layout <file> - loads a UI layout file. Use \'auto\' to enable resolution based selection.')
 end

@@ -102,10 +102,11 @@ layout.cursor.img.color = '#FFFFFFFF'
 layout.buffIcons = {}
 layout.buffIcons.path = 'assets/buffIcons/'
 layout.buffIcons.size = L{ 20, 20 }
-layout.buffIcons.offset = L{ 1, 0 }
+layout.buffIcons.offset = L{ 1, 0 } -- icons are aligned to the left side of the TP bar
 layout.buffIcons.spacing = L{ 0, 1 } -- Y coordinate is only used when buffs wrap around to a second row
 layout.buffIcons.wrap = 19 -- wrap buff icons to a second row after this many icons (max 32 icons displayed)
 layout.buffIcons.wrapOffset = 6 -- offset the second buff icon row by this many icons to the right
+layout.buffIcons.alignRight = false -- icons will extend from right to left (still aligned to left side of TP bar, use offset!)
 
 layout.text = {}
 layout.text.tpFullColor = '#50B4FAFF'
@@ -136,6 +137,8 @@ layout.text.zone.color = '#F0FFFFFF'
 layout.text.zone.stroke = '#062D54C8'
 layout.text.zone.strokeWidth = 2
 layout.text.zone.offset = L{ 0, 1 }
+layout.text.zone.short = false -- display short zone name
+layout.text.zone.alignRight = false -- right align the text to the right end of the TP bar (use short zone names or text might overlap with player name)
 
 layout.text.job = {}
 layout.text.job.font = 'Arial'

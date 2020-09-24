@@ -48,7 +48,7 @@ function listitem:init()
 	obj.tpText = utils:createText(layout.text.numbers, true)
 	
 	obj.nameText = utils:createText(layout.text.name)
-	obj.zoneText = utils:createText(layout.text.zone)
+	obj.zoneText = utils:createText(layout.text.zone, layout.text.zone.alignRight)
 	
 	obj.jobText = utils:createText(layout.text.job)
 	obj.subJobText = utils:createText(layout.text.subJob)
@@ -140,20 +140,30 @@ function listitem:pos(x, y)
 	self.tpText:pos(tpPosX - screenResX + self.tpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
 	
 	self.nameText:pos(hpPosX + self.nameOffset.x, y + self.nameOffset.y)
-	self.zoneText:pos(tpPosX + self.zoneOffset.x, y + self.zoneOffset.y)
 	self.jobText:pos(hpPosX + self.jobOffset.x, y + self.jobOffset.y)
 	self.subJobText:pos(hpPosX + self.subJobOffset.x, y + self.subJobOffset.y)
 	
+	if layout.text.zone.alignRight then
+		self.zoneText:pos(tpPosX + self.tpBar.size.width - screenResX + self.zoneOffset.x, y + self.zoneOffset.y)
+	else
+		self.zoneText:pos(tpPosX + self.zoneOffset.x, y + self.zoneOffset.y)
+	end
+	
 	self.rangeInd:pos(hpPosX + self.rangeOffset.x, y + self.rangeOffset.y)
+	
+	local direction = 1
+	if layout.buffIcons.alignRight then
+		direction = -1
+	end
 	
 	for i = 1, 32 do
 		if i <= layout.buffIcons.wrap then -- wrap buffs to next line
 			self.buffImages[i]:pos(
-				tpPosX + (i - 1) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
+				tpPosX + direction * (i - 1) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y)
 		else
 			self.buffImages[i]:pos(
-				tpPosX + (i - layout.buffIcons.wrap + layout.buffIcons.wrapOffset - 1) * 
+				tpPosX + direction * (i - layout.buffIcons.wrap + layout.buffIcons.wrapOffset - 1) * 
 				(self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y + self.buffImages[i]:scaledSize().height + self.buffSpacing.y)
 		end
@@ -256,21 +266,27 @@ function listitem:updateCursor()
 end
 
 function listitem:updateBuffs(buffs)
-	for i = 1, 32 do
-		local image = self.buffImages[i]
-		local buff = buffs[i]
-		local current = self.currentBuffs[i]
+	if table.equals(buffs, self.currentBuffs) then return end
+	self.currentBuffs = table.copy(buffs)
 	
-		if current ~= buff then -- only update if actually changed
-			if not buff or buff == 1000 or buff == 255 then
-				image:path('')
-				image:opacity(0)
-			else
-				image:path(windower.addon_path .. layout.buffIcons.path .. tostring(buff) .. '.png')
-				image:opacity(1)
-			end
-			
-			self.currentBuffs[i] = buff
+	for i = 1, 32 do
+		local buff = buffs[i]
+		
+		local image = nil
+		if layout.buffIcons.alignRight then
+			image = self.buffImages[buffs:length() - i + 1]
+		end
+		
+		if not image then
+			image = self.buffImages[i]
+		end
+		
+		if buff then
+			image:path(windower.addon_path .. layout.buffIcons.path .. tostring(buff) .. '.png')
+			image:opacity(1)
+		else
+			image:path('')
+			image:opacity(0)
 		end
 	end
 end

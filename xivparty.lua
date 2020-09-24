@@ -170,7 +170,12 @@ function updatePlayers()
 		
 			if (member.zone ~= zone) then -- outside zone
 				player:clear()
-				player.zone = '('..res.zones[member.zone].name..')'
+				
+				if layout.text.zone.short then
+					player.zone = '('..res.zones[member.zone]['search']..')'
+				else
+					player.zone = '('..res.zones[member.zone].name..')'
+				end
 			else
 				player.hp = member.hp
 				player.mp = member.mp
@@ -262,8 +267,8 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 for i = 1, 32 do -- starting at 1 to match the offset in windower.ffxi.get_player().buffs
                     local buff = original:byte(k*48+5+16+i-1) + 256*( math.floor( original:byte(k*48+5+8+ math.floor((i-1)/4)) / 4^((i-1)%4) )%4) -- Credit: Byrth, GearSwap
 					
-					if buff == 255 then -- push empty buffs to a higher number so they get sorted at the end of the list
-						buff = 1000
+					if buff == 255 then -- empty buff
+						buff = nil
 					end
 					buffsList[i] = buff
                 end
@@ -475,7 +480,7 @@ windower.register_event('addon command', function(...)
 			log('Your active buffs:')
 		end
 		for i = 1, 32 do
-			if buffs[i] and buffs[i] ~= 1000 and buffs[i] ~= 255 then
+			if buffs[i] then
 				log(getBuffText(buffs[i]))
 			end
 		end

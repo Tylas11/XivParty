@@ -66,6 +66,7 @@
             <spacing>0,1</spacing>
             <wrap>19</wrap>
             <wrapOffset>6</wrapOffset>
+			<alignRight>false</alignRight>
         </buffIcons>
         <cursor>
             <img>
@@ -132,6 +133,8 @@
                 <size>13</size>
                 <stroke>#062D54C8</stroke>
                 <strokeWidth>2</strokeWidth>
+				<short>false</short>
+				<alignRight>false</alignRight>
             </zone>
         </text>
     </global>

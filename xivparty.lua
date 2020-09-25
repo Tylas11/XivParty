@@ -416,13 +416,17 @@ windower.register_event('addon command', function(...)
 		settings:save()
 	elseif command == 'range' then
 		if args[2] then
-			local range = string.lower(args[2])
-			if range == 'off' then
-				range = 0
+			settings.rangeIndicator = getRange(args[2])
+			if args[3] then
+				settings.rangeIndicatorFar = getRange(args[3])
+				
+				if settings.rangeIndicator > settings.rangeIndicatorFar then
+					settings.rangeIndicator = getRange(args[3])
+					settings.rangeIndicatorFar = getRange(args[2])
+				end
 			else
-				range = tonumber(range)
+				settings.rangeIndicatorFar = 0
 			end
-			settings.rangeIndicator = range
 			settings:save()
 		else
 			showHelp()
@@ -512,6 +516,18 @@ windower.register_event('addon command', function(...)
 	end
 end)
 
+function getRange(arg)
+	local range = string.lower(arg)
+	
+	if range == 'off' then
+		range = 0
+	else
+		range = tonumber(range)
+	end
+	
+	return range
+end
+
 function handleCommandOnOff(currentValue, argsString, text)
 	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false)
 end
@@ -552,7 +568,7 @@ function showHelp()
 	log('   list - shows list of currently set filters')
 	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
 	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
-	log('range <distance> - shows a marker for each party member closer than the set distance (off or 0 to disable)')
+	log('range <dist> <dist2> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
 	log('customOrder - toggles custom buff ordering (customize in bufforder.lua)')
 	log('hideSolo - hides the party list while solo')
 	log('alignBottom - expands the party list from bottom to top')

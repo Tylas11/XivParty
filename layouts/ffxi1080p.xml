@@ -60,13 +60,13 @@
             </imgTop>
         </bg>
         <buffIcons>
+            <alignRight>false</alignRight>
             <offset>1,0</offset>
             <path>assets/buffIcons/</path>
             <size>20,20</size>
             <spacing>0,1</spacing>
             <wrap>19</wrap>
             <wrapOffset>6</wrapOffset>
-			<alignRight>false</alignRight>
         </buffIcons>
         <cursor>
             <img>
@@ -88,6 +88,14 @@
             </img>
             <offset>0,24</offset>
         </range>
+        <rangeFar>
+            <img>
+                <color>#FFFFFFFF</color>
+                <path>assets/RangeIndicator_far.png</path>
+                <size>10,10</size>
+            </img>
+            <offset>0,24</offset>
+        </rangeFar>
         <scale>0.75</scale>
         <text>
             <hpOrangeColor>#F8BA80FF</hpOrangeColor>
@@ -127,14 +135,14 @@
             </subJob>
             <tpFullColor>#50B4FAFF</tpFullColor>
             <zone>
+                <alignRight>false</alignRight>
                 <color>#F0FFFFFF</color>
                 <font>Arial</font>
                 <offset>0,-1</offset>
+                <short>false</short>
                 <size>11</size>
                 <stroke>#062D54C8</stroke>
                 <strokeWidth>1</strokeWidth>
-				<short>false</short>
-				<alignRight>false</alignRight>
             </zone>
         </text>
     </global>

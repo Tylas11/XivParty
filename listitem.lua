@@ -56,7 +56,10 @@ function listitem:init()
 	obj.rangeInd = utils:createImage(layout.range.img, layout.scale)
 	obj.rangeInd:opacity(0)
 	obj.rangeInd:show()
-	obj.isInRange = false
+	
+	obj.rangeIndFar = utils:createImage(layout.rangeFar.img, layout.scale)
+	obj.rangeIndFar:opacity(0)
+	obj.rangeIndFar:show()
 	
 	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
 	obj.cursor:opacity(0)
@@ -72,6 +75,7 @@ function listitem:init()
 	
 	obj.barOffset = utils:coord(layout.bar.offset)
 	obj.rangeOffset = utils:coord(layout.range.offset)
+	obj.rangeFarOffset = utils:coord(layout.rangeFar.offset)
 	obj.cursorOffset = utils:coord(layout.cursor.offset)
 	obj.buffOffset = utils:coord(layout.buffIcons.offset)
 	obj.buffSpacing = utils:coord(layout.buffIcons.spacing)
@@ -112,6 +116,7 @@ function listitem:dispose()
 	texts.destroy(self.subJobText)
 	
 	self.rangeInd:dispose()
+	self.rangeIndFar:dispose()
 	self.cursor:dispose()
 	
 	for i = 1, 32 do
@@ -150,6 +155,7 @@ function listitem:pos(x, y)
 	end
 	
 	self.rangeInd:pos(hpPosX + self.rangeOffset.x, y + self.rangeOffset.y)
+	self.rangeIndFar:pos(hpPosX + self.rangeFarOffset.x, y + self.rangeFarOffset.y)
 	
 	local direction = 1
 	if layout.buffIcons.alignRight then
@@ -181,9 +187,7 @@ function listitem:update(player)
 		
 		self:select(player.isSelected, player.isSubTarget)
 		self:updateBuffs(player.filteredBuffs)
-		
-		self.isInRange = settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator
-		self:updateRange()
+		self:updateRange(player)
 		
 		if player.jobLvl > 0 then
 			self.jobText:text(player.job..' '..tostring(player.jobLvl))
@@ -247,11 +251,16 @@ function listitem:select(isSel, isSub)
 	self:updateCursor()
 end
 
-function listitem:updateRange()
-	if self.isInRange then
+function listitem:updateRange(player)
+	if settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator then
 		self.rangeInd:opacity(1)
+		self.rangeIndFar:opacity(0)
+	elseif settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= settings.rangeIndicatorFar then
+		self.rangeInd:opacity(0)
+		self.rangeIndFar:opacity(1)
 	else
 		self.rangeInd:opacity(0)
+		self.rangeIndFar:opacity(0)
 	end
 end
 
@@ -307,6 +316,7 @@ function listitem:show()
 	self.subJobText:show()
 	
 	self.rangeInd:show()
+	self.rangeIndFar:show()
 	self.cursor:show()
 	
 	for i = 1, 32 do
@@ -330,6 +340,7 @@ function listitem:hide()
 	self.subJobText:hide()
 	
 	self.rangeInd:hide()
+	self.rangeIndFar:hide()
 	self.cursor:hide()
 	
 	for i = 1, 32 do

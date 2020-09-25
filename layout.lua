@@ -92,6 +92,13 @@ layout.range.img.path = 'assets/RangeIndicator.png'
 layout.range.img.size = L{ 10, 10 }
 layout.range.img.color = '#FFFFFFFF'
 
+layout.rangeFar = {}
+layout.rangeFar.offset = L{ 0, 30 }
+layout.rangeFar.img = {}
+layout.rangeFar.img.path = 'assets/RangeIndicator_far.png'
+layout.rangeFar.img.size = L{ 10, 10 }
+layout.rangeFar.img.color = '#FFFFFFFF'
+
 layout.cursor = {}
 layout.cursor.offset = L{ 0, 0 }
 layout.cursor.img = {}

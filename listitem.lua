@@ -39,6 +39,13 @@ function listitem:init()
 	
 	obj.hidden = false
 	
+	-- order of creation determines Z-order
+	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
+	obj.cursor:opacity(0)
+	obj.cursor:show()
+	obj.isSelected = false
+	obj.isSubTarget = false
+	
 	obj.hpBar = bar:init(layout.bar.hp)
 	obj.mpBar = bar:init(layout.bar.mp)
 	obj.tpBar = bar:init(layout.bar.tp)
@@ -60,12 +67,6 @@ function listitem:init()
 	obj.rangeIndFar = utils:createImage(layout.rangeFar.img, layout.scale)
 	obj.rangeIndFar:opacity(0)
 	obj.rangeIndFar:show()
-	
-	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
-	obj.cursor:opacity(0)
-	obj.cursor:show()
-	obj.isSelected = false
-	obj.isSubTarget = false
 	
 	obj.numbersColor = utils:colorFromHex(layout.text.numbers.color)
 	obj.tpFullColor = utils:colorFromHex(layout.text.tpFullColor)
@@ -283,7 +284,16 @@ function listitem:updateBuffs(buffs)
 		
 		local image = nil
 		if layout.buffIcons.alignRight then
-			image = self.buffImages[buffs:length() - i + 1]
+			local count = buffs:length()
+			if count > layout.buffIcons.wrap then -- more buffs than the top line
+				if i <= layout.buffIcons.wrap then -- top line
+					image = self.buffImages[layout.buffIcons.wrap - i + 1]
+				elseif i <= count then -- bottom line
+					image = self.buffImages[count - i + layout.buffIcons.wrap + 1]
+				end
+			else
+				image = self.buffImages[count - i + 1]
+			end
 		end
 		
 		if not image then

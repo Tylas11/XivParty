@@ -369,10 +369,13 @@ end
 function checkBuff(buffId)
 	if buffId and res.buffs[buffId] then
 		return true
+	elseif not buffId then
+		log('Invalid buff ID.')
 	else
 		log('Buff with ID ' .. buffId .. ' not found.')
-		return false
 	end
+	
+	return false
 end
 
 function getBuffText(buffId)
@@ -382,6 +385,23 @@ function getBuffText(buffId)
 	else
 		return tostring(buffId)
 	end
+end
+
+function getRange(arg)
+	if not arg then return nil end
+
+	local range = string.lower(arg)
+	if range == 'off' then
+		range = 0
+	else
+		range = tonumber(range)
+	end
+	
+	if not range then
+		log('Invalid range \'' .. arg .. '\'.')
+	end
+	
+	return range
 end
 
 function zoningFinished()
@@ -416,18 +436,22 @@ windower.register_event('addon command', function(...)
 		settings:save()
 	elseif command == 'range' then
 		if args[2] then
-			settings.rangeIndicator = getRange(args[2])
-			if args[3] then
-				settings.rangeIndicatorFar = getRange(args[3])
-				
-				if settings.rangeIndicator > settings.rangeIndicatorFar then
-					settings.rangeIndicator = getRange(args[3])
-					settings.rangeIndicatorFar = getRange(args[2])
+			local range1 = getRange(args[2])
+			local range2 = getRange(args[3])
+			if range1 then
+				settings.rangeIndicator = range1
+				if range2 then
+					settings.rangeIndicatorFar = range2
+					
+					if settings.rangeIndicator > settings.rangeIndicatorFar then
+						settings.rangeIndicator = range2
+						settings.rangeIndicatorFar = range1
+					end
+				else
+					settings.rangeIndicatorFar = 0
 				end
-			else
-				settings.rangeIndicatorFar = 0
+				settings:save()
 			end
-			settings:save()
 		else
 			showHelp()
 		end
@@ -516,18 +540,6 @@ windower.register_event('addon command', function(...)
 	end
 end)
 
-function getRange(arg)
-	local range = string.lower(arg)
-	
-	if range == 'off' then
-		range = 0
-	else
-		range = tonumber(range)
-	end
-	
-	return range
-end
-
 function handleCommandOnOff(currentValue, argsString, text)
 	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false)
 end
@@ -546,7 +558,7 @@ function handleCommand(currentValue, argsString, text, option1String, option1Val
 			setValue = option1Value
 		end
 	else
-		log('Unknown parameter \'' .. argsString .. '\'')
+		log('Unknown parameter \'' .. argsString .. '\'.')
 		return currentValue
 	end
 	
@@ -568,7 +580,7 @@ function showHelp()
 	log('   list - shows list of currently set filters')
 	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
 	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
-	log('range <dist> <dist2> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
+	log('range <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
 	log('customOrder - toggles custom buff ordering (customize in bufforder.lua)')
 	log('hideSolo - hides the party list while solo')
 	log('alignBottom - expands the party list from bottom to top')

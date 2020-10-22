@@ -92,13 +92,6 @@ layout.range.img.path = 'assets/RangeIndicator.png'
 layout.range.img.size = L{ 10, 10 }
 layout.range.img.color = '#FFFFFFFF'
 
-layout.rangeFar = {}
-layout.rangeFar.offset = L{ 0, 30 }
-layout.rangeFar.img = {}
-layout.rangeFar.img.path = 'assets/RangeIndicator_far.png'
-layout.rangeFar.img.size = L{ 10, 10 }
-layout.rangeFar.img.color = '#FFFFFFFF'
-
 layout.cursor = {}
 layout.cursor.offset = L{ 0, 0 }
 layout.cursor.img = {}
@@ -109,14 +102,14 @@ layout.cursor.img.color = '#FFFFFFFF'
 layout.buffIcons = {}
 layout.buffIcons.path = 'assets/buffIcons/'
 layout.buffIcons.size = L{ 20, 20 }
-layout.buffIcons.offset = L{ 1, 0 } -- icons are aligned to the left side of the TP bar
+layout.buffIcons.offset = L{ 1, 0 }
 layout.buffIcons.spacing = L{ 0, 1 } -- Y coordinate is only used when buffs wrap around to a second row
-layout.buffIcons.wrap = 19 -- wrap buff icons to a second row after this many icons (max 32 icons displayed)
+layout.buffIcons.wrap = 10 -- wrap buff icons to a second row after this many icons (max 32 icons displayed)
 layout.buffIcons.wrapOffset = 6 -- offset the second buff icon row by this many icons to the right
-layout.buffIcons.alignRight = false -- icons will extend from right to left (still aligned to left side of TP bar, use offset!)
 
 layout.text = {}
-layout.text.tpFullColor = '#50B4FAFF'
+layout.text.tpMidColor = '#ff9d00'
+layout.text.tpFullColor = '#ff004c'
 layout.text.hpYellowColor = '#F3F37CFF'
 layout.text.hpOrangeColor = '#F8BA80FF'
 layout.text.hpRedColor = '#FC8182FF'
@@ -137,6 +130,17 @@ layout.text.name.stroke = '#062D54C8'
 layout.text.name.strokeWidth = 2
 layout.text.name.offset = L{ 65, 1 }
 
+layout.text.pet = {}
+layout.text.pet.font = 'Arial'
+layout.text.pet.size = 15
+layout.text.pet.color = '#307bf2'
+layout.text.pet.stroke = '#062D54C8'
+layout.text.pet.strokeWidth = 2
+layout.text.pet.offset = L{ 65, 1 }
+
+layout.text.nopet = {}
+layout.text.nopet.color = '#eb344f'
+
 layout.text.zone = {}
 layout.text.zone.font = 'Arial'
 layout.text.zone.size = 13
@@ -144,8 +148,6 @@ layout.text.zone.color = '#F0FFFFFF'
 layout.text.zone.stroke = '#062D54C8'
 layout.text.zone.strokeWidth = 2
 layout.text.zone.offset = L{ 0, 1 }
-layout.text.zone.short = false -- display short zone name
-layout.text.zone.alignRight = false -- right align the text to the right end of the TP bar (use short zone names or text might overlap with player name)
 
 layout.text.job = {}
 layout.text.job.font = 'Arial'

@@ -38,6 +38,7 @@ function player:init()
 	p.name = '???'
 	p.zone = ''
 	p.id = -1
+	player.isPet = false
 	
 	p:clear()
 	
@@ -71,18 +72,13 @@ end
 function player:updateBuffs(buffs, filters)
 	self.buffs = buffs
 	self.filteredBuffs = T{}
-	
 	for i = 1, 32 do
 		buff = buffs[i]
-		
 		if (settings.buffs.filterMode == 'blacklist' and filters[buff]) or 
 		   (settings.buffs.filterMode == 'whitelist' and not filters[buff]) then
-			buff = nil
+			buff = 1000
 		end
-		
-		if buff then
-			self.filteredBuffs:append(buff)
-		end
+		self.filteredBuffs[i] = buff
 	end
 	
 	if settings.buffs.customOrder then

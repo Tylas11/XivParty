@@ -39,13 +39,6 @@ function listitem:init()
 	
 	obj.hidden = false
 	
-	-- order of creation determines Z-order
-	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
-	obj.cursor:opacity(0)
-	obj.cursor:show()
-	obj.isSelected = false
-	obj.isSubTarget = false
-	
 	obj.hpBar = bar:init(layout.bar.hp)
 	obj.mpBar = bar:init(layout.bar.mp)
 	obj.tpBar = bar:init(layout.bar.tp)
@@ -55,7 +48,7 @@ function listitem:init()
 	obj.tpText = utils:createText(layout.text.numbers, true)
 	
 	obj.nameText = utils:createText(layout.text.name)
-	obj.zoneText = utils:createText(layout.text.zone, layout.text.zone.alignRight)
+	obj.zoneText = utils:createText(layout.text.zone)
 	
 	obj.jobText = utils:createText(layout.text.job)
 	obj.subJobText = utils:createText(layout.text.subJob)
@@ -63,20 +56,23 @@ function listitem:init()
 	obj.rangeInd = utils:createImage(layout.range.img, layout.scale)
 	obj.rangeInd:opacity(0)
 	obj.rangeInd:show()
+	obj.isInRange = false
 	
-	obj.rangeIndFar = utils:createImage(layout.rangeFar.img, layout.scale)
-	obj.rangeIndFar:opacity(0)
-	obj.rangeIndFar:show()
+	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
+	obj.cursor:opacity(0)
+	obj.cursor:show()
+	obj.isSelected = false
+	obj.isSubTarget = false
 	
 	obj.numbersColor = utils:colorFromHex(layout.text.numbers.color)
 	obj.tpFullColor = utils:colorFromHex(layout.text.tpFullColor)
+	obj.tpMidColor = utils:colorFromHex(layout.text.tpMidColor)
 	obj.hpYellowColor = utils:colorFromHex(layout.text.hpYellowColor)
 	obj.hpOrangeColor = utils:colorFromHex(layout.text.hpOrangeColor)
 	obj.hpRedColor = utils:colorFromHex(layout.text.hpRedColor)
 	
 	obj.barOffset = utils:coord(layout.bar.offset)
 	obj.rangeOffset = utils:coord(layout.range.offset)
-	obj.rangeFarOffset = utils:coord(layout.rangeFar.offset)
 	obj.cursorOffset = utils:coord(layout.cursor.offset)
 	obj.buffOffset = utils:coord(layout.buffIcons.offset)
 	obj.buffSpacing = utils:coord(layout.buffIcons.spacing)
@@ -117,7 +113,6 @@ function listitem:dispose()
 	texts.destroy(self.subJobText)
 	
 	self.rangeInd:dispose()
-	self.rangeIndFar:dispose()
 	self.cursor:dispose()
 	
 	for i = 1, 32 do
@@ -146,31 +141,20 @@ function listitem:pos(x, y)
 	self.tpText:pos(tpPosX - screenResX + self.tpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
 	
 	self.nameText:pos(hpPosX + self.nameOffset.x, y + self.nameOffset.y)
+	self.zoneText:pos(tpPosX + self.zoneOffset.x, y + self.zoneOffset.y)
 	self.jobText:pos(hpPosX + self.jobOffset.x, y + self.jobOffset.y)
 	self.subJobText:pos(hpPosX + self.subJobOffset.x, y + self.subJobOffset.y)
 	
-	if layout.text.zone.alignRight then
-		self.zoneText:pos(tpPosX + self.tpBar.size.width - screenResX + self.zoneOffset.x, y + self.zoneOffset.y)
-	else
-		self.zoneText:pos(tpPosX + self.zoneOffset.x, y + self.zoneOffset.y)
-	end
-	
 	self.rangeInd:pos(hpPosX + self.rangeOffset.x, y + self.rangeOffset.y)
-	self.rangeIndFar:pos(hpPosX + self.rangeFarOffset.x, y + self.rangeFarOffset.y)
-	
-	local direction = 1
-	if layout.buffIcons.alignRight then
-		direction = -1
-	end
 	
 	for i = 1, 32 do
 		if i <= layout.buffIcons.wrap then -- wrap buffs to next line
 			self.buffImages[i]:pos(
-				tpPosX + direction * (i - 1) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
+				tpPosX + (i - 1) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y)
 		else
 			self.buffImages[i]:pos(
-				tpPosX + direction * (i - layout.buffIcons.wrap + layout.buffIcons.wrapOffset - 1) * 
+				tpPosX + (i - layout.buffIcons.wrap + layout.buffIcons.wrapOffset - 1) * 
 				(self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y + self.buffImages[i]:scaledSize().height + self.buffSpacing.y)
 		end
@@ -183,12 +167,27 @@ function listitem:update(player)
 		self:updateBarAndText(self.mpBar, self.mpText, player.mp, player.mpp, player.distance, 'mp')
 		self:updateBarAndText(self.tpBar, self.tpText, player.tp, player.tpp, player.distance, 'tp')
 		
+		local color = utils:colorFromHex(layout.text.name.color)
+		self.nameText:color(color.r, color.g, color.b)
+		
+		if player.isPet then
+			local color = utils:colorFromHex(layout.text.pet.color)
+			self.nameText:color(color.r, color.g, color.b)
+		end
+		if player.noPet then
+			local color = utils:colorFromHex(layout.text.nopet.color)
+			self.nameText:color(color.r, color.g, color.b)
+		end
+		
+		
 		self.nameText:text(player.name)
 		self.zoneText:text(player.zone)
 		
 		self:select(player.isSelected, player.isSubTarget)
 		self:updateBuffs(player.filteredBuffs)
-		self:updateRange(player)
+		
+		self.isInRange = settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator
+		self:updateRange()
 		
 		if player.jobLvl > 0 then
 			self.jobText:text(player.job..' '..tostring(player.jobLvl))
@@ -205,9 +204,12 @@ function listitem:update(player)
 end
 
 function listitem:updateBarAndText(bar, text, val, valPercent, distance, barType)
-	bar:update(valPercent / 100)
+
+	if valPercent then
+		bar:update(valPercent / 100)
+	end
 	
-	if val < 0 then
+	if val == nil or val < 0 then
 		text:text('?')
 	else
 		text:text(tostring(val))
@@ -215,7 +217,7 @@ function listitem:updateBarAndText(bar, text, val, valPercent, distance, barType
 	
 	local color = self.numbersColor
 	if barType == 'hp' then
-		if val >= 0 then
+		if val ~= nil and val >= 0 then
 			if valPercent < 25 then
 				color = self.hpRedColor
 			elseif valPercent < 50 then
@@ -225,7 +227,10 @@ function listitem:updateBarAndText(bar, text, val, valPercent, distance, barType
 			end
 		end
 	elseif barType == 'tp' then
-		if val >= 1000 then
+		if val ~= nil and val >= 1750 then
+			color = self.tpMidColor
+		end
+		if val ~= nil and val >= 2750 then
 			color = self.tpFullColor
 		end	
 	end
@@ -252,16 +257,11 @@ function listitem:select(isSel, isSub)
 	self:updateCursor()
 end
 
-function listitem:updateRange(player)
-	if settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator then
+function listitem:updateRange()
+	if self.isInRange then
 		self.rangeInd:opacity(1)
-		self.rangeIndFar:opacity(0)
-	elseif settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= settings.rangeIndicatorFar then
-		self.rangeInd:opacity(0)
-		self.rangeIndFar:opacity(1)
 	else
 		self.rangeInd:opacity(0)
-		self.rangeIndFar:opacity(0)
 	end
 end
 
@@ -276,36 +276,21 @@ function listitem:updateCursor()
 end
 
 function listitem:updateBuffs(buffs)
-	if table.equals(buffs, self.currentBuffs) then return end
-	self.currentBuffs = table.copy(buffs)
-	
 	for i = 1, 32 do
+		local image = self.buffImages[i]
 		local buff = buffs[i]
-		
-		local image = nil
-		if layout.buffIcons.alignRight then
-			local count = buffs:length()
-			if count > layout.buffIcons.wrap then -- more buffs than the top line
-				if i <= layout.buffIcons.wrap then -- top line
-					image = self.buffImages[layout.buffIcons.wrap - i + 1]
-				elseif i <= count then -- bottom line
-					image = self.buffImages[count - i + layout.buffIcons.wrap + 1]
-				end
+		local current = self.currentBuffs[i]
+	
+		if current ~= buff then -- only update if actually changed
+			if not buff or buff == 1000 or buff == 255 then
+				image:path('')
+				image:opacity(0)
 			else
-				image = self.buffImages[count - i + 1]
+				image:path(windower.addon_path .. layout.buffIcons.path .. tostring(buff) .. '.png')
+				image:opacity(1)
 			end
-		end
-		
-		if not image then
-			image = self.buffImages[i]
-		end
-		
-		if buff then
-			image:path(windower.addon_path .. layout.buffIcons.path .. tostring(buff) .. '.png')
-			image:opacity(1)
-		else
-			image:path('')
-			image:opacity(0)
+			
+			self.currentBuffs[i] = buff
 		end
 	end
 end
@@ -326,7 +311,6 @@ function listitem:show()
 	self.subJobText:show()
 	
 	self.rangeInd:show()
-	self.rangeIndFar:show()
 	self.cursor:show()
 	
 	for i = 1, 32 do
@@ -350,7 +334,6 @@ function listitem:hide()
 	self.subJobText:hide()
 	
 	self.rangeInd:hide()
-	self.rangeIndFar:hide()
 	self.cursor:hide()
 	
 	for i = 1, 32 do

@@ -54,12 +54,12 @@ end
 function model:takePlayerFromTemp(member)
 	for temp in self.tempPlayers:it() do
 		if (temp.name == nil and member.mob ~= nil and temp.id == member.mob.id) then
-			utils:log('Found player based on ID '..member.mob.id..' in temp players list.')
+			utils:log('Found player based on ID '..member.mob.id..' in temp players list.', 2)
 			return self.tempPlayers:delete(temp)
 		end
 	
 		if temp.name == member.name then
-			utils:log('Found player '..member.name..' in temp players list.')
+			utils:log('Found player '..member.name..' in temp players list.',2 )
 			return self.tempPlayers:delete(temp)
 		end
 	end
@@ -68,20 +68,20 @@ function model:takePlayerFromTemp(member)
 end
 
 function model:findAndSortPlayer(member, index)
-	for i = 0, 5 do
+	for i = 0, 6 do
 		if self.players[i] and self.players[i].name == member.name then
 			if (index ~= i) then
 				temp = self.players[index]
 				self.players[index] = self.players[i]
 				self.players[i] = temp
 			
-				utils:log('Found '..member.name..' and swapped from index '..tostring(index)..' to '..tostring(i))
+				utils:log('Found '..member.name..' and swapped from index '..tostring(index)..' to '..tostring(i), 0)
 			end
-			
+			--utils:log('Found '..member.name, 2)
 			return self.players[index]
 		end
 	end
-	
+	--utils:log('Did not Find '..member.name..' at '..tostring(index), 2)
 	return nil
 end
 
@@ -124,7 +124,7 @@ function model:findOrCreateTempPlayer(name, id)
 	if not foundPlayer then
 		local displayName = name
 		if not displayName then displayName = '???' end
-		utils:log('Creating temp player for '..displayName..' with ID '..tostring(id))
+		utils:log('Creating temp player for '..displayName..' with ID '..tostring(id), 2)
 		
 		foundPlayer = player:init()
 		foundPlayer.name = name

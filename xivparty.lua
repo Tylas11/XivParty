@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.3.0'
+_addon.version = '1.2.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
@@ -52,6 +52,7 @@ buffOrder = getBuffOrderWithIdKeys(bo)
 
 local view = require('view')
 local player = require('player')
+local pet = require('pet')
 
 local isLoaded = false
 local isInitialized = false
@@ -145,44 +146,47 @@ function updatePlayers()
 	local zone = windower.ffxi.get_info().zone
 	local target = windower.ffxi.get_mob_by_target('t')
 	local subtarget = windower.ffxi.get_mob_by_target('st')
+	local playerPet = windower.ffxi.get_mob_by_target('pet')
+	local partyCount = 0
 	
 	for i = 0, 5 do
 		local key = 'p%i':format(i % 6)
 		local member = party[key]
 		
-		if member then
+		if member and not member.isPet then
 			local foundPlayer = model:findAndSortPlayer(member, i)
 			if not foundPlayer then
 				foundPlayer = model:takePlayerFromTemp(member)
 				if foundPlayer then
-					table.insert(model.players, i, foundPlayer) -- insert, pushing possible existing player at this position aside. will be re-sorted later
+					utils:log('found new player: '..member.name, 2)
+					model.players[i] = foundPlayer -- insert, pushing possible existing player at this position aside. will be re-sorted later
 				else
 					utils:log('Creating new player: '..member.name, 2)
-					table.insert(model.players, i, player:init())
+					model.players[i] = player:init()
 				end
 			end
 			
 			local player = model.players[i]
+			partyCount = partyCount +1
 			
 			player.isSelected = (target ~= nil and member.mob ~= nil and target.id == member.mob.id)
 			player.isSubTarget = (subtarget ~= nil and member.mob ~= nil and subtarget.id == member.mob.id)
 			player.name = member.name
+			player.isPet = false
 		
-			if (member.zone ~= zone) then -- outside zone
+			if member.zone and (member.zone ~= zone) then -- outside zone
 				player:clear()
-				
-				if layout.text.zone.short then
-					player.zone = '('..res.zones[member.zone]['search']..')'
-				else
-					player.zone = '('..res.zones[member.zone].name..')'
-				end
+				player.zone = '('..res.zones[member.zone].name..')'
 			else
 				player.hp = member.hp
 				player.mp = member.mp
 				player.tp = member.tp
 				player.hpp = member.hpp
 				player.mpp = member.mpp
-				player.tpp = math.min(member.tp / 10, 100)
+				
+				if member.tp then
+					player.tpp = math.min(member.tp / 30, 100)
+				end
 				player.zone = ''
 				
 				if member.mob then
@@ -208,7 +212,7 @@ function updatePlayers()
 		else
 			local player = model.players[i]
 		
-			if player then
+			if player and not player.isPet then
 				for tp in model.tempPlayers:it() do
 					if tp == player then
 						utils:log('Found duplicate player '..player.name..' in temp list, deleting.', 3)
@@ -220,6 +224,53 @@ function updatePlayers()
 				player:dispose()
 				model.players[i] = nil
 			end
+		end
+	end
+	
+	--remove all trailing pets
+	if partyCount <= 5 then
+		for i = partyCount+1, 6 do
+			local pet = model.players[i]
+			if pet and pet.isPet then
+				utils:log('Removing Pet with position: '..i, 2)
+				pet:dispose()
+				model.players[i] = nil
+			end
+		end
+	end
+	
+	--re-add pet
+	utils:log('Adding Pet with PartyCount: '..partyCount, 0)
+	local j = partyCount
+	if isPetJob() then
+		partyCount = partyCount +1
+		if playerPet then
+			local foundPet = model:findAndSortPlayer(playerPet, j)
+			if not foundPet then
+				utils:log('Creating new pet: '..playerPet.name..' at '..j, 2)
+				model.players[j] = pet:init()
+			end
+			local foundPet = model.players[j]
+			foundPet.name = playerPet.name
+			foundPet.noPet = false
+			foundPet.distance = playerPet.distance
+		else
+			model.players[j] = pet:init()
+			local foundPet = model.players[j]
+			foundPet:vanish()
+		end
+	end
+	
+	if settings.growth == "up" then
+		utils:log('PartyCount: '..partyCount, 0)
+		if not view:moveEnabled() and ((isPetJob() and partyCount > 2) or (not isPetJob() and partyCount > 1)) then
+			local offset = 0;
+			for i = 0, partyCount do
+				offset = offset + (i * 7)
+			end
+			view:pos(settings.posX, settings.posY-(offset))
+		elseif not view:moveEnabled() then
+			view:pos(settings.posX, settings.posY)
 		end
 	end
 end
@@ -245,7 +296,6 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				local playerId = packet['ID']
 				if name then
 					utils:log('PACKET: Party member update for '..name, 0)
-					
 					local foundPlayer = model:findOrCreateTempPlayer(name, playerId)
 					updatePlayerJobFromPacket(foundPlayer, packet)
 				else
@@ -255,8 +305,13 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				utils:log('Failed to parse packet.', 3)
 			end
 		end
+		
+		--pet stuff
+		if isPetJob() then
+			updatePetFromPacket(id, original)
+		end
+		
 	end
-	
 	if not zoning and id == 0x076 then -- party buffs (Credit: Kenshi, PartyBuffs)
         for k = 0, 4 do
             local playerId = original:unpack('I', k*48+5)
@@ -267,8 +322,8 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 for i = 1, 32 do -- starting at 1 to match the offset in windower.ffxi.get_player().buffs
                     local buff = original:byte(k*48+5+16+i-1) + 256*( math.floor( original:byte(k*48+5+8+ math.floor((i-1)/4)) / 4^((i-1)%4) )%4) -- Credit: Byrth, GearSwap
 					
-					if buff == 255 then -- empty buff
-						buff = nil
+					if buff == 255 then -- push empty buffs to a higher number so they get sorted at the end of the list
+						buff = 1000
 					end
 					buffsList[i] = buff
                 end
@@ -317,10 +372,116 @@ function updatePlayerJobFromPacket(player, packet)
 	end
 end
 
+function updatePetFromPacket(id, original)
+
+	if original == nil then
+		return
+	end
+
+	if id == 0x44 then
+		packet = packets.parse('incoming', original)
+		local petName = original:unpack('z', 0x59)
+		if petName == "" then
+			return
+		end
+		local pet = model:findPlayer(petName, nil)
+		utils:log('PACKET: 0x44 Found Pet: '..petName, 0)
+
+		if pet and original:unpack('C', 0x05) == 0x12 then    -- puppet update
+							
+			local current_hp, max_hp, current_mp, max_mp = original:unpack('HHHH', 0x069)
+
+			-- windower.add_to_chat(8, '0x44 PUPPET'
+			--						..', cur_hp: '..current_hp
+			--						..', max_hp: '..max_hp
+			--						..', cur_mp: '..current_mp
+			--						..', max_mp: '..max_mp
+			--						..', name: '.. original:unpack('z', 0x59)
+			--					)
+			pet.hp = current_hp
+			pet.mp = current_mp
+			pet.maxhp = max_hp
+			pet.maxmp = max_mp
+			if pet.maxhp ~= 0 then
+				pet.hpp = math.floor(100 * pet.hp / pet.maxhp)
+			else
+				pet.hpp = 0
+			end
+			if pet.maxmp ~= 0 then
+				pet.mpp = math.floor(100 * pet.mp / pet.maxmp)
+			else
+				pet.mpp = 0
+			end
+		end
+
+	elseif id == 0x67 or id == 0x068 then    -- general hp/tp/mp update
+	
+		packet = packets.parse('incoming', original)
+		utils:log('PACKET: 0x67 or 0x068', 0)
+		local msg_type = packet['Message Type'] or null
+		local msg_len = packet['Message Length']  or null
+		local pet_idx = packet['Pet Index']  or null
+		local own_idx = packet['Owner Index']  or null
+
+		local petName = ((msg_len > 24) and original:unpack('z', 0x19) or "")
+
+		if (msg_type == 0x04) and id == 0x067 then
+			pet_idx, own_idx = own_idx, pet_idx
+		end
+		
+		utils:log('PACKET:0x67 or 0x068 ['..msg_type..'] Searching for : '..petName..' '..pet_idx, 2)
+		local pet = model:findPlayer(petName, pet_idx)
+		
+		if pet == nil then
+			utils:log('PACKET:0x67 or 0x068 No Pet found', 2)
+			return
+		end
+				
+		utils:log('PACKET:0x67 or 0x068 ['..msg_type..'] Found Pet: '..petName, 2)
+
+		if (msg_type == 0x04) then
+			utils:log('PACKET: 0x04', 0)
+			if (pet_idx == 0) then
+				pet:dispose() -- died
+			else
+				utils:log('PACKET: Updating General', 0)
+				pet.tp = packet['Pet TP']
+				pet.hpp = packet['Current HP%']
+				pet.mpp = packet['Current MP%']
+				--windower.add_to_chat(8, '0x04 '
+				--					..', pet.tp: '..pet.tp
+				--					..', pet.hpp: '..pet.hpp
+				--					..', pet.mpp : '..pet.mpp 
+				--					..', pet.maxhp: '..pet.maxhp
+				--					..', pet.maxmp: '..pet.maxmp
+				--				)
+				pet.tpp = math.floor(100 * pet.tp / 3000)
+				if pet.maxhp and pet.maxhp >= 0 then
+					pet.hp = math.floor(pet.hpp * pet.maxhp / 100)
+				else
+					pet.hp = pet.hpp
+				end
+				if pet.maxmp and pet.maxmp >= 0 then
+					pet.mp = math.floor(pet.mpp * pet.maxmp / 100)
+				else
+					pet.mp = pet.mpp
+				end
+			end
+		end
+	end
+end
 -- utilities
 
 function isSolo()
 	return windower.ffxi.get_party().party1_leader == nil
+end
+
+function isPetJob()
+	local player = windower.ffxi.get_player()
+	if not player then
+		return false
+	end
+	return S{"SMN","PUP", "BST", "GEO"}:contains(windower.ffxi.get_player().main_job)
 end
 
 function loadLayout(layoutName)
@@ -369,13 +530,10 @@ end
 function checkBuff(buffId)
 	if buffId and res.buffs[buffId] then
 		return true
-	elseif not buffId then
-		log('Invalid buff ID.')
 	else
 		log('Buff with ID ' .. buffId .. ' not found.')
+		return false
 	end
-	
-	return false
 end
 
 function getBuffText(buffId)
@@ -385,23 +543,6 @@ function getBuffText(buffId)
 	else
 		return tostring(buffId)
 	end
-end
-
-function getRange(arg)
-	if not arg then return nil end
-
-	local range = string.lower(arg)
-	if range == 'off' then
-		range = 0
-	else
-		range = tonumber(range)
-	end
-	
-	if not range then
-		log('Invalid range \'' .. arg .. '\'.')
-	end
-	
-	return range
 end
 
 function zoningFinished()
@@ -425,33 +566,20 @@ windower.register_event('addon command', function(...)
 		local ret = handleCommandOnOff(settings.hideSolo, args[2], 'Party list hiding while solo')
 		settings.hideSolo = ret
 		settings:save()
-	elseif command == 'alignbottom' then
-		local ret = handleCommandOnOff(settings.alignBottom, args[2], 'Bottom alignment')
-		settings.alignBottom = ret
-		settings:save()
-		view:pos(settings.posX, settings.posY)
 	elseif command == 'customorder' then
 		local ret = handleCommandOnOff(settings.buffs.customOrder, args[2], 'Custom buff ordering')
 		settings.buffs.customOrder = ret
 		settings:save()
 	elseif command == 'range' then
 		if args[2] then
-			local range1 = getRange(args[2])
-			local range2 = getRange(args[3])
-			if range1 then
-				settings.rangeIndicator = range1
-				if range2 then
-					settings.rangeIndicatorFar = range2
-					
-					if settings.rangeIndicator > settings.rangeIndicatorFar then
-						settings.rangeIndicator = range2
-						settings.rangeIndicatorFar = range1
-					end
-				else
-					settings.rangeIndicatorFar = 0
-				end
-				settings:save()
+			local range = string.lower(args[2])
+			if range == 'off' then
+				range = 0
+			else
+				range = tonumber(range)
 			end
+			settings.rangeIndicator = range
+			settings:save()
 		else
 			showHelp()
 		end
@@ -508,7 +636,7 @@ windower.register_event('addon command', function(...)
 			log('Your active buffs:')
 		end
 		for i = 1, 32 do
-			if buffs[i] then
+			if buffs[i] and buffs[i] ~= 1000 and buffs[i] ~= 255 then
 				log(getBuffText(buffs[i]))
 			end
 		end
@@ -558,7 +686,7 @@ function handleCommand(currentValue, argsString, text, option1String, option1Val
 			setValue = option1Value
 		end
 	else
-		log('Unknown parameter \'' .. argsString .. '\'.')
+		log('Unknown parameter \'' .. argsString .. '\'')
 		return currentValue
 	end
 	
@@ -580,10 +708,9 @@ function showHelp()
 	log('   list - shows list of currently set filters')
 	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
 	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
-	log('range <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
+	log('range <distance> - shows a marker for each party member closer than the set distance (off or 0 to disable)')
 	log('customOrder - toggles custom buff ordering (customize in bufforder.lua)')
 	log('hideSolo - hides the party list while solo')
-	log('alignBottom - expands the party list from bottom to top')
 	log('move - move the UI via drag and drop, mouse wheel to adjust space between party members')
 	log('layout <file> - loads a UI layout file. Use \'auto\' to enable resolution based selection.')
 end

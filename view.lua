@@ -83,33 +83,19 @@ end
 function view:pos(x, y)
 	if not isInitialized then return end
 
-	-- top/left corner, when aligned to bottom: bottom/left corner
 	self.posX = x
 	self.posY = y
 
-	if settings.alignBottom then
-		bg:pos(x, y - bg.size.height)
-		dragImage:pos(x, y - bg.size.height)
-	else
-		bg:pos(x, y)
-		dragImage:pos(x, y)
-	end
+	bg:pos(x, y)
+	dragImage:pos(x, y)
 	
-	local count = listItems:length()
-	
-	for i = 0, 5 do
+	for i = 0, 6 do
 		local item = listItems[i]
 		
 		if item then
-			if settings.alignBottom then
-				item:pos(
-					x + self.listOffset.x, 
-					y + self.listOffset.y - bg.bottom:scaledSize().height - (count - i) * (layout.list.itemHeight + settings.spacingY))
-			else
-				item:pos(
-					x + self.listOffset.x, 
-					y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
-			end
+			item:pos(
+				x + self.listOffset.x, 
+				y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
 		end
 	end
 end
@@ -119,7 +105,7 @@ function view:update(force)
 	
 	local count = listItems:length()
 	
-	for i = 0, 5 do
+	for i = 0, 6 do
 		local player = model.players[i]
 		local item = listItems[i]
 		
@@ -183,11 +169,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 		-- mouse drag
 		if type == 0 then
 			if dragged then
-				if settings.alignBottom then
-					view:pos(x - dragged.x, y - (dragged.y - dragImage:size().height))
-				else
-					view:pos(x - dragged.x, y - dragged.y)
-				end
+				view:pos(x - dragged.x, y - dragged.y)
 				return true
 			end
 		

@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -222,7 +222,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 		end
 	end
 
-    return false
+	return false
 end)
 
 return view

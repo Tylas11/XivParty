@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.3.0'
+_addon.version = '1.4.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
@@ -67,11 +67,11 @@ local layout1440 = '1440p'
 -- initialization / dispose / events
 
 windower.register_event('load', function()
-    if windower.ffxi.get_info().logged_in then
-        settings = config.load(defaults)
+	if windower.ffxi.get_info().logged_in then
+		settings = config.load(defaults)
 		loadLayout(settings.layout)
 		isLoaded = true
-    end
+	end
 end)
 
 windower.register_event('login', function()
@@ -88,13 +88,13 @@ windower.register_event('logout', function()
 end)
 
 windower.register_event('status change', function(status)
-    if not hidden and status == 4 then -- hide UI during cutscenes
+	if not hidden and status == 4 then -- hide UI during cutscenes
 		hidden = true
-        view:hide()
-    elseif hidden and status ~= 4 then
+		view:hide()
+	elseif hidden and status ~= 4 then
 		hidden = false
-        view:show()
-    end
+		view:show()
+	end
 end)
 
 function init()
@@ -228,18 +228,36 @@ end
 
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
 	if not zoning then
+		if id == 0xC8 then -- alliance update
+			local packet = packets.parse('incoming', original)
+			for i = 1, 18 do
+				local playerId = packet['ID ' .. tostring(i)]
+				local flags = packet['Flags ' .. tostring(i)]
+				if flags and playerId and playerId > 0 then
+					-- TODO: players that have never been in the same zone since they joined the party or the addon was loaded will have no ID
+					--		 need to build the party list purely from packets which will most likely also contain the ID
+					local foundPlayer = model:findOrCreateTempPlayer(nil, playerId)
+					
+					--log(tostring(foundPlayer.name) .. ' / ' .. playerId .. ' / ' .. flags)
+					
+					updateLeaderFromFlags(foundPlayer, flags)
+				end
+			end
+		end
+	
 		if id == 0xDF then -- char update
-			packet = packets.parse('incoming', original)
+			local packet = packets.parse('incoming', original)
 			if packet then
 				local playerId = packet['ID']
 				utils:log('PACKET: Char update for player ID: '..playerId, 0)
-			
+				
 				local foundPlayer = model:findOrCreateTempPlayer(nil, playerId)
 				updatePlayerJobFromPacket(foundPlayer, packet)
 			end
 		end
+		
 		if id == 0xDD then -- party member update
-			packet = packets.parse('incoming', original)
+			local packet = packets.parse('incoming', original)
 			if packet then
 				local name = packet['Name']
 				local playerId = packet['ID']
@@ -258,20 +276,20 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 	end
 	
 	if not zoning and id == 0x076 then -- party buffs (Credit: Kenshi, PartyBuffs)
-        for k = 0, 4 do
-            local playerId = original:unpack('I', k*48+5)
-            
-            if playerId ~= 0 then -- NOTE: main player buffs are not available here
+		for k = 0, 4 do
+			local playerId = original:unpack('I', k*48+5)
+			
+			if playerId ~= 0 then -- NOTE: main player buffs are not available here
 				local buffsList = {}
 				
-                for i = 1, 32 do -- starting at 1 to match the offset in windower.ffxi.get_player().buffs
-                    local buff = original:byte(k*48+5+16+i-1) + 256*( math.floor( original:byte(k*48+5+8+ math.floor((i-1)/4)) / 4^((i-1)%4) )%4) -- Credit: Byrth, GearSwap
+				for i = 1, 32 do -- starting at 1 to match the offset in windower.ffxi.get_player().buffs
+					local buff = original:byte(k*48+5+16+i-1) + 256*( math.floor( original:byte(k*48+5+8+ math.floor((i-1)/4)) / 4^((i-1)%4) )%4) -- Credit: Byrth, GearSwap
 					
 					if buff == 255 then -- empty buff
 						buff = nil
 					end
 					buffsList[i] = buff
-                end
+				end
 				
 				local foundPlayer = model:findPlayer(nil, playerId)
 				if not foundPlayer then
@@ -281,19 +299,25 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					utils:log('Updated buffs for player with ID ' .. tostring(playerId), 1)
 					foundPlayer:updateBuffs(buffsList, model.buffFilters)
 				end
-            end
-        end
-    end
+			end
+		end
+	end
 	
 	if id == 0xB then
 		utils:log('Zoning...')
-        zoning = true
+		zoning = true
 		dispose()
-    elseif id == 0xA and zoning then
+	elseif id == 0xA and zoning then
 		utils:log('Zoning done.')
 		coroutine.schedule(zoningFinished, 3) -- delay a bit so init does not see pre-zone party lists
-    end
+	end
 end)
+
+function updateLeaderFromFlags(player, flags)
+	player.isLeader = utils:bitAnd(flags, 4) > 0
+	player.isAllianceLeader = utils:bitAnd(flags, 8) > 0
+	player.isQuarterMaster = utils:bitAnd(flags, 16) > 0
+end
 
 function updatePlayerJobFromPacket(player, packet)
 	-- these can contain NON 0 / NON 0 when the party member is out of zone

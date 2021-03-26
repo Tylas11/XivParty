@@ -76,6 +76,16 @@
             </img>
             <offset>0,2</offset>
         </cursor>
+        <leader>
+            <allianceColor>#FFFFFFFF</allianceColor>
+            <img>
+                <color>#E6E159FF</color>
+                <path>assets/Leader.png</path>
+                <size>7,5</size>
+            </img>
+            <offset>49,11.5</offset>
+            <quarterMasterColor>#66E659FF</quarterMasterColor>
+        </leader>
         <list>
             <itemHeight>34</itemHeight>
             <offset>22,0</offset>

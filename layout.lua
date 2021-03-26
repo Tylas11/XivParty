@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -84,6 +84,15 @@ layout.bar.tp.imgFg = {}
 layout.bar.tp.imgFg.path = 'assets/BarFG.png'
 layout.bar.tp.imgFg.size = L{ 103, 6 }
 layout.bar.tp.imgFg.color = '#FFFFFFFF'
+
+layout.leader = {}
+layout.leader.offset = L{ 58, 15 }
+layout.leader.img = {}
+layout.leader.img.path = 'assets/Leader.png'
+layout.leader.img.size = L{ 7, 5 }
+layout.leader.img.color = '#E6E159FF' -- party leader color
+layout.leader.allianceColor = '#FFFFFFFF'
+layout.leader.quarterMasterColor = '#66E659FF'
 
 layout.range = {}
 layout.range.offset = L{ 0, 30 }

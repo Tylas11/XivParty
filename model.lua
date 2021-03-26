@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without

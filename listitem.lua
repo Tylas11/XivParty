@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,20 @@ function listitem:init()
 	obj.jobText = utils:createText(layout.text.job)
 	obj.subJobText = utils:createText(layout.text.subJob)
 	
+	obj.leader = utils:createImage(layout.leader.img, layout.scale)
+	obj.leader:opacity(0)
+	obj.leader:show()
+	
+	obj.allianceLeader = utils:createImage(layout.leader.img, layout.scale)
+	obj.allianceLeader:color(utils:colorFromHex(layout.leader.allianceColor))
+	obj.allianceLeader:opacity(0)
+	obj.allianceLeader:show()
+	
+	obj.quarterMaster = utils:createImage(layout.leader.img, layout.scale)
+	obj.quarterMaster:color(utils:colorFromHex(layout.leader.quarterMasterColor))
+	obj.quarterMaster:opacity(0)
+	obj.quarterMaster:show()
+	
 	obj.rangeInd = utils:createImage(layout.range.img, layout.scale)
 	obj.rangeInd:opacity(0)
 	obj.rangeInd:show()
@@ -75,6 +89,7 @@ function listitem:init()
 	obj.hpRedColor = utils:colorFromHex(layout.text.hpRedColor)
 	
 	obj.barOffset = utils:coord(layout.bar.offset)
+	obj.leaderOffset = utils:coord(layout.leader.offset)
 	obj.rangeOffset = utils:coord(layout.range.offset)
 	obj.rangeFarOffset = utils:coord(layout.rangeFar.offset)
 	obj.cursorOffset = utils:coord(layout.cursor.offset)
@@ -116,6 +131,10 @@ function listitem:dispose()
 	texts.destroy(self.jobText)
 	texts.destroy(self.subJobText)
 	
+	self.leader:dispose()
+	self.allianceLeader:dispose()
+	self.quarterMaster:dispose()
+	
 	self.rangeInd:dispose()
 	self.rangeIndFar:dispose()
 	self.cursor:dispose()
@@ -141,7 +160,7 @@ function listitem:pos(x, y)
 	-- right aligned text coordinates start at the right side of the screen
 	local screenResX = windower.get_windower_settings().ui_x_res
 	
-    self.hpText:pos(hpPosX - screenResX + self.hpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
+	self.hpText:pos(hpPosX - screenResX + self.hpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
 	self.mpText:pos(mpPosX - screenResX + self.mpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
 	self.tpText:pos(tpPosX - screenResX + self.tpBar.size.width + self.numbersOffset.x, y + self.numbersOffset.y)
 	
@@ -154,6 +173,10 @@ function listitem:pos(x, y)
 	else
 		self.zoneText:pos(tpPosX + self.zoneOffset.x, y + self.zoneOffset.y)
 	end
+	
+	self.leader:pos(hpPosX + self.leaderOffset.x, y + self.leaderOffset.y)
+	self.allianceLeader:pos(self.leader:pos().x, self.leader:pos().y - self.allianceLeader:scaledSize().height)
+	self.quarterMaster:pos(self.allianceLeader:pos().x, self.allianceLeader:pos().y - self.quarterMaster:scaledSize().height)
 	
 	self.rangeInd:pos(hpPosX + self.rangeOffset.x, y + self.rangeOffset.y)
 	self.rangeIndFar:pos(hpPosX + self.rangeFarOffset.x, y + self.rangeFarOffset.y)
@@ -189,6 +212,7 @@ function listitem:update(player)
 		self:select(player.isSelected, player.isSubTarget)
 		self:updateBuffs(player.filteredBuffs)
 		self:updateRange(player)
+		self:updateLeader(player)
 		
 		if player.jobLvl > 0 then
 			self.jobText:text(player.job..' '..tostring(player.jobLvl))
@@ -250,6 +274,26 @@ function listitem:select(isSel, isSub)
 	self.isSubTarget = isSub
 	
 	self:updateCursor()
+end
+
+function listitem:updateLeader(player)
+	if player.isLeader then
+		self.leader:opacity(1)
+	else
+		self.leader:opacity(0)
+	end
+	
+	if player.isAllianceLeader then
+		self.allianceLeader:opacity(1)
+	else
+		self.allianceLeader:opacity(0)
+	end
+	
+	if player.isQuarterMaster then
+		self.quarterMaster:opacity(1)
+	else
+		self.quarterMaster:opacity(0)
+	end
 end
 
 function listitem:updateRange(player)
@@ -325,6 +369,10 @@ function listitem:show()
 	self.jobText:show()
 	self.subJobText:show()
 	
+	self.leader:show()
+	self.allianceLeader:show()
+	self.quarterMaster:show()
+	
 	self.rangeInd:show()
 	self.rangeIndFar:show()
 	self.cursor:show()
@@ -348,6 +396,10 @@ function listitem:hide()
 	
 	self.jobText:hide()
 	self.subJobText:hide()
+	
+	self.leader:hide()
+	self.allianceLeader:hide()
+	self.quarterMaster:hide()
 	
 	self.rangeInd:hide()
 	self.rangeIndFar:hide()

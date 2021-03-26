@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@ end
 function bar:pos(x, y)
 	-- this centers the foreground image inside the background image, background assumed to be larger
 	local fgOffsetX = (self.sizeBg.x - self.sizeFg.x) / 2 * layout.scale
-    local fgOffsetY = (self.sizeBg.y - self.sizeFg.y) / 2 * layout.scale
+	local fgOffsetY = (self.sizeBg.y - self.sizeFg.y) / 2 * layout.scale
 	
 	self.imgBg:pos(x, y)
 	self.imgFg:pos(x + fgOffsetX, y + fgOffsetY)

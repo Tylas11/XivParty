@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -75,8 +75,8 @@ function utils:createText(textInfo, right)
 	text:color(color.r, color.g, color.b)
 	text:alpha(color.a)
 	text:stroke_color(stroke.r, stroke.g, stroke.b)
-    text:stroke_alpha(stroke.a)
-    text:stroke_width(textInfo.strokeWidth)
+	text:stroke_alpha(stroke.a)
+	text:stroke_width(textInfo.strokeWidth)
 	
 	return text
 end
@@ -133,6 +133,60 @@ function utils:log(text, level)
 	if self.level <= level and text then
 		windower.add_to_chat(8, text)
 	end
+end
+
+function utils:logTable(t, depth)
+	if not depth then
+		depth = 0
+	end
+
+	local indent = ''
+	for i = 0, depth, 1 do
+		indent = indent .. ' '
+	end
+
+	if type(t) == 'table' then
+		for key,value in pairs(t) do
+			if type(value) == 'table' then
+				utils:log(indent .. key)
+			else
+				utils:log(indent .. key .. ' = ' .. tostring(value))
+			end
+			utils:logTable(value, depth + 3)
+		end
+	end
+end
+
+-- bitwise operations
+
+function utils:bitAnd(a,b)
+	local p,c=1,0
+	while a>0 and b>0 do
+		local ra,rb=a%2,b%2
+		if ra+rb>1 then c=c+p end
+		a,b,p=(a-ra)/2,(b-rb)/2,p*2
+	end
+	return c
+end
+
+function utils:bitOr(a,b)
+	local p,c=1,0
+	while a+b>0 do
+		local ra,rb=a%2,b%2
+		if ra+rb>0 then c=c+p end
+		a,b,p=(a-ra)/2,(b-rb)/2,p*2
+	end
+	return c
+end
+
+function utils:bitNot(n)
+	local p,c=1,0
+	while n>0 do
+		local r=n%2
+		if r<1 then c=c+p end
+		n,p=(n-r)/2,p*2
+	end
+	return c
 end
 
 return utils

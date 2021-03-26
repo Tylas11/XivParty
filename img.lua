@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -144,7 +144,13 @@ function img:color(r,g,b)
 		return self.image:color()
 	end
 	
-	self.image:color(r,g,b)
+	-- color object returned by utils:colorFromHex
+	if type(r) == 'table' and r.r and r.g and r.b and r.a then
+		self.image:color(r.r, r.g, r.b)
+		self:alpha(r.a)
+	else
+		self.image:color(r,g,b)
+	end
 end
 
 function img:alpha(a)

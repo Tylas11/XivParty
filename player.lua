@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2020, Tylas
+	Copyright © 2021, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -56,6 +56,10 @@ function player:clear()
 	
 	self.isSelected = false
 	self.isSubTarget = false
+	
+	--self.isLeader = false
+	--self.isAllianceLeader = false
+	--self.isQuarterMaster = false
 	
 	self.job = '???'
 	self.jobLvl = 0

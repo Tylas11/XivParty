@@ -135,94 +135,9 @@ windower.register_event('prerender', function()
 
 	if not isInitialized then return end
 	
-	updatePlayers()
+	model:updatePlayers()
 	view:update()
 end)
-
-function updatePlayers()
-	local mainPlayer = windower.ffxi.get_player()
-	local party = T(windower.ffxi.get_party())
-	local zone = windower.ffxi.get_info().zone
-	local target = windower.ffxi.get_mob_by_target('t')
-	local subtarget = windower.ffxi.get_mob_by_target('st')
-	
-	for i = 0, 5 do
-		local key = 'p%i':format(i % 6)
-		local member = party[key]
-		
-		if member then
-			local foundPlayer = model:findAndSortPlayer(member, i)
-			if not foundPlayer then
-				foundPlayer = model:takePlayerFromTemp(member)
-				if foundPlayer then
-					table.insert(model.players, i, foundPlayer) -- insert, pushing possible existing player at this position aside. will be re-sorted later
-				else
-					utils:log('Creating new player: '..member.name, 2)
-					table.insert(model.players, i, player:init())
-				end
-			end
-			
-			local player = model.players[i]
-			
-			player.isSelected = (target ~= nil and member.mob ~= nil and target.id == member.mob.id)
-			player.isSubTarget = (subtarget ~= nil and member.mob ~= nil and subtarget.id == member.mob.id)
-			player.name = member.name
-		
-			if (member.zone ~= zone) then -- outside zone
-				player:clear()
-				
-				if layout.text.zone.short then
-					player.zone = '('..res.zones[member.zone]['search']..')'
-				else
-					player.zone = '('..res.zones[member.zone].name..')'
-				end
-			else
-				player.hp = member.hp
-				player.mp = member.mp
-				player.tp = member.tp
-				player.hpp = member.hpp
-				player.mpp = member.mpp
-				player.tpp = math.min(member.tp / 10, 100)
-				player.zone = ''
-				
-				if member.mob then
-					player.id = member.mob.id
-					player.distance = member.mob.distance
-					
-					model:mergeTempBuffs(player)
-				else
-					player.distance = 99999
-				end
-				
-				if (member.name == mainPlayer.name) then -- set buffs and job info for main player
-					player:updateBuffs(mainPlayer.buffs, model.buffFilters)
-					player.job = res.jobs[mainPlayer.main_job_id].name_short
-					player.jobLvl = mainPlayer.main_job_level
-					
-					if (mainPlayer.sub_job_id) then -- only if subjob is set
-						player.subJob = res.jobs[mainPlayer.sub_job_id].name_short
-						player.subJobLvl = mainPlayer.sub_job_level
-					end
-				end
-			end
-		else
-			local player = model.players[i]
-		
-			if player then
-				for tp in model.tempPlayers:it() do
-					if tp == player then
-						utils:log('Found duplicate player '..player.name..' in temp list, deleting.', 3)
-						model.tempPlayers:delete(tp)
-						break
-					end
-				end
-				
-				player:dispose()
-				model.players[i] = nil
-			end
-		end
-	end
-end
 
 -- packets
 
@@ -230,17 +145,14 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 	if not zoning then
 		if id == 0xC8 then -- alliance update
 			local packet = packets.parse('incoming', original)
-			for i = 1, 18 do
-				local playerId = packet['ID ' .. tostring(i)]
-				local flags = packet['Flags ' .. tostring(i)]
-				if flags and playerId and playerId > 0 then
-					-- TODO: players that have never been in the same zone since they joined the party or the addon was loaded will have no ID
-					--		 need to build the party list purely from packets which will most likely also contain the ID
-					local foundPlayer = model:findOrCreateTempPlayer(nil, playerId)
-					
-					--log(tostring(foundPlayer.name) .. ' / ' .. playerId .. ' / ' .. flags)
-					
-					updateLeaderFromFlags(foundPlayer, flags)
+			if packet then
+				for i = 1, 18 do
+					local playerId = packet['ID ' .. tostring(i)]
+					local flags = packet['Flags ' .. tostring(i)]
+					if flags and playerId and playerId > 0 then
+						local foundPlayer = model:getPlayer(nil, playerId, 'alliance')
+						foundPlayer:updateLeaderFromFlags(flags)
+					end
 				end
 			end
 		end
@@ -249,10 +161,14 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 			local packet = packets.parse('incoming', original)
 			if packet then
 				local playerId = packet['ID']
-				utils:log('PACKET: Char update for player ID: '..playerId, 0)
-				
-				local foundPlayer = model:findOrCreateTempPlayer(nil, playerId)
-				updatePlayerJobFromPacket(foundPlayer, packet)
+				if playerId and playerId > 0 then
+					utils:log('PACKET: Char update for player ID: '..playerId, 0)
+					
+					local foundPlayer = model:getPlayer(nil, playerId, 'char')
+					foundPlayer:updateJobFromPacket(packet)
+				else
+					utils:log('Char update: ID not found.', 3)
+				end
 			end
 		end
 		
@@ -261,16 +177,14 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 			if packet then
 				local name = packet['Name']
 				local playerId = packet['ID']
-				if name then
+				if name and playerId and playerId > 0 then
 					utils:log('PACKET: Party member update for '..name, 0)
 					
-					local foundPlayer = model:findOrCreateTempPlayer(name, playerId)
-					updatePlayerJobFromPacket(foundPlayer, packet)
+					local foundPlayer = model:getPlayer(name, playerId, 'party')
+					foundPlayer:updateJobFromPacket(packet)
 				else
-					utils:log('Name data not found.', 3)
+					utils:log('Party update: name and/or ID not found.', 3)
 				end
-			else
-				utils:log('Failed to parse packet.', 3)
 			end
 		end
 	end
@@ -291,14 +205,9 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					buffsList[i] = buff
 				end
 				
-				local foundPlayer = model:findPlayer(nil, playerId)
-				if not foundPlayer then
-					utils:log('Player with ID '..tostring(playerId)..' not found. Storing temporary buffs.', 2)
-					model.tempBuffs[playerId] = buffsList
-				else
-					utils:log('Updated buffs for player with ID ' .. tostring(playerId), 1)
-					foundPlayer:updateBuffs(buffsList, model.buffFilters)
-				end
+				local foundPlayer = model:getPlayer(nil, playerId, 'buffs')
+				foundPlayer:updateBuffs(buffsList)
+				utils:log('Updated buffs for player with ID ' .. tostring(playerId), 1)
 			end
 		end
 	end
@@ -312,34 +221,6 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 		coroutine.schedule(zoningFinished, 3) -- delay a bit so init does not see pre-zone party lists
 	end
 end)
-
-function updateLeaderFromFlags(player, flags)
-	player.isLeader = utils:bitAnd(flags, 4) > 0
-	player.isAllianceLeader = utils:bitAnd(flags, 8) > 0
-	player.isQuarterMaster = utils:bitAnd(flags, 16) > 0
-end
-
-function updatePlayerJobFromPacket(player, packet)
-	-- these can contain NON 0 / NON 0 when the party member is out of zone
-	-- seem to always get NON 0 / NON 0 if character has no SJ
-	local mJob = packet['Main job']
-	local mJobLvl = packet['Main job level']
-	local sJob =  packet['Sub job']
-	local sJobLvl = packet['Sub job level']
-	local playerId = packet['ID']
-	
-	if (mJob and mJobLvl and sJob and sJobLvl and mJobLvl > 0) then
-		player.id = playerId
-		player.job = res.jobs[mJob].name_short
-		player.jobLvl = mJobLvl
-		player.subJob = res.jobs[sJob].name_short
-		player.subJobLvl = sJobLvl
-		
-		utils:log('Set job info: '..res.jobs[mJob].name_short..tostring(mJobLvl)..'/'..res.jobs[sJob].name_short..tostring(sJobLvl), 0)
-	else
-		utils:log('Unusable job info. Dropping.', 0)
-	end
-end
 
 -- utilities
 
@@ -386,7 +267,7 @@ end
 
 function refreshFilteredBuffs()
 	for player in model.players:it() do
-		player:updateBuffs(player.buffs, model.buffFilters)
+		player:refreshFilteredBuffs()
 	end
 end
 

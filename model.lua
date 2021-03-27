@@ -31,108 +31,90 @@ local player = require('player')
 
 -- NOTE: list indices start with 1. when forced to index 0, iterating with :it() will work but out of order
 
-model.players = T{} -- ordered list by party list position, index range 0..5
-model.tempPlayers = T{} -- unordered list, dont access using indices!
-model.tempBuffs = T{} -- dictionary, key: player ID
+model.players = T{} -- party members to be displayed in the view, ordered by party list position, index range 0..5
+model.allPlayers = T{} -- unordered list of all players that we ever received data for
 model.buffFilters = T{} -- dictionary, key: buff ID, value: bool indicating whether to filter
 
 function model:clear()
-	for player in self.players:it() do
-		player:dispose()
+	for ap in self.allPlayers:it() do
+		ap:dispose()
 	end
-	self.players:clear()
+	self.allPlayers:clear()
 	
-	for tempPlayer in self.tempPlayers:it() do
-		tempPlayer:dispose()
-	end
-	self.tempPlayers:clear()
-	
-	self.tempBuffs:clear()
+	self.players:clear() -- items already disposed via allPlayers
 	self.buffFilters:clear()
 end
 
-function model:takePlayerFromTemp(member)
-	for temp in self.tempPlayers:it() do
-		if (temp.name == nil and member.mob ~= nil and temp.id == member.mob.id) then
-			utils:log('Found player based on ID '..member.mob.id..' in temp players list.')
-			return self.tempPlayers:delete(temp)
-		end
+function model:updatePlayers()
+	local mainPlayer = windower.ffxi.get_player()
+	local party = T(windower.ffxi.get_party())
+	local zone = windower.ffxi.get_info().zone
+	local target = windower.ffxi.get_mob_by_target('t')
+	local subtarget = windower.ffxi.get_mob_by_target('st')
 	
-		if temp.name == member.name then
-			utils:log('Found player '..member.name..' in temp players list.')
-			return self.tempPlayers:delete(temp)
-		end
-	end
-	
-	return nil
-end
-
-function model:findAndSortPlayer(member, index)
 	for i = 0, 5 do
-		if self.players[i] and self.players[i].name == member.name then
-			if (index ~= i) then
-				temp = self.players[index]
-				self.players[index] = self.players[i]
-				self.players[i] = temp
-			
-				utils:log('Found '..member.name..' and swapped from index '..tostring(index)..' to '..tostring(i))
+		local member = party['p%i':format(i % 6)]
+		if member and member.name then
+			local id
+			if member.mob and member.mob.id > 0 then
+				id = member.mob.id
 			end
+			local foundPlayer = self:getPlayer(member.name, id, 'member')
+			foundPlayer:update(member, zone, target, subtarget)
 			
-			return self.players[index]
+			self.players[i] = foundPlayer
+		else
+			self.players[i] = nil
 		end
 	end
-	
-	return nil
 end
 
-function model:mergeTempBuffs(player)
-	if self.tempBuffs[player.id] then
-		utils:log('Found and merged buffs for player '..player.name..' with ID '..tostring(player.id))
-		
-		player:updateBuffs(self.tempBuffs[player.id], self.buffFilters)
-		self.tempBuffs[player.id] = nil
-	end
-end
-
-function model:findPlayer(name, id)
+-- gets or creates a player based on name or ID
+-- will merge existing players if a name-ID match is found
+function model:getPlayer(name, id, debugTag, dontCreate)
 	local foundPlayer
-
-	-- look in players list
-	for p in self.players:it() do
-		if (name ~= nil and p.name == name) or (id ~= nil and p.id == id) then
-			foundPlayer = p
-			break
+	local foundByName
+	local foundById
+	
+	if not name and not id then
+		utils:log('Attempted a player lookup without name and ID.', 4)
+		return nil
+	end
+	
+	for ap in self.allPlayers:it() do
+		if name and ap.name == name then
+			foundByName = ap
+		end
+		if id and ap.id == id then
+			foundById = ap
 		end
 	end
 	
-	-- look in temp players list
-	if not foundPlayer then
-		for tp in self.tempPlayers:it() do
-			if (name ~= nil and tp.name == name) or (id ~= nil and tp.id == id) then
-				foundPlayer = tp
-			end
+	-- found by both, but they are not the same object then merge
+	if foundByName and foundById and foundByName ~= foundById then
+		foundPlayer = foundByName:merge(foundById)
+		foundById:dispose()
+		self.allPlayers:delete(foundById)
+	else
+		if foundByName then
+			foundPlayer = foundByName
+		else
+			foundPlayer = foundById
+		end
+		
+		if not foundPlayer and not dontCreate then
+			utils:log('Creating new player (' .. debugTag .. ')', 2)
+			foundPlayer = player:init(name, id)
+			self.allPlayers:append(foundPlayer)
 		end
 	end
 	
 	return foundPlayer
 end
 
--- finds player by name OR id, create new if not found and add to temp list
-function model:findOrCreateTempPlayer(name, id)
-	local foundPlayer = self:findPlayer(name, id)
-	
-	if not foundPlayer then
-		local displayName = name
-		if not displayName then displayName = '???' end
-		utils:log('Creating temp player for '..displayName..' with ID '..tostring(id))
-		
-		foundPlayer = player:init()
-		foundPlayer.name = name
-		foundPlayer.id = id
-		self.tempPlayers:append(foundPlayer)
-	end
-	
-	return foundPlayer
+-- finds player by name, returns nil if not found
+function model:findPlayer(name)
+	return self:getPlayer(name, nil, 'findPlayer', true)
 end
 
 return model

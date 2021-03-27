@@ -135,6 +135,14 @@ function utils:log(text, level)
 	end
 end
 
+function utils:toString(obj)
+	if obj then
+		return tostring(obj)
+	end
+	
+	return '???'
+end
+
 function utils:logTable(t, depth)
 	if not depth then
 		depth = 0
@@ -148,9 +156,9 @@ function utils:logTable(t, depth)
 	if type(t) == 'table' then
 		for key,value in pairs(t) do
 			if type(value) == 'table' then
-				utils:log(indent .. key)
+				windower.add_to_chat(8, indent .. key)
 			else
-				utils:log(indent .. key .. ' = ' .. tostring(value))
+				windower.add_to_chat(8, indent .. key .. ' = ' .. tostring(value))
 			end
 			utils:logTable(value, depth + 3)
 		end

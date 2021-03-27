@@ -43,8 +43,6 @@ function listitem:init()
 	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
 	obj.cursor:opacity(0)
 	obj.cursor:show()
-	obj.isSelected = false
-	obj.isSubTarget = false
 	
 	obj.hpBar = bar:init(layout.bar.hp)
 	obj.mpBar = bar:init(layout.bar.mp)
@@ -202,33 +200,37 @@ end
 
 function listitem:update(player)
 	if player then
-		self:updateBarAndText(self.hpBar, self.hpText, player.hp, player.hpp, player.distance, 'hp')
-		self:updateBarAndText(self.mpBar, self.mpText, player.mp, player.mpp, player.distance, 'mp')
-		self:updateBarAndText(self.tpBar, self.tpText, player.tp, player.tpp, player.distance, 'tp')
+		local isOutsideZone = player.zone and player.zone ~= windower.ffxi.get_info().zone
+	
+		self:updateBarAndText(self.hpBar, self.hpText, player.hp, player.hpp, player.distance, isOutsideZone, 'hp')
+		self:updateBarAndText(self.mpBar, self.mpText, player.mp, player.mpp, player.distance, isOutsideZone, 'mp')
+		self:updateBarAndText(self.tpBar, self.tpText, player.tp, player.tpp, player.distance, isOutsideZone, 'tp')
 		
-		self.nameText:text(player.name)
-		self.zoneText:text(player.zone)
+		if player.name then
+			self.nameText:text(player.name)
+		else
+			self.nameText:text('???')
+		end
 		
-		self:select(player.isSelected, player.isSubTarget)
-		self:updateBuffs(player.filteredBuffs)
-		self:updateRange(player)
+		self:updateZone(player, isOutsideZone)
+		self:updateJob(player, isOutsideZone)
 		self:updateLeader(player)
-		
-		if player.jobLvl > 0 then
-			self.jobText:text(player.job..' '..tostring(player.jobLvl))
-		else
-			self.jobText:text('')
-		end
-		
-		if player.subJobLvl > 0 then
-			self.subJobText:text(player.subJob..' '..tostring(player.subJobLvl))
-		else
-			self.subJobText:text('')
-		end
+		self:updateRange(player, isOutsideZone)
+		self:updateCursor(player, isOutsideZone)
+		self:updateBuffs(player.filteredBuffs, isOutsideZone)
 	end
 end
 
-function listitem:updateBarAndText(bar, text, val, valPercent, distance, barType)
+function listitem:updateBarAndText(bar, text, val, valPercent, distance, isOutsideZone, barType)
+	if isOutsideZone then
+		val = nil
+		valPercent = nil
+		distance = nil
+	end
+
+	if not val then val = -1 end
+	if not valPercent then valPercent = 0 end
+	
 	bar:update(valPercent / 100)
 	
 	if val < 0 then
@@ -258,22 +260,45 @@ function listitem:updateBarAndText(bar, text, val, valPercent, distance, barType
 	text:alpha(color.a)
 	
 	-- distance indication
-	if distance:sqrt() > 50 then -- cannot target, over 50 distance, mob table not set
+	if distance and distance:sqrt() > 50 then -- cannot target, over 50 distance, mob table not set
 		bar:opacity(0.25)
-	elseif distance:sqrt() > 20.79 then -- out of heal range
+	elseif distance and distance:sqrt() > 20.79 then -- out of heal range
 		bar:opacity(0.5)
 	else
 		bar:opacity(1)
 	end
 end
 
-function listitem:select(isSel, isSub)
-	if self.isSelected == isSel and self.isSubTarget == isSub then return end
-
-	self.isSelected = isSel
-	self.isSubTarget = isSub
+function listitem:updateZone(player, isOutsideZone)
+	local zoneString = ''
 	
-	self:updateCursor()
+	if player.zone and isOutsideZone then
+		if layout.text.zone.short then
+			zoneString = '('..res.zones[player.zone]['search']..')'
+		else
+			zoneString = '('..res.zones[player.zone].name..')'
+		end
+	end
+	
+	self.zoneText:text(zoneString)
+end
+
+function listitem:updateJob(player, isOutsideZone)
+	local jobString = ''
+	local subJobString = ''
+	
+	if not isOutsideZone then
+		if player.job and player.jobLvl and player.jobLvl > 0 then
+			jobString = res.jobs[player.job].name_short .. ' ' .. tostring(player.jobLvl)
+		end
+		
+		if player.subJob and player.subJobLvl and player.subJobLvl > 0 then
+			subJobString = res.jobs[player.subJob].name_short .. ' ' .. tostring(player.subJobLvl)
+		end
+	end
+	
+	self.jobText:text(jobString)
+	self.subJobText:text(subJobString)
 end
 
 function listitem:updateLeader(player)
@@ -296,30 +321,43 @@ function listitem:updateLeader(player)
 	end
 end
 
-function listitem:updateRange(player)
-	if settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator then
-		self.rangeInd:opacity(1)
-		self.rangeIndFar:opacity(0)
-	elseif settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= settings.rangeIndicatorFar then
-		self.rangeInd:opacity(0)
-		self.rangeIndFar:opacity(1)
-	else
-		self.rangeInd:opacity(0)
-		self.rangeIndFar:opacity(0)
+function listitem:updateRange(player, isOutsideZone)
+	local opacity = 0
+	local opacityFar = 0
+
+	if player.distance and not isOutsideZone then
+		if settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator then
+			opacity = 1
+			opacityFar = 0
+		elseif settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= settings.rangeIndicatorFar then
+			opacity = 0
+			opacityFar = 1
+		end
 	end
+	
+	self.rangeInd:opacity(opacity)
+	self.rangeIndFar:opacity(opacityFar)
 end
 
-function listitem:updateCursor()
-	if self.isSelected then
-		self.cursor:opacity(1)
-	elseif self.isSubTarget then
-		self.cursor:opacity(0.5)
-	else
-		self.cursor:opacity(0)
+function listitem:updateCursor(player, isOutsideZone)
+	local opacity = 0
+	
+	if not isOutsideZone then
+		if player.isSelected then
+			opacity = 1
+		elseif player.isSubTarget then
+			opacity = 0.5
+		end
 	end
+	
+	self.cursor:opacity(opacity)
 end
 
-function listitem:updateBuffs(buffs)
+function listitem:updateBuffs(buffs, isOutsideZone)
+	if not buffs or isOutsideZone then
+		buffs = T{}
+	end
+
 	if table.equals(buffs, self.currentBuffs) then return end
 	self.currentBuffs = table.copy(buffs)
 	

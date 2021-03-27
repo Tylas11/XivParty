@@ -29,58 +29,105 @@
 local player = {}
 player.__index = player
 
-function player:init()
-	utils:log('Initializing player', 1)
+-- either parameter can be nil, but not both
+function player:init(name, id)
+	if not name and not id then
+		utils:log('Cannot init player without name or ID!', 4)
+		return nil
+	end
+
+	local initText = ''
+	if name then
+		initText = initText .. '. Name = ' .. name
+	end
+	if id then
+		initText = initText .. '. ID = ' .. tostring(id)
+	end
+	utils:log('Initializing player' .. initText, 2)
 
 	local p = {}
 	setmetatable(p, player) -- make handle lookup
 
-	p.name = '???'
-	p.zone = ''
-	p.id = -1
-	
-	p:clear()
+	p.name = name
+	p.id = id
 	
 	return p
 end
 
-function player:clear()
-	self.hp = -1 -- not set: UI will show '?' instead of the number
-	self.mp = -1
-	self.tp = -1
+-- merges data from other player into self
+function player:merge(other)
+	utils:log('Merging player ' .. utils:toString(other.name) .. '(' .. utils:toString(other.id) .. ')' ..
+			  ' into ' .. utils:toString(self.name) .. '(' .. utils:toString(self.id) .. ')', 2)
+
+	if other.name then self.name = other.name end
+	if other.id and other.id > 0 then self.id = other.id end
 	
-	-- percentages
-	self.hpp = 0
-	self.mpp = 0
-	self.tpp = 0
+	if other.hp then self.hp = other.hp end
+	if other.mp then self.mp = other.mp end
+	if other.tp then self.tp = other.tp end
+	if other.hpp then self.hpp = other.hpp end
+	if other.mpp then self.mpp = other.mpp end
+	if other.tpp then self.tpp = other.tpp end
 	
-	self.isSelected = false
-	self.isSubTarget = false
+	if other.isSelected then self.isSelected = other.isSelected end
+	if other.isSubTarget then self.isSubTarget = other.isSubTarget end
+	if other.distance then self.distance = other.distance end
 	
-	--self.isLeader = false
-	--self.isAllianceLeader = false
-	--self.isQuarterMaster = false
+	if other.job then self.job = other.job end
+	if other.jobLvl then self.jobLvl = other.jobLvl end
+	if other.subJob then self.subJob = other.subJob end
+	if other.subJobLvl then self.subJobLvl = other.subJobLvl end
 	
-	self.job = '???'
-	self.jobLvl = 0
-	self.subJob = '???'
-	self.subJobLvl = 0
+	if other.buffs then self.buffs = other.buffs end
+	if other.filteredBuffs then self.filteredBuffs = other.filteredBuffs end
 	
-	self.distance = 99999
-	
-	self.buffs = {} -- list of all buffs this player has
-	self.filteredBuffs = T{} -- list of filtered buffs to be displayed
+	return self
 end
 
-function player:updateBuffs(buffs, filters)
-	self.buffs = buffs
-	self.filteredBuffs = T{}
+function player:update(member, zone, target, subtarget)
+	self.name = member.name
+
+	self.hp = member.hp
+	self.mp = member.mp
+	self.tp = member.tp
+	self.hpp = member.hpp
+	self.mpp = member.mpp
+	self.tpp = math.min(member.tp / 10, 100)
+
+	self.isSelected = target and member.mob and target.id == member.mob.id
+	self.isSubTarget = subtarget and member.mob and subtarget.id == member.mob.id
+	
+	self.zone = member.zone
+	
+	if member.mob then
+		self.id = member.mob.id
+		self.distance = member.mob.distance
+	else
+		self.distance = 99999 -- no mob means player too far to target
+	end
+	
+	local mainPlayer = windower.ffxi.get_player()
+	if member.name == mainPlayer.name then -- set buffs and job info for main player
+		self:updateBuffs(mainPlayer.buffs)
+		self.job = mainPlayer.main_job_id
+		self.jobLvl = mainPlayer.main_job_level
+		
+		if mainPlayer.sub_job_id then -- only if subjob is set
+			self.subJob = mainPlayer.sub_job_id
+			self.subJobLvl = mainPlayer.sub_job_level
+		end
+	end
+end
+
+function player:updateBuffs(buffs)
+	self.buffs = buffs -- list of all buffs this player has
+	self.filteredBuffs = T{} -- list of filtered buffs to be displayed
 	
 	for i = 1, 32 do
 		buff = buffs[i]
 		
-		if (settings.buffs.filterMode == 'blacklist' and filters[buff]) or 
-		   (settings.buffs.filterMode == 'whitelist' and not filters[buff]) then
+		if (settings.buffs.filterMode == 'blacklist' and model.buffFilters[buff]) or 
+		   (settings.buffs.filterMode == 'whitelist' and not model.buffFilters[buff]) then
 			buff = nil
 		end
 		
@@ -93,6 +140,36 @@ function player:updateBuffs(buffs, filters)
 		self.filteredBuffs:sort(buffOrderCompare)
 	else
 		self.filteredBuffs:sort()
+	end
+end
+
+function player:refreshFilteredBuffs()
+	updateBuffs(self.buffs)
+end
+
+function player:updateLeaderFromFlags(flags)
+	self.isLeader = utils:bitAnd(flags, 4) > 0
+	self.isAllianceLeader = utils:bitAnd(flags, 8) > 0
+	self.isQuarterMaster = utils:bitAnd(flags, 16) > 0
+end
+
+function player:updateJobFromPacket(packet)
+	-- these can contain NON 0 / NON 0 when the party member is out of zone
+	-- seem to always get NON 0 / NON 0 if character has no SJ
+	local mJob = packet['Main job']
+	local mJobLvl = packet['Main job level']
+	local sJob =  packet['Sub job']
+	local sJobLvl = packet['Sub job level']
+	
+	if (mJob and mJobLvl and sJob and sJobLvl and mJobLvl > 0) then
+		self.job = mJob
+		self.jobLvl = mJobLvl
+		self.subJob = sJob
+		self.subJobLvl = sJobLvl
+		
+		utils:log('Set job info: '..res.jobs[mJob].name_short..tostring(mJobLvl)..'/'..res.jobs[sJob].name_short..tostring(sJobLvl), 0)
+	else
+		utils:log('Unusable job info. Dropping.', 0)
 	end
 end
 
@@ -114,7 +191,7 @@ function player:dispose()
 	if (self.name) then
 		displayName = self.name
 	end
-	utils:log('Disposing player '..displayName, 1)
+	utils:log('Disposing player '..displayName, 2)
 	
 	setmetatable(self, nil)
 end

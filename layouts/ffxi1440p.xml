@@ -15,6 +15,14 @@
                     <size>103,6</size>
                 </imgFg>
             </hp>
+            <imgGlowMid>
+                <path>assets/BarGlowMid.png</path>
+                <size>6,32</size>
+            </imgGlowMid>
+            <imgGlowSides>
+                <path>assets/BarGlowSides.png</path>
+                <size>3,32</size>
+            </imgGlowSides>
             <mp>
                 <imgBg>
                     <color>#FFFF9CFF</color>

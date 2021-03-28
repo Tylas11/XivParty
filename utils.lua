@@ -44,9 +44,11 @@ function utils:createImage(imageInfo, scaleX, scaleY)
 	local size = utils:coord(imageInfo.size)
 	local image = img:init(windower.addon_path .. imageInfo.path, size.x, size.y, scaleX, scaleY)
 	
-	local color = utils:colorFromHex(imageInfo.color)
-	image:color(color.r, color.g, color.b)
-	image:alpha(color.a)
+	if imageInfo.color then
+		local color = utils:colorFromHex(imageInfo.color)
+		image:color(color.r, color.g, color.b)
+		image:alpha(color.a)
+	end
 	
 	return image
 end

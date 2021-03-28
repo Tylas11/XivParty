@@ -55,6 +55,15 @@ layout.bar.offset = L{ 0, 20 }
 layout.bar.spacingX = 24 -- distance between hp, mp and tp bars
 layout.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
 
+-- glow colors are taken from the respective bar foreground colors
+layout.bar.imgGlowMid = {}
+layout.bar.imgGlowMid.path = 'assets/BarGlowMid.png'
+layout.bar.imgGlowMid.size = L{ 6, 32 }
+
+layout.bar.imgGlowSides = {}
+layout.bar.imgGlowSides.path = 'assets/BarGlowSides.png'
+layout.bar.imgGlowSides.size = L{ 3, 32 }
+
 layout.bar.hp = {}
 layout.bar.hp.imgBg = {}
 layout.bar.hp.imgBg.path = 'assets/BarBG.png'

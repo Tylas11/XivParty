@@ -69,8 +69,8 @@ function player:merge(other)
 	if other.mpp then self.mpp = other.mpp end
 	if other.tpp then self.tpp = other.tpp end
 	
-	if other.isSelected then self.isSelected = other.isSelected end
-	if other.isSubTarget then self.isSubTarget = other.isSubTarget end
+	if other.isSelected ~= nil then self.isSelected = other.isSelected end
+	if other.isSubTarget ~= nil then self.isSubTarget = other.isSubTarget end
 	if other.distance then self.distance = other.distance end
 	
 	if other.job then self.job = other.job end
@@ -80,6 +80,10 @@ function player:merge(other)
 	
 	if other.buffs then self.buffs = other.buffs end
 	if other.filteredBuffs then self.filteredBuffs = other.filteredBuffs end
+	
+	if other.isLeader ~= nil then self.isLeader = other.isLeader end
+	if other.isAllianceLeader ~= nil then self.isAllianceLeader = other.isAllianceLeader end
+	if other.isQuarterMaster ~= nil then self.isQuarterMaster = other.isQuarterMaster end
 	
 	return self
 end

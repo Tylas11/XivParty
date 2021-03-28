@@ -38,11 +38,24 @@ function bar:init(barInfo)
 	obj.imgBg = utils:createImage(barInfo.imgBg, layout.scale)
 	obj.imgFg = utils:createImage(barInfo.imgFg, layout.scale)
 	
+	obj.imgGlowMid = utils:createImage(layout.bar.imgGlowMid, layout.scale)
+	obj.imgGlowLeft = utils:createImage(layout.bar.imgGlowSides, layout.scale)
+	obj.imgGlowRight = utils:createImage(layout.bar.imgGlowSides, layout.scale)
+	
+	obj.imgGlowMid:color(utils:colorFromHex(barInfo.imgFg.color))
+	obj.imgGlowLeft:color(utils:colorFromHex(barInfo.imgFg.color))
+	obj.imgGlowRight:color(utils:colorFromHex(barInfo.imgFg.color))
+	
 	obj.value = 1
 	obj.exactValue = 1
 	
 	obj.sizeBg = utils:coord(barInfo.imgBg.size)
 	obj.sizeFg = utils:coord(barInfo.imgFg.size)
+	obj.sizeGlow = utils:coord(layout.bar.imgGlowMid.size)
+	obj.sizeGlowSides = utils:coord(layout.bar.imgGlowSides.size)
+	
+	-- flip horizontally, this will move the image origin to the top-right corner
+	obj.imgGlowRight:size(-obj.sizeGlowSides.x, obj.sizeGlowSides.y)
 	
 	obj.size = {}
 	obj.size.width = obj.imgBg:scaledSize().width -- this assumes the BG is larger than the FG
@@ -56,6 +69,9 @@ function bar:dispose()
 
 	self.imgBg:dispose()
 	self.imgFg:dispose()
+	self.imgGlowMid:dispose()
+	self.imgGlowLeft:dispose()
+	self.imgGlowRight:dispose()
 
 	setmetatable(self, nil)
 end
@@ -75,8 +91,35 @@ function bar:update(targetValue)
 		self.exactValue = self.exactValue + (targetValue - self.exactValue) * layout.bar.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
+	    
+		-- instantly move the bar, the glow will be animated instead
+		self.imgFg:size(self.sizeFg.x * targetValue, self.sizeFg.y)
+	end
 	
-		self.imgFg:size(self.sizeFg.x * self.value, self.sizeFg.y)
+	self:updateGlow(targetValue)
+end
+
+function bar:updateGlow(targetValue)
+	if math.abs(targetValue - self.value) > 0.01 then
+		local glowWidth = self.sizeFg.x * math.abs(targetValue - self.value)
+		
+		-- center glow vertically on the bar foreground image
+		local glowMidPosY = self.imgFg:pos().y + (self.sizeFg.y / 2 - self.sizeGlow.y / 2) * layout.scale
+		local glowSidesPosY = self.imgFg:pos().y + (self.sizeFg.y / 2 - self.sizeGlowSides.y / 2) * layout.scale
+	
+		self.imgGlowMid:opacity(1)
+		self.imgGlowLeft:opacity(1)
+		self.imgGlowRight:opacity(1)
+	
+		self.imgGlowMid:size(glowWidth, self.sizeGlow.y)
+		self.imgGlowMid:pos(self.imgFg:pos().x + self.sizeFg.x * math.min(targetValue, self.value) * layout.scale, glowMidPosY)
+			
+		self.imgGlowLeft:pos(self.imgGlowMid:pos().x - self.sizeGlowSides.x * layout.scale, glowSidesPosY)
+		self.imgGlowRight:pos(self.imgGlowMid:pos().x + (glowWidth + self.sizeGlowSides.x) * layout.scale, glowSidesPosY)
+	else
+		self.imgGlowMid:opacity(0)
+		self.imgGlowLeft:opacity(0)
+		self.imgGlowRight:opacity(0)
 	end
 end
 
@@ -87,11 +130,17 @@ end
 function bar:show()
 	self.imgBg:show()
 	self.imgFg:show()
+	self.imgGlowMid:show()
+	self.imgGlowLeft:show()
+	self.imgGlowRight:show()
 end
 
 function bar:hide()
 	self.imgBg:hide()
 	self.imgFg:hide()
+	self.imgGlowMid:hide()
+	self.imgGlowLeft:hide()
+	self.imgGlowRight:hide()
 end
 
 return bar

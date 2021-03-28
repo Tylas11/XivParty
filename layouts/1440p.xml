@@ -52,17 +52,17 @@
         </bar>
         <bg>
             <imgBottom>
-                <color>#FFFFFFFF</color>
+                <color>#FFFFFFDD</color>
                 <path>assets/BgBottom.png</path>
                 <size>377,21</size>
             </imgBottom>
             <imgMid>
-                <color>#FFFFFFFF</color>
+                <color>#FFFFFFDD</color>
                 <path>assets/BgMid.png</path>
                 <size>377,12</size>
             </imgMid>
             <imgTop>
-                <color>#FFFFFFFF</color>
+                <color>#FFFFFFDD</color>
                 <path>assets/BgTop.png</path>
                 <size>377,21</size>
             </imgTop>

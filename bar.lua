@@ -42,10 +42,11 @@ function bar:init(barInfo)
 	obj.imgGlowLeft = utils:createImage(layout.bar.imgGlowSides, layout.scale)
 	obj.imgGlowRight = utils:createImage(layout.bar.imgGlowSides, layout.scale)
 	
-	obj.imgGlowMid:color(utils:colorFromHex(barInfo.imgFg.color))
-	obj.imgGlowLeft:color(utils:colorFromHex(barInfo.imgFg.color))
-	obj.imgGlowRight:color(utils:colorFromHex(barInfo.imgFg.color))
+	obj.imgGlowMid:color(utils:colorFromHex(barInfo.glowColor))
+	obj.imgGlowLeft:color(utils:colorFromHex(barInfo.glowColor))
+	obj.imgGlowRight:color(utils:colorFromHex(barInfo.glowColor))
 	
+	obj.isDimmed = false
 	obj.value = 1
 	obj.exactValue = 1
 	
@@ -92,15 +93,18 @@ function bar:update(targetValue)
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
 	    
-		-- instantly move the bar, the glow will be animated instead
-		self.imgFg:size(self.sizeFg.x * targetValue, self.sizeFg.y)
+		if self.isDimmed then -- animate bar, glow hidden while dimmed
+			self.imgFg:size(self.sizeFg.x * self.value, self.sizeFg.y)
+		else -- instantly move the bar, the glow will be animated instead
+			self.imgFg:size(self.sizeFg.x * targetValue, self.sizeFg.y)
+		end
 	end
 	
 	self:updateGlow(targetValue)
 end
 
 function bar:updateGlow(targetValue)
-	if math.abs(targetValue - self.value) > 0.01 then
+	if not self.isDimmed and math.abs(targetValue - self.value) > 0.01 then
 		local glowWidth = self.sizeFg.x * math.abs(targetValue - self.value)
 		
 		-- center glow vertically on the bar foreground image
@@ -124,6 +128,7 @@ function bar:updateGlow(targetValue)
 end
 
 function bar:opacity(o)
+	self.isDimmed = o < 1
 	self.imgFg:opacity(o)
 end
 

@@ -38,17 +38,17 @@ layout.bg = {}
 layout.bg.imgTop = {}
 layout.bg.imgTop.path = 'assets/BgTop.png'
 layout.bg.imgTop.size = L{ 377, 21 }
-layout.bg.imgTop.color = '#FFFFFFFF'
+layout.bg.imgTop.color = '#FFFFFFDD'
 
 layout.bg.imgMid = {}
 layout.bg.imgMid.path = 'assets/BgMid.png' -- this texture is repeated vertically when the list resizes
 layout.bg.imgMid.size = L{ 377, 12 }
-layout.bg.imgMid.color = '#FFFFFFFF'
+layout.bg.imgMid.color = '#FFFFFFDD'
 
 layout.bg.imgBottom = {}
 layout.bg.imgBottom.path = 'assets/BgBottom.png'
 layout.bg.imgBottom.size = L{ 377, 21 }
-layout.bg.imgBottom.color = '#FFFFFFFF'
+layout.bg.imgBottom.color = '#FFFFFFDD'
 
 layout.bar = {}
 layout.bar.offset = L{ 0, 20 }
@@ -65,6 +65,7 @@ layout.bar.imgGlowSides.path = 'assets/BarGlowSides.png'
 layout.bar.imgGlowSides.size = L{ 3, 32 }
 
 layout.bar.hp = {}
+layout.bar.hp.glowColor = '#FFFFFFFF'
 layout.bar.hp.imgBg = {}
 layout.bar.hp.imgBg.path = 'assets/BarBG.png'
 layout.bar.hp.imgBg.size = L{ 107, 10 }
@@ -75,6 +76,7 @@ layout.bar.hp.imgFg.size = L{ 103, 6 }
 layout.bar.hp.imgFg.color = '#FFFFFFFF'
 
 layout.bar.mp = {}
+layout.bar.mp.glowColor = '#FFFFFFFF'
 layout.bar.mp.imgBg = {}
 layout.bar.mp.imgBg.path = 'assets/BarBG.png'
 layout.bar.mp.imgBg.size = L{ 107, 10 }
@@ -85,6 +87,7 @@ layout.bar.mp.imgFg.size = L{ 103, 6 }
 layout.bar.mp.imgFg.color = '#FFFFFFFF'
 
 layout.bar.tp = {}
+layout.bar.tp.glowColor = '#FFFFFFFF'
 layout.bar.tp.imgBg = {}
 layout.bar.tp.imgBg.path = 'assets/BarBG.png'
 layout.bar.tp.imgBg.size = L{ 107, 10 }

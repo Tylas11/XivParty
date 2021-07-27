@@ -3,7 +3,7 @@ A party list addon for Windower 4.
 
 Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be filtered and are sorted debuffs before buffs for easier visibility. Distance to party members is indicated by dimming HP bars when out of casting or targeting range.
 
-![Screenshot](https://i.imgur.com/VtnZmB0.jpg)
+![Screenshot](https://i.imgur.com/IYV8rz4.jpg) ![Screenshot2](https://i.imgur.com/Y3rPvf0.jpg)
 
 ## Installation
 * Download the [latest release](https://github.com/Tylas11/XivParty/releases) and extract it to Windower4/addons
@@ -22,10 +22,10 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 | //xp filter mode        | Switches between blacklist and whitelist filter mode (both use same filter list).              |
 | //xp buffs [name]       | Shows list of currently active buffs (and IDs) for a party member. Omit name to see own buffs. |
 | //xp range [near] [far] | Shows a marker for each party member closer than the set distances. "off" or "0" to disable.   |
-| //xp customOrder        | Toggles custom buff ordering (customize in bufforder.lua).                                     |
+| //xp customOrder        | Toggles custom buff order (customize in bufforder.lua).                                        |
 | //xp hideSolo           | Hides the party list while solo.                                                               |
 | //xp alignBottom        | Expands the party list from bottom to top.                                                     |
-| //xp move               | Move the UI via drag and drop, use mouse wheel to adjust space between party members.          |
+| //xp setup              | Toggles setup mode showing 6 fake party members. Move the UI via drag and drop, hold CTRL for grid snap. <br> Use mouse wheel to adjust space between party members. |
 | //xp layout [file]      | Loads a UI layout file from the XivParty/layouts directory. Omit file extension. <br/> Use "auto" to enable resolution based selection (for default layouts only). |
 
 ## Range Indication
@@ -33,8 +33,8 @@ The distance to party members is indicated by dimming their HP bars in two stage
 
 There is also a customizable range indicator useful when casting aoe buffs. Set a near and an optional far distance with the "range" command. A filled diamond icon (near) or a hollow diamond icon (far) will appear below the HP bar of any party member in range. The main player will always have the icon displayed when the feature is active. Set the range to "off" or "0" to disable.
 
-## Custom Buff Ordering
-By default buffs are ordered debuffs first, then buffs by various categories. This can be disabled to revert to the game's original ordering, which is sometimes random and based on when the buff was added to the game.
+## Custom Buff Order
+By default buffs are sorted debuffs first, then buffs by various categories. This can be disabled to revert back to the game's original order, which is sometimes random and based on when the buff was added to the game.
 
 You can customize the sorting order by editing the file bufforder.lua. Just reorder the lines of the list. Do not change the IDs. The name strings are not used by the addon and are only there for readability. Save the file as UTF-8 without BOM or ANSI (however this will destroy the Japanese translations).
 
@@ -55,6 +55,9 @@ The HP/MP/TP bars each use a background and foreground image which can be set se
 Buffs are positioned at the left edge of the TP bar and extend to the right. They wrap around to a second row when there are more buffs than the "wrap" count set in the layout. The "wrapOffset" will push the second row by a number of icon widths to the right.
 
 The icons can be configured to align right and extend to the left. They will still start at the left edge of the TP bar, so a negative offset is recommended to move them outside the party list window.
+
+#### Job Icons
+Consist of five separate images (front to back): frame, icon, gradient, background and highlight. The image files are 64 x 64 but are currently displayed at a smaller size. The icon can be scaled up in the layout by setting the respective size values. The background image color is set in code based on the job's role and can be customized in the layout. Job roles can be changed or added in jobs.lua, when adding new roles also add a color entry with the same name in the layout. 
 
 #### Texts
 Most texts can be configured separately, only the HP/MP/TP numbers share the same settings. There are additional font colors when the TP bar fills up or when HP drops below certain percentages. The zone name can optionally be right-aligned to the right edge of the TP bar. When using right alignment, it is recommended to use the "short" zone names or they might overlap with long player names.

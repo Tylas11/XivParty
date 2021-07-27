@@ -80,7 +80,7 @@ end
 function bg:resize(rowCount)
 	utils:log('BG setting row count: ' .. rowCount, 1)
 
-	self.contentHeight = rowCount * (layout.list.itemHeight + settings.spacingY) / layout.scale
+	self.contentHeight = (rowCount * (layout.list.itemHeight) + (rowCount - 1) * settings.itemSpacing) / layout.scale
 	self.mid:size(self.sizeMid.x, self.contentHeight)
 	self.mid.image:repeat_xy(1, math.floor(self.contentHeight / self.sizeMid.y))
 	self:pos(self.posX, self.posY) -- refresh position of bottom tile

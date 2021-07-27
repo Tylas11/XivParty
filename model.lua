@@ -26,14 +26,29 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local model = {}
 local player = require('player')
 
--- NOTE: list indices start with 1. when forced to index 0, iterating with :it() will work but out of order
+local model = {}
+model.__index = model
 
-model.players = T{} -- party members to be displayed in the view, ordered by party list position, index range 0..5
-model.allPlayers = T{} -- unordered list of all players that we ever received data for
-model.buffFilters = T{} -- dictionary, key: buff ID, value: bool indicating whether to filter
+function model:init()
+	local obj = {}
+	setmetatable(obj, model) -- make handle lookup
+	
+	-- NOTE: list indices start with 1. when forced to index 0, iterating with :it() will work but out of order
+	
+	obj.players = T{} -- party members to be displayed in the view, ordered by party list position, index range 0..5
+	obj.allPlayers = T{} -- unordered list of all players that we ever received data for
+	obj.buffFilters = T{} -- dictionary, key: buff ID, value: bool indicating whether to filter
+	
+	return obj
+end
+
+function model:dispose()
+	self:clear()
+
+	setmetatable(self, nil)
+end
 
 function model:clear()
 	for ap in self.allPlayers:it() do
@@ -90,11 +105,27 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 		end
 	end
 	
-	-- found by both, but they are not the same object then merge
+	-- found by both, but they are not the same object
 	if foundByName and foundById and foundByName ~= foundById then
-		foundPlayer = foundByName:merge(foundById)
-		foundById:dispose()
-		self.allPlayers:delete(foundById)
+		-- both have an ID but it is not the same, this can happen if players/trusts left the party and are still in the allPlayers list
+		if foundByName.id ~= nil and foundById.id ~= nil and foundByName.id > 0 and foundById.id > 0 and foundByName.id ~= foundById.id then
+			utils:log('ID conflict finding player, returning player with higher ID.', 2)
+		
+			-- use the player with the higher ID (most likely newer, confirmed true for trusts)
+			if foundByName.id > foundById.id then
+				foundPlayer = foundByName
+				foundById:dispose()
+				self.allPlayers:delete(foundById)
+			else
+				foundPlayer = foundById
+				foundByName:dispose()
+				self.allPlayers:delete(foundByName)
+			end
+		else -- merge
+			foundPlayer = foundByName:merge(foundById)
+			foundById:dispose()
+			self.allPlayers:delete(foundById)
+		end
 	else
 		if foundByName then
 			foundPlayer = foundByName
@@ -104,7 +135,7 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 		
 		if not foundPlayer and not dontCreate then
 			utils:log('Creating new player (' .. debugTag .. ')', 2)
-			foundPlayer = player:init(name, id)
+			foundPlayer = player:init(name, id, self)
 			self.allPlayers:append(foundPlayer)
 		end
 	end
@@ -115,6 +146,38 @@ end
 -- finds player by name, returns nil if not found
 function model:findPlayer(name)
 	return self:getPlayer(name, nil, 'findPlayer', true)
+end
+
+-- gets leader of current party
+function model:getPartyLeader()
+	for player in self.players:it() do
+		if player.isLeader then
+			return player
+		end
+	end
+	
+	return nil
+end
+
+-- creates players and buffs for setup mode
+function model:createSetupData()
+	local setupJobs = {
+		[0] = { j = 'RUN', sj = 'DRK' },
+		[1] = { j = 'WHM', sj = 'SCH' },
+		[2] = { j = 'MNK', sj = 'WAR' },
+		[3] = { j = 'DRK', sj = 'SAM' },
+		[4] = { j = 'SMN', sj = 'RDM' },
+		[5] = { j = 'BRD', sj = 'NIN' }
+	}
+
+	for i = 0, 5 do
+		local p = player:init('Player' .. tostring(i+1), (i+1), self)
+		p:createSetupData(setupJobs[i].j, setupJobs[i].sj)
+		self.players[i] = p
+	end
+	
+	self.players[0].isLeader = true
+	self.players[math.random(0,5)].isSelected = true
 end
 
 return model

@@ -503,6 +503,7 @@ local buffOrder = L{
 	{id=620,en="Awaken",ja="覚醒",enl="awakened",jal="覚醒"},
 	{id=622,en="Guarding Rate Boost",ja="ガード率アップ",enl="Guarding Rate Boost",jal="ガード率アップ"},
 	{id=623,en="Rampart",ja="ランパート",enl="Rampart",jal="ランパート"},
+	{id=628,en="Hover Shot",ja="ホバーショット",enl="Hover Shot",jal="ホバーショット"},
 	
 	-- dancer
 	{id=368,en="Drain Samba",ja="ドレインサンバ",enl="Drain Samba",jal="ドレインサンバ"},
@@ -726,6 +727,7 @@ local buffOrder = L{
 	
 	-- 72hr buffs
 	{id=481,en="Abdhaljs Seal",ja="アブダルスの焼印",enl="Abdhaljs Seal",jal="アブダルスの焼印"},
+	{id=629,en="Moogle Amplifier",ja="モグアンプ",enl="Moogle Amplifier",jal="モグアンプ"},
 	{id=618,en="Emporox's Gift",ja="エンポロックスのツボ",enl="Emporox's Gift",jal="エンポロックスのツボ"},
 	
 	-- unused?

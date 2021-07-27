@@ -4,6 +4,7 @@
         <bar>
             <animSpeed>0.1</animSpeed>
             <hp>
+                <glowColor>#FFFFFFFF</glowColor>
                 <imgBg>
                     <color>#FF9597FF</color>
                     <path>assets/BarBG_grey.png</path>
@@ -24,6 +25,7 @@
                 <size>3,32</size>
             </imgGlowSides>
             <mp>
+                <glowColor>#FFFFFFFF</glowColor>
                 <imgBg>
                     <color>#FFFF9CFF</color>
                     <path>assets/BarBG_grey.png</path>
@@ -38,6 +40,7 @@
             <offset>0,20</offset>
             <spacingX>25</spacingX>
             <tp>
+                <glowColor>#FFFFFFFF</glowColor>
                 <imgBg>
                     <color>#8EB4F9FF</color>
                     <path>assets/BarBG_grey.png</path>
@@ -54,17 +57,17 @@
             <imgBottom>
                 <color>#FFFFFFDD</color>
                 <path>assets/FfxiBgBottom.png</path>
-                <size>420,10</size>
+                <size>427,10</size>
             </imgBottom>
             <imgMid>
                 <color>#FFFFFFDD</color>
                 <path>assets/FfxiBgMid.png</path>
-                <size>420,4</size>
+                <size>427,4</size>
             </imgMid>
             <imgTop>
                 <color>#FFFFFFDD</color>
                 <path>assets/FfxiBgTop.png</path>
-                <size>420,12</size>
+                <size>427,12</size>
             </imgTop>
         </bg>
         <buffIcons>
@@ -82,8 +85,49 @@
                 <path>assets/Cursor.png</path>
                 <size>46,36</size>
             </img>
-            <offset>0,0</offset>
+            <offset>-76,0</offset>
         </cursor>
+        <jobIcon>
+            <colors>
+                <dd>#663535FF</dd>
+                <healer>#3B6529FF</healer>
+                <special>#FFFFFFFF</special>
+                <support>#DAB200FF</support>
+                <tank>#364597FF</tank>
+            </colors>
+            <imgBg>
+                <color>#FFFFFFFF</color>
+                <offset>0,0</offset>
+                <path>assets/jobIcons/bg.png</path>
+                <size>36,36</size>
+            </imgBg>
+            <imgFrame>
+                <color>#FFFFFFFF</color>
+                <offset>0,0</offset>
+                <path>assets/jobIcons/frame.png</path>
+                <size>36,36</size>
+            </imgFrame>
+            <imgGradient>
+                <color>#FFFFFFFF</color>
+                <offset>0,0</offset>
+                <path>assets/jobIcons/gradient.png</path>
+                <size>36,36</size>
+            </imgGradient>
+            <imgHighlight>
+                <color>#FFFFFFFF</color>
+                <offset>-13,-13</offset>
+                <path>assets/jobIcons/highlight.png</path>
+                <size>62,62</size>
+            </imgHighlight>
+            <imgIcon>
+                <color>#FFFFFFFF</color>
+                <offset>0,-0.25</offset>
+                <path />
+                <size>36,36</size>
+            </imgIcon>
+            <offset>-41,-2</offset>
+            <path>assets/jobIcons/</path>
+        </jobIcon>
         <leader>
             <allianceColor>#FFFFFFFF</allianceColor>
             <img>
@@ -95,8 +139,8 @@
             <quarterMasterColor>#66E659FF</quarterMasterColor>
         </leader>
         <list>
-            <itemHeight>42</itemHeight>
-            <offset>15,0</offset>
+            <itemHeight>46</itemHeight>
+            <offset>22,0</offset>
         </list>
         <range>
             <img>

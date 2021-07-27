@@ -26,6 +26,7 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+local jobIcon = require('jobIcon')
 local bar = require('bar')
 
 local listitem = {}
@@ -40,6 +41,8 @@ function listitem:init()
 	obj.hidden = false
 	
 	-- order of creation determines Z-order
+	obj.jobIcon = jobIcon:init()
+	
 	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
 	obj.cursor:opacity(0)
 	obj.cursor:show()
@@ -100,6 +103,7 @@ function listitem:init()
 	obj.zoneOffset = utils:coord(layout.text.zone.offset)
 	obj.jobOffset = utils:coord(layout.text.job.offset)
 	obj.subJobOffset = utils:coord(layout.text.subJob.offset)
+	obj.jobIconOffset = utils:coord(layout.jobIcon.offset)
 	
 	obj.buffImages = {}
 	for i = 1, 32 do
@@ -129,6 +133,8 @@ function listitem:dispose()
 	texts.destroy(self.jobText)
 	texts.destroy(self.subJobText)
 	
+	self.jobIcon:dispose()
+	
 	self.leader:dispose()
 	self.allianceLeader:dispose()
 	self.quarterMaster:dispose()
@@ -153,7 +159,7 @@ function listitem:pos(x, y)
 	self.mpBar:pos(mpPosX, y + self.barOffset.y)
 	self.tpBar:pos(tpPosX, y + self.barOffset.y)
 
-	self.cursor:pos(hpPosX - self.cursor:scaledSize().width + self.cursorOffset.x, y + self.cursorOffset.y)
+	self.cursor:pos(x + self.cursorOffset.x, y + self.cursorOffset.y)
 	
 	-- right aligned text coordinates start at the right side of the screen
 	local screenResX = windower.get_windower_settings().ui_x_res
@@ -165,6 +171,8 @@ function listitem:pos(x, y)
 	self.nameText:pos(hpPosX + self.nameOffset.x, y + self.nameOffset.y)
 	self.jobText:pos(hpPosX + self.jobOffset.x, y + self.jobOffset.y)
 	self.subJobText:pos(hpPosX + self.subJobOffset.x, y + self.subJobOffset.y)
+	
+	self.jobIcon:pos(x + self.jobIconOffset.x, y + self.jobIconOffset.y)
 	
 	if layout.text.zone.alignRight then
 		self.zoneText:pos(tpPosX + self.tpBar.size.width - screenResX + self.zoneOffset.x, y + self.zoneOffset.y)
@@ -212,6 +220,7 @@ function listitem:update(player)
 			self.nameText:text('???')
 		end
 		
+		self.jobIcon:update(player, isOutsideZone)
 		self:updateZone(player, isOutsideZone)
 		self:updateJob(player, isOutsideZone)
 		self:updateLeader(player)
@@ -288,12 +297,18 @@ function listitem:updateJob(player, isOutsideZone)
 	local subJobString = ''
 	
 	if not isOutsideZone then
-		if player.job and player.jobLvl and player.jobLvl > 0 then
-			jobString = res.jobs[player.job].name_short .. ' ' .. tostring(player.jobLvl)
+		if player.job then
+			jobString = player.job
+			if player.jobLvl then
+				jobString = jobString .. ' ' .. tostring(player.jobLvl)
+			end
 		end
 		
-		if player.subJob and player.subJobLvl and player.subJobLvl > 0 then
-			subJobString = res.jobs[player.subJob].name_short .. ' ' .. tostring(player.subJobLvl)
+		if player.subJob then
+			subJobString = player.subJob
+			if player.subJobLvl then
+				subJobString = subJobString .. ' ' .. tostring(player.subJobLvl)
+			end
 		end
 	end
 	
@@ -407,6 +422,8 @@ function listitem:show()
 	self.jobText:show()
 	self.subJobText:show()
 	
+	self.jobIcon:show()
+	
 	self.leader:show()
 	self.allianceLeader:show()
 	self.quarterMaster:show()
@@ -434,6 +451,8 @@ function listitem:hide()
 	
 	self.jobText:hide()
 	self.subJobText:hide()
+	
+	self.jobIcon:hide()
 	
 	self.leader:hide()
 	self.allianceLeader:hide()

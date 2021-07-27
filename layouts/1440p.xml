@@ -4,6 +4,7 @@
         <bar>
             <animSpeed>0.1</animSpeed>
             <hp>
+                <glowColor>#FFFFFFFF</glowColor>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <path>assets/BarBG.png</path>
@@ -24,6 +25,7 @@
                 <size>3,32</size>
             </imgGlowSides>
             <mp>
+                <glowColor>#FFFFFFFF</glowColor>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <path>assets/BarBG.png</path>
@@ -38,6 +40,7 @@
             <offset>0,20</offset>
             <spacingX>24</spacingX>
             <tp>
+                <glowColor>#FFFFFFFF</glowColor>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <path>assets/BarBG.png</path>
@@ -79,11 +82,52 @@
         <cursor>
             <img>
                 <color>#FFFFFFFF</color>
-                <path>assets/Cursor.png</path>
-                <size>46,36</size>
+                <path>assets/CursorXiv.png</path>
+                <size>390,60</size>
             </img>
-            <offset>0,0</offset>
+            <offset>-10,-8</offset>
         </cursor>
+        <jobIcon>
+            <colors>
+                <dd>#663535FF</dd>
+                <healer>#3B6529FF</healer>
+                <special>#FFFFFFFF</special>
+                <support>#DAB200FF</support>
+                <tank>#364597FF</tank>
+            </colors>
+            <imgBg>
+                <color>#FFFFFFFF</color>
+                <offset>0,0</offset>
+                <path>assets/jobIcons/bg.png</path>
+                <size>36,36</size>
+            </imgBg>
+            <imgFrame>
+                <color>#FFFFFFFF</color>
+                <offset>0,0</offset>
+                <path>assets/jobIcons/frame.png</path>
+                <size>36,36</size>
+            </imgFrame>
+            <imgGradient>
+                <color>#FFFFFFFF</color>
+                <offset>0,0</offset>
+                <path>assets/jobIcons/gradient.png</path>
+                <size>36,36</size>
+            </imgGradient>
+            <imgHighlight>
+                <color>#FFFFFFFF</color>
+                <offset>-13,-13</offset>
+                <path>assets/jobIcons/highlight.png</path>
+                <size>62,62</size>
+            </imgHighlight>
+            <imgIcon>
+                <color>#FFFFFFFF</color>
+                <offset>0,-0.25</offset>
+                <path />
+                <size>36,36</size>
+            </imgIcon>
+            <offset>-41,-2</offset>
+            <path>assets/jobIcons/</path>
+        </jobIcon>
         <leader>
             <allianceColor>#FFFFFFFF</allianceColor>
             <img>
@@ -95,7 +139,7 @@
             <quarterMasterColor>#66E659FF</quarterMasterColor>
         </leader>
         <list>
-            <itemHeight>42</itemHeight>
+            <itemHeight>46</itemHeight>
             <offset>30,0</offset>
         </list>
         <range>

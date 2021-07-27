@@ -31,7 +31,7 @@ local layout = {}
 layout.scale = 1 -- image scale factor. does not affect offsets, spacings or font sizes. intended for easier creation of multi resolution layouts
 
 layout.list = {}
-layout.list.itemHeight = 40 -- overall height of a party list item (top to bottom, including all texts, images). not affected by scale
+layout.list.itemHeight = 46 -- overall height of a party list item (top to bottom, including all texts, images). not affected by scale
 layout.list.offset = L{ 30, 0 } -- distance between edge of the mid background part and party list items
 
 layout.bg = {}
@@ -97,6 +97,46 @@ layout.bar.tp.imgFg.path = 'assets/BarFG.png'
 layout.bar.tp.imgFg.size = L{ 103, 6 }
 layout.bar.tp.imgFg.color = '#FFFFFFFF'
 
+layout.jobIcon = {}
+layout.jobIcon.offset = L{ -41, -2 } -- offset for the whole component
+layout.jobIcon.path = 'assets/jobIcons/' -- where all job icons are located, named <3 letter job>.png
+layout.jobIcon.colors = {} -- background colors for job roles
+layout.jobIcon.colors.dd = '#663535FF'
+layout.jobIcon.colors.tank = '#364597FF'
+layout.jobIcon.colors.healer = '#3B6529FF'
+layout.jobIcon.colors.support = '#DAB200FF'
+layout.jobIcon.colors.special = '#FFFFFFFF'
+
+layout.jobIcon.imgFrame = {}
+layout.jobIcon.imgFrame.offset = L{ 0, 0 }
+layout.jobIcon.imgFrame.path = 'assets/jobIcons/frame.png'
+layout.jobIcon.imgFrame.size = L{ 36, 36 }
+layout.jobIcon.imgFrame.color = '#FFFFFFFF'
+
+layout.jobIcon.imgIcon = {}
+layout.jobIcon.imgIcon.offset = L{ 0, -0.25 } -- slight Y offset to improve aliasing artifacts from scaling
+layout.jobIcon.imgIcon.path = '' -- must remain empty
+layout.jobIcon.imgIcon.size = L{ 36, 36 }
+layout.jobIcon.imgIcon.color = '#FFFFFFFF'
+
+layout.jobIcon.imgGradient = {}
+layout.jobIcon.imgGradient.offset = L{ 0, 0 }
+layout.jobIcon.imgGradient.path = 'assets/jobIcons/gradient.png'
+layout.jobIcon.imgGradient.size = L{ 36, 36 }
+layout.jobIcon.imgGradient.color = '#FFFFFFFF'
+
+layout.jobIcon.imgBg = {}
+layout.jobIcon.imgBg.offset = L{ 0, 0 }
+layout.jobIcon.imgBg.path = 'assets/jobIcons/bg.png'
+layout.jobIcon.imgBg.size = L{ 36, 36 }
+layout.jobIcon.imgBg.color = '#FFFFFFFF' -- will be overwritten with role colors
+
+layout.jobIcon.imgHighlight = {}
+layout.jobIcon.imgHighlight.offset = L{ -13, -13 } -- relative to the whole job icon component position
+layout.jobIcon.imgHighlight.path = 'assets/jobIcons/highlight.png'
+layout.jobIcon.imgHighlight.size = L{ 62, 62 }
+layout.jobIcon.imgHighlight.color = '#FFFFFFFF'
+
 layout.leader = {}
 layout.leader.offset = L{ 58, 15 }
 layout.leader.img = {}
@@ -121,10 +161,10 @@ layout.rangeFar.img.size = L{ 10, 10 }
 layout.rangeFar.img.color = '#FFFFFFFF'
 
 layout.cursor = {}
-layout.cursor.offset = L{ 0, 0 }
+layout.cursor.offset = L{ -50, 0 }
 layout.cursor.img = {}
 layout.cursor.img.path = 'assets/Cursor.png'
-layout.cursor.img.size = L{ 46, 36 } -- cursor is right aligned, this will be used to offset it to the left
+layout.cursor.img.size = L{ 46, 36 }
 layout.cursor.img.color = '#FFFFFFFF'
 
 layout.buffIcons = {}

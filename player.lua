@@ -26,14 +26,21 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+local jobs = require('jobs')
+
 local player = {}
 player.__index = player
 
 -- either parameter can be nil, but not both
-function player:init(name, id)
+function player:init(name, id, mdl)
 	if not name and not id then
 		utils:log('Cannot init player without name or ID!', 4)
 		return nil
+	end
+	
+	if not mdl then
+		utils:log('Cannot init player without model!', 4)
+		return
 	end
 
 	local initText = ''
@@ -45,13 +52,24 @@ function player:init(name, id)
 	end
 	utils:log('Initializing player' .. initText, 2)
 
-	local p = {}
-	setmetatable(p, player) -- make handle lookup
+	local obj = {}
+	setmetatable(obj, player) -- make handle lookup
 
-	p.name = name
-	p.id = id
+	obj.name = name
+	obj.id = id
+	obj.model = mdl
 	
-	return p
+	return obj
+end
+
+function player:dispose()
+	local displayName = '???'
+	if (self.name) then
+		displayName = self.name
+	end
+	utils:log('Disposing player '..displayName, 2)
+	
+	setmetatable(self, nil)
 end
 
 -- merges data from other player into self
@@ -72,6 +90,8 @@ function player:merge(other)
 	if other.isSelected ~= nil then self.isSelected = other.isSelected end
 	if other.isSubTarget ~= nil then self.isSubTarget = other.isSubTarget end
 	if other.distance then self.distance = other.distance end
+	
+	if other.isTrust ~= nil then self.isTrust = other.isTrust end
 	
 	if other.job then self.job = other.job end
 	if other.jobLvl then self.jobLvl = other.jobLvl end
@@ -106,6 +126,23 @@ function player:update(member, zone, target, subtarget)
 	if member.mob then
 		self.id = member.mob.id
 		self.distance = member.mob.distance
+		self.isTrust = member.mob.is_npc
+		
+		if self.isTrust and (self.job == nil or self.jobLvl == nil or self.jobLvl == 0) then -- optimization: only update if job/lvl not set
+			local trustInfo = jobs:getTrustInfo(self.name, member.mob.models[1])
+			if trustInfo then
+				self.job = trustInfo.job
+				self.subJob = trustInfo.subJob
+				
+				local partyLeader = self.model:getPartyLeader()
+				if partyLeader and partyLeader.jobLvl then
+					self.jobLvl = partyLeader.jobLvl
+					self.subJobLvl = math.max(1, math.floor(partyLeader.jobLvl / 2))
+				end
+			else
+				utils:log('Failed to get trust info for ' .. self.name, 4)
+			end
+		end
 	else
 		self.distance = 99999 -- no mob means player too far to target
 	end
@@ -113,11 +150,11 @@ function player:update(member, zone, target, subtarget)
 	local mainPlayer = windower.ffxi.get_player()
 	if member.name == mainPlayer.name then -- set buffs and job info for main player
 		self:updateBuffs(mainPlayer.buffs)
-		self.job = mainPlayer.main_job_id
+		self.job = res.jobs[mainPlayer.main_job_id].name_short
 		self.jobLvl = mainPlayer.main_job_level
 		
 		if mainPlayer.sub_job_id then -- only if subjob is set
-			self.subJob = mainPlayer.sub_job_id
+			self.subJob = res.jobs[mainPlayer.sub_job_id].name_short
 			self.subJobLvl = mainPlayer.sub_job_level
 		end
 	end
@@ -127,11 +164,13 @@ function player:updateBuffs(buffs)
 	self.buffs = buffs -- list of all buffs this player has
 	self.filteredBuffs = T{} -- list of filtered buffs to be displayed
 	
+	if not buffs then return end
+	
 	for i = 1, 32 do
 		buff = buffs[i]
 		
-		if (settings.buffs.filterMode == 'blacklist' and model.buffFilters[buff]) or 
-		   (settings.buffs.filterMode == 'whitelist' and not model.buffFilters[buff]) then
+		if (settings.buffs.filterMode == 'blacklist' and self.model.buffFilters[buff]) or 
+		   (settings.buffs.filterMode == 'whitelist' and not self.model.buffFilters[buff]) then
 			buff = nil
 		end
 		
@@ -148,7 +187,7 @@ function player:updateBuffs(buffs)
 end
 
 function player:refreshFilteredBuffs()
-	updateBuffs(self.buffs)
+	self:updateBuffs(self.buffs)
 end
 
 function player:updateLeaderFromFlags(flags)
@@ -166,15 +205,44 @@ function player:updateJobFromPacket(packet)
 	local sJobLvl = packet['Sub job level']
 	
 	if (mJob and mJobLvl and sJob and sJobLvl and mJobLvl > 0) then
-		self.job = mJob
+		self.job = res.jobs[mJob].name_short
 		self.jobLvl = mJobLvl
-		self.subJob = sJob
+		self.subJob = res.jobs[sJob].name_short
 		self.subJobLvl = sJobLvl
 		
-		utils:log('Set job info: '..res.jobs[mJob].name_short..tostring(mJobLvl)..'/'..res.jobs[sJob].name_short..tostring(sJobLvl), 0)
+		utils:log('Set job info: '.. self.job ..tostring(mJobLvl)..'/'.. self.subJob ..tostring(sJobLvl), 0)
 	else
 		utils:log('Unusable job info. Dropping.', 0)
 	end
+end
+
+function player:createSetupData(job, subJob)
+	self.hp = math.random(500,2500)
+	self.mp = math.random(500,1500)
+	self.tp = math.random(0,3000)
+	self.hpp = self.hp / 2500 * 100
+	self.mpp = math.random(50, 100)
+	self.tpp = math.min(self.tp / 1000 * 100, 100)
+	
+	self.zone = windower.ffxi.get_info().zone
+	
+	self.isSelected = false
+	self.isSubTarget = false
+	self.distance = math.random(0, 400)
+	self.isTrust = false
+	
+	self.job = job
+	self.jobLvl = 99
+	self.subJob = subJob
+	self.subJobLvl = 49
+	
+	self.buffs = {}
+	
+	for i = 1, 32 do
+		self.buffs[i] = math.random(1, 629)
+	end
+	
+	self:updateBuffs(self.buffs)
 end
 
 function buffOrderCompare(a, b)
@@ -188,16 +256,6 @@ function buffOrderCompare(a, b)
 	end
 	
 	return buffOrder[a] < buffOrder[b]
-end
-
-function player:dispose()
-	local displayName = '???'
-	if (self.name) then
-		displayName = self.name
-	end
-	utils:log('Disposing player '..displayName, 2)
-	
-	setmetatable(self, nil)
 end
 
 return player

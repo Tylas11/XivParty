@@ -53,6 +53,7 @@ function img:init(path, width, height, scaleX, scaleY)
 	obj.data = {}
 	obj.data.alpha = 255
 	obj.data.opacity = 1.0
+	obj.data.path = path
 	obj.data.pos = {}
 	obj.data.pos.x = 0
 	obj.data.pos.y = 0
@@ -90,7 +91,10 @@ function img:path(path)
 		return self.image:path()
 	end
 	
-	self.image:path(path)
+	if path ~= self.data.path then
+		self.data.path = path
+		self.image:path(path)
+	end
 end
 
 function img:pos(x, y)

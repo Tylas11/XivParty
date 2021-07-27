@@ -45,7 +45,9 @@ local layoutDefaults = require('layout')
 
 utils = require('utils')
 img = require('img')
-model = require('model')
+
+local md = require('model')
+local model = md:init()
 
 local bo = require('buffOrder')
 buffOrder = getBuffOrderWithIdKeys(bo)
@@ -57,6 +59,8 @@ local isLoaded = false
 local isInitialized = false
 local zoning = false
 local hidden = false
+
+math.randomseed(os.time())
 
 -- constants
 
@@ -103,7 +107,7 @@ function init()
 	
 	utils:log('Initializing...')
 	loadFilters()
-	view:init()
+	view:init(model)
 	view:pos(settings.posX, settings.posY)
 	view:show()
 	
@@ -275,9 +279,9 @@ function checkBuff(buffId)
 	if buffId and res.buffs[buffId] then
 		return true
 	elseif not buffId then
-		log('Invalid buff ID.')
+		error('Invalid buff ID.')
 	else
-		log('Buff with ID ' .. buffId .. ' not found.')
+		error('Buff with ID ' .. buffId .. ' not found.')
 	end
 	
 	return false
@@ -303,7 +307,7 @@ function getRange(arg)
 	end
 	
 	if not range then
-		log('Invalid range \'' .. arg .. '\'.')
+		error('Invalid range \'' .. arg .. '\'.')
 	end
 	
 	return range
@@ -323,9 +327,13 @@ windower.register_event('addon command', function(...)
 		command = string.lower(args[1])
 	end
 	
-	if command == 'move' then
-		local ret = handleCommandOnOff(view:moveEnabled(), args[2], 'Mouse dragging')
-		view:moveEnabled(ret)
+	if command == 'setup' then
+		if not isInitialized then
+			error('Party list not initialized. Join a party or disable hiding while solo.')
+		else
+			local ret = handleCommandOnOff(view:setupEnabled(), args[2], 'Setup mode')
+			view:setupEnabled(ret)
+		end
 	elseif command == 'hidesolo' then
 		local ret = handleCommandOnOff(settings.hideSolo, args[2], 'Party list hiding while solo')
 		settings.hideSolo = ret
@@ -406,7 +414,8 @@ windower.register_event('addon command', function(...)
 				buffs = foundPlayer.buffs
 				log(playerName .. '\'s active buffs:')
 			else
-				log('Player ' .. playerName .. ' not found.')
+				error('Player ' .. playerName .. ' not found.')
+				return
 			end
 		else
 			buffs = windower.ffxi.get_player().buffs
@@ -435,7 +444,7 @@ windower.register_event('addon command', function(...)
 				settings:save()
 				init()
 			else
-				log('The layout file \'' .. filename .. '\' does not exist!')
+				error('The layout file \'' .. filename .. '\' does not exist!')
 			end
 		else
 			showHelp()
@@ -463,7 +472,7 @@ function handleCommand(currentValue, argsString, text, option1String, option1Val
 			setValue = option1Value
 		end
 	else
-		log('Unknown parameter \'' .. argsString .. '\'.')
+		error('Unknown parameter \'' .. argsString .. '\'.')
 		return currentValue
 	end
 	
@@ -489,6 +498,6 @@ function showHelp()
 	log('customOrder - toggles custom buff ordering (customize in bufforder.lua)')
 	log('hideSolo - hides the party list while solo')
 	log('alignBottom - expands the party list from bottom to top')
-	log('move - move the UI via drag and drop, mouse wheel to adjust space between party members')
+	log('setup - move the UI via drag and drop, hold CTRL for grid snap, mouse wheel to adjust space between party members')
 	log('layout <file> - loads a UI layout file. Use \'auto\' to enable resolution based selection.')
 end

@@ -30,17 +30,31 @@ local view = {}
 
 local bg = require('bg')
 local listitem = require('listitem')
+local md = require('model')
 
 local listItems = T{} -- ordered list by party list position, index range 0..5
 local dragImage
 local dragged
 local isInitialized = false
-local isMoveEnabled = false
+local isSetupEnabled = false
+local isCtrlDown = false
 local hidden = false
 
-function view:init()
+local model
+local setupModel
+
+function view:init(mdl)
 	if isInitialized then return end
 
+	if not mdl then
+		utils:log('Cannot init view without model!', 4)
+		return
+	end
+	
+	model = mdl
+	setupModel = md:init()
+	setupModel:createSetupData()
+	
 	utils:log('Initializing view')
 	bg:init()
 	
@@ -61,6 +75,8 @@ function view:dispose()
 	utils:log('Disposing view')
 	isInitialized = false
 
+	setupModel:dispose()
+	
 	bg:dispose()
 	dragImage:dispose()
 	
@@ -70,14 +86,14 @@ function view:dispose()
 	listItems:clear()
 end
 
-function view:moveEnabled(enable)
+function view:setupEnabled(enable)
 	if enable ~= nil then
-		if enable ~= isMoveEnabled then
-			isMoveEnabled = enable
+		if enable ~= isSetupEnabled then
+			isSetupEnabled = enable
 		end
 	end
 	
-	return isMoveEnabled
+	return isSetupEnabled
 end
 
 function view:pos(x, y)
@@ -104,11 +120,11 @@ function view:pos(x, y)
 			if settings.alignBottom then
 				item:pos(
 					x + self.listOffset.x, 
-					y + self.listOffset.y - bg.bottom:scaledSize().height - (count - i) * (layout.list.itemHeight + settings.spacingY))
+					y + self.listOffset.y - bg.bottom:scaledSize().height - (count - i) * (layout.list.itemHeight + settings.itemSpacing) + settings.itemSpacing)
 			else
 				item:pos(
 					x + self.listOffset.x, 
-					y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.spacingY))
+					y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.itemSpacing))
 			end
 		end
 	end
@@ -120,7 +136,13 @@ function view:update(force)
 	local count = listItems:length()
 	
 	for i = 0, 5 do
-		local player = model.players[i]
+		local player
+		if isSetupEnabled then
+			player = setupModel.players[i]
+		else
+			player = model.players[i]
+		end
+		
 		local item = listItems[i]
 		
 		if player then
@@ -173,20 +195,34 @@ function view:hide()
 	end
 end
 
+windower.register_event('keyboard', function(key, down)
+    if key == 29 then -- ctrl
+        isCtrlDown = down
+    end
+end)
+
 -- handle drag and drop
 windower.register_event('mouse', function(type, x, y, delta, blocked)
     if blocked then
 		return 
 	end
 
-	if isMoveEnabled then
+	if isSetupEnabled then
 		-- mouse drag
 		if type == 0 then
 			if dragged then
+				local posX = x - dragged.x
+				local posY = y - dragged.y
+				
+				if isCtrlDown then -- grid snap
+					posX = math.floor(posX /10) * 10
+					posY = math.floor(posY /10) * 10
+				end
+			
 				if settings.alignBottom then
-					view:pos(x - dragged.x, y - (dragged.y - dragImage:size().height))
+					view:pos(posX, posY + dragImage:size().height)
 				else
-					view:pos(x - dragged.x, y - dragged.y)
+					view:pos(posX, posY)
 				end
 				return true
 			end
@@ -214,7 +250,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 		-- mouse scroll
 		elseif type == 10 then
 			if dragImage.image:hover(x, y) then
-				settings.spacingY = math.max(0, settings.spacingY + delta)
+				settings.itemSpacing = math.max(0, settings.itemSpacing + delta)
 				settings:save()
 				
 				view:update(true) -- force a redraw

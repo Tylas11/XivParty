@@ -159,7 +159,7 @@ function utils:logTable(t, depth)
 		for key,value in pairs(t) do
 			if type(value) == 'table' then
 				windower.add_to_chat(8, indent .. key)
-			else
+			elseif key ~= '_raw' and key ~= '_data' then
 				windower.add_to_chat(8, indent .. key .. ' = ' .. tostring(value))
 			end
 			utils:logTable(value, depth + 3)

@@ -164,8 +164,8 @@ end
 -- creates players and buffs for setup mode
 function model:createSetupData()
 	for i = 0, 5 do
-		local j = res.jobs[math.random(1,22)].name_short
-		local sj = res.jobs[math.random(1,22)].name_short
+		local j = res.jobs[math.random(1,22)].ens
+		local sj = res.jobs[math.random(1,22)].ens
 	
 		local p = player:init('Player' .. tostring(i+1), (i+1), self)
 		p:createSetupData(j, sj)

@@ -304,7 +304,7 @@ function listitem:updateJob(player, isOutsideZone)
 			end
 		end
 		
-		if player.subJob then
+		if player.subJob and player.subJob ~= 'MON' then
 			subJobString = player.subJob
 			if player.subJobLvl then
 				subJobString = subJobString .. ' ' .. tostring(player.subJobLvl)

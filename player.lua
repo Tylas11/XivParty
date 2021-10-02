@@ -150,11 +150,11 @@ function player:update(member, zone, target, subtarget)
 	local mainPlayer = windower.ffxi.get_player()
 	if member.name == mainPlayer.name then -- set buffs and job info for main player
 		self:updateBuffs(mainPlayer.buffs)
-		self.job = res.jobs[mainPlayer.main_job_id].name_short
+		self.job = res.jobs[mainPlayer.main_job_id].ens
 		self.jobLvl = mainPlayer.main_job_level
 		
 		if mainPlayer.sub_job_id then -- only if subjob is set
-			self.subJob = res.jobs[mainPlayer.sub_job_id].name_short
+			self.subJob = res.jobs[mainPlayer.sub_job_id].ens
 			self.subJobLvl = mainPlayer.sub_job_level
 		end
 	end
@@ -205,9 +205,9 @@ function player:updateJobFromPacket(packet)
 	local sJobLvl = packet['Sub job level']
 	
 	if (mJob and mJobLvl and sJob and sJobLvl and mJobLvl > 0) then
-		self.job = res.jobs[mJob].name_short
+		self.job = res.jobs[mJob].ens
 		self.jobLvl = mJobLvl
-		self.subJob = res.jobs[sJob].name_short
+		self.subJob = res.jobs[sJob].ens
 		self.subJobLvl = sJobLvl
 		
 		utils:log('Set job info: '.. self.job ..tostring(mJobLvl)..'/'.. self.subJob ..tostring(sJobLvl), 0)

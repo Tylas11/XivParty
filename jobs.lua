@@ -61,7 +61,8 @@ jobs.roles = {
 	['SCH'] = healer,
 	['GEO'] = support,
 	['RUN'] = tank,
-	['SPC'] = special
+	['SPC'] = special,
+	['MON'] = dd
 }
 
 -- model IDs are needed to resolve name conflicts between trust I / II variants

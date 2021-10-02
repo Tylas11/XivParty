@@ -83,9 +83,9 @@
             <img>
                 <color>#FFFFFFFF</color>
                 <path>assets/Cursor.png</path>
-                <size>46,36</size>
+                <size>37,24</size>
             </img>
-            <offset>-57,0</offset>
+            <offset>-52,4</offset>
         </cursor>
         <jobIcon>
             <colors>

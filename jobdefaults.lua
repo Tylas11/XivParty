@@ -26,23 +26,16 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local defaults = {}
+local jobDefaults = {}
 
-defaults.layout = 'auto' -- active UI layout, found in XivParty/layouts directory. use 'auto' for automatic resolution based selection
+jobDefaults.jobEnabled = false -- when set to false, job specific settings will be ignored and globals used instead
 
-defaults.posX = 70 -- x screen position of the party list
-defaults.posY = 400 -- y screen position of the party list
-defaults.itemSpacing = 0 -- distance between party list items
+jobDefaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
+jobDefaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
 
-defaults.alignBottom = false -- expands the party list from bottom to top
-defaults.hideSolo = false -- hides the party list when you are not in a party
+jobDefaults.buffs = {}
+jobDefaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
+jobDefaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
+jobDefaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
 
-defaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
-defaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
-
-defaults.buffs = {}
-defaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-defaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
-defaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
-
-return defaults
+return jobDefaults

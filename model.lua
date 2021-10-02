@@ -39,7 +39,6 @@ function model:init()
 	
 	obj.players = T{} -- party members to be displayed in the view, ordered by party list position, index range 0..5
 	obj.allPlayers = T{} -- unordered list of all players that we ever received data for
-	obj.buffFilters = T{} -- dictionary, key: buff ID, value: bool indicating whether to filter
 	
 	return obj
 end
@@ -55,13 +54,10 @@ function model:clear()
 		ap:dispose()
 	end
 	self.allPlayers:clear()
-	
 	self.players:clear() -- items already disposed via allPlayers
-	self.buffFilters:clear()
 end
 
 function model:updatePlayers()
-	local mainPlayer = windower.ffxi.get_player()
 	local party = T(windower.ffxi.get_party())
 	local zone = windower.ffxi.get_info().zone
 	local target = windower.ffxi.get_mob_by_target('t')
@@ -159,20 +155,20 @@ function model:getPartyLeader()
 	return nil
 end
 
+function model:refreshFilteredBuffs()
+	for player in self.players:it() do
+		player:refreshFilteredBuffs()
+	end
+end
+
 -- creates players and buffs for setup mode
 function model:createSetupData()
-	local setupJobs = {
-		[0] = { j = 'RUN', sj = 'DRK' },
-		[1] = { j = 'WHM', sj = 'SCH' },
-		[2] = { j = 'MNK', sj = 'WAR' },
-		[3] = { j = 'DRK', sj = 'SAM' },
-		[4] = { j = 'SMN', sj = 'RDM' },
-		[5] = { j = 'BRD', sj = 'NIN' }
-	}
-
 	for i = 0, 5 do
+		local j = res.jobs[math.random(1,22)].name_short
+		local sj = res.jobs[math.random(1,22)].name_short
+	
 		local p = player:init('Player' .. tostring(i+1), (i+1), self)
-		p:createSetupData(setupJobs[i].j, setupJobs[i].sj)
+		p:createSetupData(j, sj)
 		self.players[i] = p
 	end
 	

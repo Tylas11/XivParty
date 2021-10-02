@@ -52,8 +52,6 @@ function view:init(mdl)
 	end
 	
 	model = mdl
-	setupModel = md:init()
-	setupModel:createSetupData()
 	
 	utils:log('Initializing view')
 	bg:init()
@@ -74,8 +72,12 @@ function view:dispose()
 
 	utils:log('Disposing view')
 	isInitialized = false
-
-	setupModel:dispose()
+	
+	isSetupEnabled = false
+	if setupModel then
+		setupModel:dispose()
+		setupModel = nil
+	end
 	
 	bg:dispose()
 	dragImage:dispose()
@@ -138,6 +140,11 @@ function view:update(force)
 	for i = 0, 5 do
 		local player
 		if isSetupEnabled then
+			if not setupModel then
+				setupModel = md:init()
+				setupModel:createSetupData()
+			end
+		
 			player = setupModel.players[i]
 		else
 			player = model.players[i]

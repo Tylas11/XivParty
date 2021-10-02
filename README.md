@@ -25,6 +25,7 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 | //xp customOrder        | Toggles custom buff order (customize in bufforder.lua).                                        |
 | //xp hideSolo           | Hides the party list while solo.                                                               |
 | //xp alignBottom        | Expands the party list from bottom to top.                                                     |
+| //xp job                | Toggles job specific settings for current job. Settings changes to range or buffs will only affect this job. |
 | //xp setup              | Toggles setup mode showing 6 fake party members. Move the UI via drag and drop, hold CTRL for grid snap. <br> Use mouse wheel to adjust space between party members. |
 | //xp layout [file]      | Loads a UI layout file from the XivParty/layouts directory. Omit file extension. <br/> Use "auto" to enable resolution based selection (for default layouts only). |
 
@@ -37,6 +38,9 @@ There is also a customizable range indicator useful when casting aoe buffs. Set 
 By default buffs are sorted debuffs first, then buffs by various categories. This can be disabled to revert back to the game's original order, which is sometimes random and based on when the buff was added to the game.
 
 You can customize the sorting order by editing the file bufforder.lua. Just reorder the lines of the list. Do not change the IDs. The name strings are not used by the addon and are only there for readability. Save the file as UTF-8 without BOM or ANSI (however this will destroy the Japanese translations).
+
+## Job Specific Settings
+Can be toggled separately for each job using the "job" command. While on a job with enabled job specific settings, the following commands will only affect the settings of that job: range, filter, customOrder. Switching jobs will automatically apply a job's specific settings, or the global settings when none present or disabled.
 
 ## Creating Custom Layouts
 A layout consists of an XML file in XivParty/layouts and image files in XivParty/assets. Constants defining positions, offsets, sizes, fonts and colors of various UI elements are exposed in the XML file, so editing the LUA files should not be necessary in most cases.
@@ -54,7 +58,7 @@ The HP/MP/TP bars each use a background and foreground image which can be set se
 #### Buff Icons
 Buffs are positioned at the left edge of the TP bar and extend to the right. They wrap around to a second row when there are more buffs than the "wrap" count set in the layout. The "wrapOffset" will push the second row by a number of icon widths to the right.
 
-The icons can be configured to align right and extend to the left. They will still start at the left edge of the TP bar, so a negative offset is recommended to move them outside the party list window.
+The icons can be configured to align right and extend to the left by setting "alignRight" to true. They will still start at the left edge of the TP bar, so a negative X "offset" is recommended to move them outside the party list window.
 
 #### Job Icons
 Consist of five separate images (front to back): frame, icon, gradient, background and highlight. The image files are 64 x 64 but are currently displayed at a smaller size. The icon can be scaled up in the layout by setting the respective size values. The background image color is set in code based on the job's role and can be customized in the layout. Job roles can be changed or added in jobs.lua, when adding new roles also add a color entry with the same name in the layout. 

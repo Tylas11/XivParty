@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.5.0'
+_addon.version = '1.6.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
@@ -40,14 +40,14 @@ logger = require('logger')
 file = require('files')
 require('strings')
 
-local defaults = require('defaults')
-local layoutDefaults = require('layout')
-
 utils = require('utils')
 img = require('img')
 
 local md = require('model')
 local model = md:init()
+
+settings = require('settings')
+local layoutDefaults = require('layout')
 
 local bo = require('buffOrder')
 buffOrder = getBuffOrderWithIdKeys(bo)
@@ -72,7 +72,8 @@ local layout1440 = '1440p'
 
 windower.register_event('load', function()
 	if windower.ffxi.get_info().logged_in then
-		settings = config.load(defaults)
+		settings:init(model)
+		settings:load()
 		loadLayout(settings.layout)
 		isLoaded = true
 	end
@@ -80,14 +81,14 @@ end)
 
 windower.register_event('login', function()
 	if not isLoaded then
-		settings = config.load(defaults)
+		settings:init(model)
+		settings:load()
 		loadLayout(settings.layout)
 		isLoaded = true
 	end
 end)
 
 windower.register_event('logout', function()
-	settings = nil
 	isLoaded = false
 end)
 
@@ -106,7 +107,6 @@ function init()
 	if isInitialized then return end
 	
 	utils:log('Initializing...')
-	loadFilters()
 	view:init(model)
 	view:pos(settings.posX, settings.posY)
 	view:show()
@@ -126,8 +126,10 @@ end
 
 windower.register_event('prerender', function()
 	if zoning then return end
-
-	if settings and settings.hideSolo then
+	
+	settings:update()
+	
+	if settings.hideSolo then
 		if not isSolo() and not isInitialized then
 			init()
 		elseif isSolo() and isInitialized then
@@ -136,7 +138,7 @@ windower.register_event('prerender', function()
 	elseif windower.ffxi.get_info().logged_in and not isInitialized then
 		init()
 	end
-
+    
 	if not isInitialized then return end
 	
 	model:updatePlayers()
@@ -247,34 +249,6 @@ function loadLayout(layoutName)
 	layout = config.load('layouts/' .. layoutName .. '.xml', layoutDefaults)
 end
 
-function loadFilters()
-	-- why use a custom CSV parser? because config.lua does not detect a list with a single element as a list >_>
-	if settings.buffs.filters ~= '' then
-		for part in T(settings.buffs.filters:split(';')):it() do
-			local buffIdString = part:trim()
-			if buffIdString ~= '' then
-				model.buffFilters[tonumber(buffIdString)] = true
-			end
-		end
-	end
-end
-
-function saveFilters()
-	settings.buffs.filters = ''
-	
-	for buffId, doFilter in pairs(model.buffFilters) do 
-		-- why add a semicolon even on the first element? because config.lua will mistake a single element as a number and not a string
-		settings.buffs.filters = settings.buffs.filters .. tostring(buffId) .. ';'
-	end
-	settings:save()
-end
-
-function refreshFilteredBuffs()
-	for player in model.players:it() do
-		player:refreshFilteredBuffs()
-	end
-end
-
 function checkBuff(buffId)
 	if buffId and res.buffs[buffId] then
 		return true
@@ -344,7 +318,7 @@ windower.register_event('addon command', function(...)
 		settings:save()
 		view:pos(settings.posX, settings.posY)
 	elseif command == 'customorder' then
-		local ret = handleCommandOnOff(settings.buffs.customOrder, args[2], 'Custom buff ordering')
+		local ret = handleCommandOnOff(settings.buffs.customOrder, args[2], 'Custom buff order')
 		settings.buffs.customOrder = ret
 		settings:save()
 	elseif command == 'range' then
@@ -355,13 +329,18 @@ windower.register_event('addon command', function(...)
 				settings.rangeIndicator = range1
 				if range2 then
 					settings.rangeIndicatorFar = range2
-					
 					if settings.rangeIndicator > settings.rangeIndicatorFar then
 						settings.rangeIndicator = range2
 						settings.rangeIndicatorFar = range1
 					end
+					log('Range indicators set to ' .. tostring(range1) .. ' / ' .. tostring(range2) .. '.')
 				else
 					settings.rangeIndicatorFar = 0
+					if range1 > 0 then
+						log('Range indicator set to ' .. tostring(range1) .. '.')
+					else
+						log('Range indicator disabled.')
+					end
 				end
 				settings:save()
 			end
@@ -373,27 +352,27 @@ windower.register_event('addon command', function(...)
 		if subCommand == 'add' then
 			local buffId = tonumber(args[3])
 			if checkBuff(buffId) then
-				model.buffFilters[buffId] = true
-				saveFilters()
-				refreshFilteredBuffs()
+				settings.buffFilters[buffId] = true
+				settings:save()
+				model:refreshFilteredBuffs()
 				log('Added buff filter for ' .. getBuffText(buffId))
 			end
 		elseif subCommand == 'remove' then
 			local buffId = tonumber(args[3])
 			if checkBuff(buffId) then
-				model.buffFilters[buffId] = nil
-				saveFilters()
-				refreshFilteredBuffs()
+				settings.buffFilters[buffId] = nil
+				settings:save()
+				model:refreshFilteredBuffs()
 				log('Removed buff filter for ' .. getBuffText(buffId))
 			end
 		elseif subCommand == 'clear' then
-			model.buffFilters = T{}
-			saveFilters()
-			refreshFilteredBuffs()
+			settings.buffFilters = T{}
+			settings:save()
+			model:refreshFilteredBuffs()
 			log('All buff filters cleared.')
 		elseif subCommand == 'list' then
 			log('Currently active buff filters (' .. settings.buffs.filterMode .. '):')
-			for buffId, doFilter in pairs(model.buffFilters) do
+			for buffId, doFilter in pairs(settings.buffFilters) do
 				if doFilter then
 					log(getBuffText(buffId))
 				end
@@ -402,7 +381,9 @@ windower.register_event('addon command', function(...)
 			local ret = handleCommand(settings.buffs.filterMode, args[3], 'Filter mode', 'blacklist', 'blacklist', 'whitelist', 'whitelist')
 			settings.buffs.filterMode = ret
 			settings:save()
-			refreshFilteredBuffs()
+			model:refreshFilteredBuffs()
+		else
+			showHelp()
 		end
 	elseif command == 'buffs' then
 		local playerName = args[2]
@@ -449,17 +430,39 @@ windower.register_event('addon command', function(...)
 		else
 			showHelp()
 		end
+	elseif command == 'job' then
+		local job = windower.ffxi.get_player().main_job
+		local ret = handleCommandOnOff(settings.jobEnabled, args[2], 'Job specific settings for ' .. job, true)
+		
+		if ret then
+			if not settings.jobEnabled then
+				settings:load(true, true)
+				log('Settings changes to range and buffs will now only affect this job.')
+			end
+		elseif settings.jobEnabled then
+			settings.jobEnabled = false
+			settings:save()
+			settings:load()
+			log('Global settings applied. The job specific settings for ' .. job .. ' will remain saved for later use.')
+		end
 	else
 		showHelp()
 	end
 end)
 
-function handleCommandOnOff(currentValue, argsString, text)
-	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false)
+function handleCommandOnOff(currentValue, argsString, text, plural)
+	local isNowText = nil
+	if plural then
+		isNowText = 'are now'
+	end
+	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false, isNowText)
 end
 
-function handleCommand(currentValue, argsString, text, option1String, option1Value, option2String, option2Value)
+function handleCommand(currentValue, argsString, text, option1String, option1Value, option2String, option2Value, isNowText)
 	local setValue
+	if not isNowText then
+		isNowText = 'is now'
+	end
 
 	if argsString and string.lower(argsString) == option1String then
 		setValue = option1Value
@@ -480,7 +483,7 @@ function handleCommand(currentValue, argsString, text, option1String, option1Val
 	if setValue == option2Value then
 		setString = option2String
 	end
-	log(text .. ' is now ' .. setString .. '.')
+	log(text .. ' ' .. isNowText .. ' ' .. setString .. '.')
 	
 	return setValue
 end
@@ -495,9 +498,10 @@ function showHelp()
 	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
 	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
 	log('range <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
-	log('customOrder - toggles custom buff ordering (customize in bufforder.lua)')
+	log('customOrder - toggles custom buff order (customize in bufforder.lua)')
 	log('hideSolo - hides the party list while solo')
 	log('alignBottom - expands the party list from bottom to top')
+	log('job - toggles job specific settings for current job')
 	log('setup - move the UI via drag and drop, hold CTRL for grid snap, mouse wheel to adjust space between party members')
 	log('layout <file> - loads a UI layout file. Use \'auto\' to enable resolution based selection.')
 end

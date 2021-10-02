@@ -169,8 +169,8 @@ function player:updateBuffs(buffs)
 	for i = 1, 32 do
 		buff = buffs[i]
 		
-		if (settings.buffs.filterMode == 'blacklist' and self.model.buffFilters[buff]) or 
-		   (settings.buffs.filterMode == 'whitelist' and not self.model.buffFilters[buff]) then
+		if (settings.buffs.filterMode == 'blacklist' and settings.buffFilters[buff]) or 
+		   (settings.buffs.filterMode == 'whitelist' and not settings.buffFilters[buff]) then
 			buff = nil
 		end
 		

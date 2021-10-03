@@ -3,7 +3,7 @@ A party list addon for Windower 4.
 
 Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be filtered and are sorted debuffs before buffs for easier visibility. Distance to party members is indicated by dimming HP bars when out of casting or targeting range.
 
-![Screenshot](https://i.imgur.com/IYV8rz4.jpg) ![Screenshot2](https://i.imgur.com/Y3rPvf0.jpg)
+![Screenshot](https://i.imgur.com/9i5lt8r.jpg) ![Screenshot2](https://i.imgur.com/cntqR38.jpg)
 
 ## Installation
 * Download the [latest release](https://github.com/Tylas11/XivParty/releases) and extract it to Windower4/addons

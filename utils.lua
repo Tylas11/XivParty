@@ -133,7 +133,7 @@ function utils:log(text, level)
 	end	
 
 	if self.level <= level and text then
-		windower.add_to_chat(8, text)
+		windower.add_to_chat(8, text) -- message type "8" can be filtered in-game as "call for help"
 	end
 end
 

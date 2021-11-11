@@ -173,7 +173,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					local foundPlayer = model:getPlayer(nil, playerId, 'char')
 					foundPlayer:updateJobFromPacket(packet)
 				else
-					utils:log('Char update: ID not found.', 3)
+					utils:log('Char update: ID not found.', 1)
 				end
 			end
 		end
@@ -189,7 +189,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					local foundPlayer = model:getPlayer(name, playerId, 'party')
 					foundPlayer:updateJobFromPacket(packet)
 				else
-					utils:log('Party update: name and/or ID not found.', 3)
+					utils:log('Party update: name and/or ID not found.', 1)
 				end
 			end
 		end

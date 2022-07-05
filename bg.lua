@@ -27,45 +27,58 @@
 ]]
 
 local bg = {}
+bg.__index = bg
 
-local isInitialized = false
 local isDebug = false
 
-function bg:init()
+function bg:init(ptySet)
+	if not ptySet then
+		utils:log('partylist:init missing parameter ptySet!', 4)
+		return
+	end
+
 	utils:log('Initializing bg')
 
-	bg.contentHeight = 0 -- height of the content area (excludes top and bottom tiles)
-	bg.size = {}
-	bg.size.width = 0
-	bg.size.height = 0
-	bg.posX = 0
-	bg.posY = 0
-	bg.sizeMid = utils:coord(layout.bg.imgMid.size)
+	local obj = {}
+	setmetatable(obj, bg) -- make handle lookup
+
+	obj.partySettings = ptySet
+
+	obj.hidden = true
+	obj.rowCount = 0
+	obj.contentHeight = 0 -- height of the content area (excludes top and bottom tiles)
+	obj.size = {}
+	obj.size.width = 0
+	obj.size.height = 0
+	obj.posX = 0
+	obj.posY = 0
+	obj.sizeMid = utils:coord(layout.bg.imgMid.size)
 	
-	bg.top = utils:createImage(layout.bg.imgTop, layout.scale)
-	bg.mid = utils:createImage(layout.bg.imgMid, layout.scale)
-	bg.bottom = utils:createImage(layout.bg.imgBottom, layout.scale)
+	obj.top = utils:createImage(layout.bg.imgTop, layout.scale)
+	obj.mid = utils:createImage(layout.bg.imgMid, layout.scale)
+	obj.bottom = utils:createImage(layout.bg.imgBottom, layout.scale)
 		
 	if isDebug then -- debug background
-		bg.top:path('')
-		bg.mid:path('')
-		bg.bottom:path('')
+		obj.top:path('')
+		obj.mid:path('')
+		obj.bottom:path('')
 		
-		bg.top:color(255,0,0)
-		bg.mid:color(0,255,0)
-		bg.bottom:color(0,0,255)
+		obj.top:color(255,0,0)
+		obj.mid:color(0,255,0)
+		obj.bottom:color(0,0,255)
 	end
 	
-	isInitialized = true
+	return obj
 end
 
 function bg:dispose()
 	utils:log('Disposing bg')
-	isInitialized = false
 
 	self.top:dispose()
 	self.mid:dispose()
 	self.bottom:dispose()
+
+	setmetatable(self, nil)
 end
 
 function bg:pos(x, y)
@@ -80,7 +93,9 @@ end
 function bg:resize(rowCount)
 	utils:log('BG setting row count: ' .. rowCount, 1)
 
-	self.contentHeight = (rowCount * (layout.list.itemHeight) + (rowCount - 1) * settings.itemSpacing) / layout.scale
+	self.rowCount = rowCount
+
+	self.contentHeight = (rowCount * (layout.list.itemHeight) + (rowCount - 1) * self.partySettings.itemSpacing) / layout.scale
 	self.mid:size(self.sizeMid.x, self.contentHeight)
 	self.mid.image:repeat_xy(1, math.floor(self.contentHeight / self.sizeMid.y))
 	self:pos(self.posX, self.posY) -- refresh position of bottom tile
@@ -88,22 +103,30 @@ function bg:resize(rowCount)
 	-- visible size of the whole background area
 	self.size.width = math.max(math.max(self.top:scaledSize().width, self.bottom:scaledSize().width), self.mid:scaledSize().width)
 	self.size.height = self.top:scaledSize().height + self.mid:scaledSize().height + self.bottom:scaledSize().height
+
+	self:updateVisibility()
+end
+
+function bg:updateVisibility()
+	if not self.hidden and self.rowCount > 0 then
+		self.top:show()
+		self.mid:show()
+		self.bottom:show()
+	else
+		self.top:hide()
+		self.mid:hide()
+		self.bottom:hide()
+	end
 end
 
 function bg:show()
-	if not isInitialized then return end
-	
-	self.top:show()
-	self.mid:show()
-	self.bottom:show()
+	self.hidden = false
+	self:updateVisibility()
 end
 
 function bg:hide()
-	if not isInitialized then return end
-
-	self.top:hide()
-	self.mid:hide()
-	self.bottom:hide()
+	self.hidden = true
+	self:updateVisibility()
 end
 
 return bg

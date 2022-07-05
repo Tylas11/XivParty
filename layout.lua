@@ -55,7 +55,7 @@ layout.bar.offset = L{ 0, 20 }
 layout.bar.spacingX = 24 -- distance between hp, mp and tp bars
 layout.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
 
--- glow colors are taken from the respective bar foreground colors
+-- glow colors are set on each bar individually
 layout.bar.imgGlowMid = {}
 layout.bar.imgGlowMid.path = 'assets/BarGlowMid.png'
 layout.bar.imgGlowMid.size = L{ 6, 32 }
@@ -105,7 +105,7 @@ layout.jobIcon.colors.dd = '#663535FF'
 layout.jobIcon.colors.tank = '#364597FF'
 layout.jobIcon.colors.healer = '#3B6529FF'
 layout.jobIcon.colors.support = '#DAB200FF'
-layout.jobIcon.colors.special = '#FFFFFFFF'
+layout.jobIcon.colors.special = '#FF9700FF'
 
 layout.jobIcon.imgFrame = {}
 layout.jobIcon.imgFrame.offset = L{ 0, 0 }

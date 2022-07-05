@@ -35,10 +35,14 @@ function model:init()
 	local obj = {}
 	setmetatable(obj, model) -- make handle lookup
 	
-	-- NOTE: list indices start with 1. when forced to index 0, iterating with :it() will work but out of order
+	-- NOTE: in lua list indices start with 1. when forced to index 0, iterating with :it() will work but out of order
 	
-	obj.players = T{} -- party members to be displayed in the view, ordered by party list position, index range 0..5
 	obj.allPlayers = T{} -- unordered list of all players that we ever received data for
+
+	obj.parties = T{}
+	for i = 0, 2 do
+		obj.parties[i] = T{} -- lists for members of the main party, first and second alliance parties, ordered by party list position, index ranges 0..5
+	end
 	
 	return obj
 end
@@ -54,28 +58,33 @@ function model:clear()
 		ap:dispose()
 	end
 	self.allPlayers:clear()
-	self.players:clear() -- items already disposed via allPlayers
+
+	-- items already disposed via allPlayers
+	for i = 0, 2 do
+		self.parties[i]:clear()
+	end
 end
 
 function model:updatePlayers()
-	local party = T(windower.ffxi.get_party())
-	local zone = windower.ffxi.get_info().zone
+	local members = T(windower.ffxi.get_party())
 	local target = windower.ffxi.get_mob_by_target('t')
 	local subtarget = windower.ffxi.get_mob_by_target('st')
 	
-	for i = 0, 5 do
-		local member = party['p%i':format(i % 6)]
+	for i = 0, 17 do
+		local idx = (i / 6):floor()
+        local key = {'p%i', 'a1%i', 'a2%i'}[idx + 1]:format(i % 6)
+		local member = members[key]
 		if member and member.name then
 			local id
 			if member.mob and member.mob.id > 0 then
 				id = member.mob.id
 			end
 			local foundPlayer = self:getPlayer(member.name, id, 'member')
-			foundPlayer:update(member, zone, target, subtarget)
+			foundPlayer:update(member, target, subtarget)
 			
-			self.players[i] = foundPlayer
+			self.parties[idx][i % 6] = foundPlayer
 		else
-			self.players[i] = nil
+			self.parties[idx][i % 6] = nil
 		end
 	end
 end
@@ -131,7 +140,7 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 		
 		if not foundPlayer and not dontCreate then
 			utils:log('Creating new player (' .. debugTag .. ')', 2)
-			foundPlayer = player:init(name, id, self)
+			foundPlayer = player:init(name, id)
 			self.allPlayers:append(foundPlayer)
 		end
 	end
@@ -144,36 +153,10 @@ function model:findPlayer(name)
 	return self:getPlayer(name, nil, 'findPlayer', true)
 end
 
--- gets leader of current party
-function model:getPartyLeader()
-	for player in self.players:it() do
-		if player.isLeader then
-			return player
-		end
-	end
-	
-	return nil
-end
-
 function model:refreshFilteredBuffs()
-	for player in self.players:it() do
+	for player in self.allPlayers:it() do -- TODO: alliance members might not have buff information, could only iterate the main party list as a minor optimization
 		player:refreshFilteredBuffs()
 	end
-end
-
--- creates players and buffs for setup mode
-function model:createSetupData()
-	for i = 0, 5 do
-		local j = res.jobs[math.random(1,22)].ens
-		local sj = res.jobs[math.random(1,22)].ens
-	
-		local p = player:init('Player' .. tostring(i+1), (i+1), self)
-		p:createSetupData(j, sj)
-		self.players[i] = p
-	end
-	
-	self.players[0].isLeader = true
-	self.players[math.random(0,5)].isSelected = true
 end
 
 return model

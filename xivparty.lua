@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.6.0'
+_addon.version = '1.7.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
@@ -108,7 +108,6 @@ function init()
 	
 	utils:log('Initializing...')
 	view:init(model)
-	view:pos(settings.posX, settings.posY)
 	view:show()
 	
 	isInitialized = true
@@ -316,7 +315,7 @@ windower.register_event('addon command', function(...)
 		local ret = handleCommandOnOff(settings.alignBottom, args[2], 'Bottom alignment')
 		settings.alignBottom = ret
 		settings:save()
-		view:pos(settings.posX, settings.posY)
+		view:update(true) -- force a redraw
 	elseif command == 'customorder' then
 		local ret = handleCommandOnOff(settings.buffs.customOrder, args[2], 'Custom buff order')
 		settings.buffs.customOrder = ret

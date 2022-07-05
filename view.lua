@@ -26,44 +26,31 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+local pl = require('partylist')
+local player = require('player')
+
 local view = {}
 
-local bg = require('bg')
-local listitem = require('listitem')
-local md = require('model')
-
-local listItems = T{} -- ordered list by party list position, index range 0..5
-local dragImage
-local dragged
 local isInitialized = false
 local isSetupEnabled = false
-local isCtrlDown = false
-local hidden = false
 
-local model
-local setupModel
+local partyLists = T{} -- UI elements for each party
+local setupParties = T{} -- setup data for each party
 
-function view:init(mdl)
+function view:init(model)
 	if isInitialized then return end
 
-	if not mdl then
-		utils:log('Cannot init view without model!', 4)
+	if not model then
+		utils:log('view:init missing parameter model!', 4)
 		return
 	end
 	
-	model = mdl
-	
 	utils:log('Initializing view')
-	bg:init()
-	
-	dragImage = img:init('', bg.size.width, bg.size.height)
-	dragImage:alpha(0)
-	dragImage:show()
-	
-	self.posX = 0
-	self.posY = 0
-	self.listOffset = utils:coord(layout.list.offset)
-	
+
+	for i = 0, 2 do
+		partyLists[i] = pl:init(model.parties[i], self:getSettingsByIndex(i))
+	end
+
 	isInitialized = true
 end
 
@@ -71,201 +58,87 @@ function view:dispose()
 	if not isInitialized then return end
 
 	utils:log('Disposing view')
+
+	for i = 0, 2 do
+		if setupParties[i] then
+			for sp in setupParties[i]:it() do
+				sp:dispose()
+			end
+		end
+		partyLists[i]:dispose()
+	end
+	setupParties:clear()
+	partyLists:clear()
+
 	isInitialized = false
-	
-	isSetupEnabled = false
-	if setupModel then
-		setupModel:dispose()
-		setupModel = nil
-	end
-	
-	bg:dispose()
-	dragImage:dispose()
-	
-	for item in listItems:it() do
-		item:dispose()
-	end
-	listItems:clear()
+end
+
+function view:getSettingsByIndex(index)
+	if index == 0 then return settings.party end
+	if index == 1 then return settings.alliance1 end
+	if index == 2 then return settings.alliance2 end
+
+	utils:log('getSettingsByIndex: index ' .. tostring(index) .. 'not found!', 4)
+	return nil
 end
 
 function view:setupEnabled(enable)
-	if enable ~= nil then
-		if enable ~= isSetupEnabled then
-			isSetupEnabled = enable
+	if not isInitialized then return end
+	if enable == nil then return isSetupEnabled end
+
+	isSetupEnabled = enable
+
+	for i = 0, 2 do
+		if enable and not setupParties[i] then
+			setupParties[i] = self:createSetupData(i == 0)
 		end
+		partyLists[i]:setupEnabled(enable, setupParties[i])
 	end
-	
-	return isSetupEnabled
 end
 
-function view:pos(x, y)
-	if not isInitialized then return end
+-- creates party and buffs for setup mode
+function view:createSetupData(isMainParty)
+	local setupParty = T{}
 
-	-- top/left corner, when aligned to bottom: bottom/left corner
-	self.posX = x
-	self.posY = y
-
-	if settings.alignBottom then
-		bg:pos(x, y - bg.size.height)
-		dragImage:pos(x, y - bg.size.height)
-	else
-		bg:pos(x, y)
-		dragImage:pos(x, y)
-	end
-	
-	local count = listItems:length()
-	
 	for i = 0, 5 do
-		local item = listItems[i]
-		
-		if item then
-			if settings.alignBottom then
-				item:pos(
-					x + self.listOffset.x, 
-					y + self.listOffset.y - bg.bottom:scaledSize().height - (count - i) * (layout.list.itemHeight + settings.itemSpacing) + settings.itemSpacing)
-			else
-				item:pos(
-					x + self.listOffset.x, 
-					y + self.listOffset.y + bg.top:scaledSize().height + i * (layout.list.itemHeight + settings.itemSpacing))
-			end
-		end
+		local j = res.jobs[math.random(1,22)].ens
+		local sj = res.jobs[math.random(1,22)].ens
+	
+		local p = player:init('Player' .. tostring(i + 1), (i + 1))
+		p:createSetupData(j, sj, isMainParty)
+		setupParty[i] = p
 	end
+	
+	setupParty[0].isLeader = true
+	if isMainParty then
+		setupParty[math.random(0,5)].isSelected = true
+	end
+
+	return setupParty
 end
 
 function view:update(force)
 	if not isInitialized then return end
 	
-	local count = listItems:length()
-	
-	for i = 0, 5 do
-		local player
-		if isSetupEnabled then
-			if not setupModel then
-				setupModel = md:init()
-				setupModel:createSetupData()
-			end
-		
-			player = setupModel.players[i]
-		else
-			player = model.players[i]
-		end
-		
-		local item = listItems[i]
-		
-		if player then
-			if not item then
-				item = listitem:init()
-				listItems[i] = item
-				if not hidden then
-					item:show()
-				end
-			end
-			
-			item:update(player)
-		elseif item then
-			item:dispose()
-			listItems[i] = nil
-		end
-	end
-	
-	if count ~= listItems:length() or force then
-		bg:resize(listItems:length())
-		dragImage:size(bg.size.width, bg.size.height)
-		
-		self:pos(self.posX, self.posY)
+	for i = 0, 2 do
+		partyLists[i]:update(force)
 	end
 end
 
 function view:show()
 	if not isInitialized then return end
 	
-	hidden = false
-	
-	bg:show()
-	dragImage:show()
-	
-	for item in listItems:it() do
-		item:show()
+	for i = 0, 2 do
+		partyLists[i]:show()
 	end
 end
 
 function view:hide()
 	if not isInitialized then return end
 
-	hidden = true
-	
-	bg:hide()
-	dragImage:hide()
-	
-	for item in listItems:it() do
-		item:hide()
+	for i = 0, 2 do
+		partyLists[i]:hide()
 	end
 end
-
-windower.register_event('keyboard', function(key, down)
-    if key == 29 then -- ctrl
-        isCtrlDown = down
-    end
-end)
-
--- handle drag and drop
-windower.register_event('mouse', function(type, x, y, delta, blocked)
-    if blocked then
-		return 
-	end
-
-	if isSetupEnabled then
-		-- mouse drag
-		if type == 0 then
-			if dragged then
-				local posX = x - dragged.x
-				local posY = y - dragged.y
-				
-				if isCtrlDown then -- grid snap
-					posX = math.floor(posX /10) * 10
-					posY = math.floor(posY /10) * 10
-				end
-			
-				if settings.alignBottom then
-					view:pos(posX, posY + dragImage:size().height)
-				else
-					view:pos(posX, posY)
-				end
-				return true
-			end
-		
-		-- mouse left click
-		elseif type == 1 then
-			if dragImage.image:hover(x, y) then
-				dragged = {image = dragImage.image, x = x - dragImage:pos().x, y = y - dragImage:pos().y}
-				return true
-			end
-		
-		-- mouse left release
-		elseif type == 2 then
-			if dragged then
-				settings.posX = view.posX
-				settings.posY = view.posY
-				
-				utils:log('Saving position: ' .. view.posX .. ', ' .. view.posY)
-				settings:save()
-				
-				dragged = nil
-				return true
-			end
-		
-		-- mouse scroll
-		elseif type == 10 then
-			if dragImage.image:hover(x, y) then
-				settings.itemSpacing = math.max(0, settings.itemSpacing + delta)
-				settings:save()
-				
-				view:update(true) -- force a redraw
-			end
-		end
-	end
-
-	return false
-end)
 
 return view

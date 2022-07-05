@@ -31,18 +31,13 @@ local jobs = require('jobs')
 local player = {}
 player.__index = player
 
--- either parameter can be nil, but not both
-function player:init(name, id, mdl)
+-- either parameter name or id can be nil, but not both
+function player:init(name, id)
 	if not name and not id then
-		utils:log('Cannot init player without name or ID!', 4)
+		utils:log('player:init missing parameter name or id!', 4)
 		return nil
 	end
 	
-	if not mdl then
-		utils:log('Cannot init player without model!', 4)
-		return
-	end
-
 	local initText = ''
 	if name then
 		initText = initText .. '. Name = ' .. name
@@ -57,7 +52,6 @@ function player:init(name, id, mdl)
 
 	obj.name = name
 	obj.id = id
-	obj.model = mdl
 	
 	return obj
 end
@@ -90,6 +84,7 @@ function player:merge(other)
 	if other.isSelected ~= nil then self.isSelected = other.isSelected end
 	if other.isSubTarget ~= nil then self.isSubTarget = other.isSubTarget end
 	if other.distance then self.distance = other.distance end
+	if other.zone then self.zone = other.zone end
 	
 	if other.isTrust ~= nil then self.isTrust = other.isTrust end
 	
@@ -108,7 +103,7 @@ function player:merge(other)
 	return self
 end
 
-function player:update(member, zone, target, subtarget)
+function player:update(member, target, subtarget)
 	self.name = member.name
 
 	self.hp = member.hp
@@ -134,10 +129,10 @@ function player:update(member, zone, target, subtarget)
 				self.job = trustInfo.job
 				self.subJob = trustInfo.subJob
 				
-				local partyLeader = self.model:getPartyLeader()
-				if partyLeader and partyLeader.jobLvl then
-					self.jobLvl = partyLeader.jobLvl
-					self.subJobLvl = math.max(1, math.floor(partyLeader.jobLvl / 2))
+				local leaderLevel = self:getLeaderLevel()
+				if leaderLevel then
+					self.jobLvl = leaderLevel
+					self.subJobLvl = math.max(1, math.floor(leaderLevel / 2))
 				end
 			else
 				utils:log('Failed to get trust info for ' .. self.name, 4)
@@ -158,6 +153,18 @@ function player:update(member, zone, target, subtarget)
 			self.subJobLvl = mainPlayer.sub_job_level
 		end
 	end
+end
+
+function player:getLeaderLevel()
+	local party = windower.ffxi.get_party()
+	if party.party1_leader then
+		local leader = party['p%i':format(party.party1_leader)]
+		if leader then
+			return leader.main_job_level
+		end
+	end
+
+	return nil
 end
 
 function player:updateBuffs(buffs)
@@ -216,7 +223,7 @@ function player:updateJobFromPacket(packet)
 	end
 end
 
-function player:createSetupData(job, subJob)
+function player:createSetupData(job, subJob, isMainParty)
 	self.hp = math.random(500,2500)
 	self.mp = math.random(500,1500)
 	self.tp = math.random(0,3000)
@@ -238,8 +245,10 @@ function player:createSetupData(job, subJob)
 	
 	self.buffs = {}
 	
-	for i = 1, 32 do
-		self.buffs[i] = math.random(1, 629)
+	if isMainParty then
+		for i = 1, 32 do
+			self.buffs[i] = math.random(1, 629)
+		end
 	end
 	
 	self:updateBuffs(self.buffs)

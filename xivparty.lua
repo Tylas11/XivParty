@@ -42,18 +42,17 @@ require('strings')
 
 utils = require('utils')
 img = require('img')
+require('player')
 
 local md = require('model')
 local model = md:init()
 
 settings = require('settings')
-local layoutDefaults = require('layout')
 
 local bo = require('buffOrder')
 buffOrder = getBuffOrderWithIdKeys(bo)
 
 local view = require('view')
-local player = require('player')
 
 local isLoaded = false
 local isInitialized = false
@@ -62,19 +61,12 @@ local hidden = false
 
 math.randomseed(os.time())
 
--- constants
-
-local layoutAuto = 'auto'
-local layout1080 = '1080p'
-local layout1440 = '1440p'
-
 -- initialization / dispose / events
 
 windower.register_event('load', function()
 	if windower.ffxi.get_info().logged_in then
 		settings:init(model)
 		settings:load()
-		loadLayout(settings.layout)
 		isLoaded = true
 	end
 end)
@@ -83,7 +75,6 @@ windower.register_event('login', function()
 	if not isLoaded then
 		settings:init(model)
 		settings:load()
-		loadLayout(settings.layout)
 		isLoaded = true
 	end
 end)
@@ -231,21 +222,6 @@ end)
 
 function isSolo()
 	return windower.ffxi.get_party().party1_leader == nil
-end
-
-function loadLayout(layoutName)
-	if layoutName == layoutAuto then
-		local resY = windower.get_windower_settings().ui_y_res
-		if resY <= 1200 then
-			layoutName = layout1080
-		else
-			layoutName = layout1440
-		end
-		
-		--print('Detected Y resolution ' .. tostring(resY) .. '. Loading layout \'' .. layoutName .. '\'.')
-	end
-
-	layout = config.load('layouts/' .. layoutName .. '.xml', layoutDefaults)
 end
 
 function checkBuff(buffId)
@@ -409,7 +385,7 @@ windower.register_event('addon command', function(...)
 	elseif command == 'layout' then
 		if args[2] then
 			local isAuto = args[2] == layoutAuto
-			local filename = 'layouts/' .. args[2] .. '.xml'
+			local filename = layoutDir .. args[2] .. '.xml'
 			
 			if isAuto or file.exists(filename) then
 				if isAuto then
@@ -419,7 +395,6 @@ windower.register_event('addon command', function(...)
 				end
 				
 				dispose()
-				loadLayout(args[2])
 				settings.layout = args[2]
 				settings:save()
 				init()

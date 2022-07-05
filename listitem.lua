@@ -32,24 +32,25 @@ local bar = require('bar')
 local listitem = {}
 listitem.__index = listitem
 
-function listitem:init()
+function listitem:init(layout)
 	utils:log('Initializing party list element', 1)
 
 	local obj = {}
 	setmetatable(obj, listitem) -- make handle lookup
 	
+	obj.layout = layout
 	obj.hidden = false
 	
 	-- order of creation determines Z-order
-	obj.jobIcon = jobIcon:init()
+	obj.jobIcon = jobIcon:init(layout)
 	
 	obj.cursor = utils:createImage(layout.cursor.img, layout.scale)
 	obj.cursor:opacity(0)
 	obj.cursor:show()
 	
-	obj.hpBar = bar:init(layout.bar.hp)
-	obj.mpBar = bar:init(layout.bar.mp)
-	obj.tpBar = bar:init(layout.bar.tp)
+	obj.hpBar = bar:init(layout.bar.hp, layout)
+	obj.mpBar = bar:init(layout.bar.mp, layout)
+	obj.tpBar = bar:init(layout.bar.tp, layout)
 	
 	obj.hpText = utils:createText(layout.text.numbers, true)
 	obj.mpText = utils:createText(layout.text.numbers, true)
@@ -152,8 +153,8 @@ end
 
 function listitem:pos(x, y)
 	local hpPosX = x + self.barOffset.x
-	local mpPosX = hpPosX + self.hpBar.size.width + layout.bar.spacingX
-	local tpPosX = mpPosX + self.mpBar.size.width + layout.bar.spacingX
+	local mpPosX = hpPosX + self.hpBar.size.width + self.layout.bar.spacingX
+	local tpPosX = mpPosX + self.mpBar.size.width + self.layout.bar.spacingX
 	
 	self.hpBar:pos(hpPosX, y + self.barOffset.y)
 	self.mpBar:pos(mpPosX, y + self.barOffset.y)
@@ -174,7 +175,7 @@ function listitem:pos(x, y)
 	
 	self.jobIcon:pos(x + self.jobIconOffset.x, y + self.jobIconOffset.y)
 	
-	if layout.text.zone.alignRight then
+	if self.layout.text.zone.alignRight then
 		self.zoneText:pos(tpPosX + self.tpBar.size.width - screenResX + self.zoneOffset.x, y + self.zoneOffset.y)
 	else
 		self.zoneText:pos(tpPosX + self.zoneOffset.x, y + self.zoneOffset.y)
@@ -188,18 +189,18 @@ function listitem:pos(x, y)
 	self.rangeIndFar:pos(hpPosX + self.rangeFarOffset.x, y + self.rangeFarOffset.y)
 	
 	local direction = 1
-	if layout.buffIcons.alignRight then
+	if self.layout.buffIcons.alignRight then
 		direction = -1
 	end
 	
 	for i = 1, 32 do
-		if i <= layout.buffIcons.wrap then -- wrap buffs to next line
+		if i <= self.layout.buffIcons.wrap then -- wrap buffs to next line
 			self.buffImages[i]:pos(
 				tpPosX + direction * (i - 1) * (self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y)
 		else
 			self.buffImages[i]:pos(
-				tpPosX + direction * (i - layout.buffIcons.wrap + layout.buffIcons.wrapOffset - 1) * 
+				tpPosX + direction * (i - self.layout.buffIcons.wrap + self.layout.buffIcons.wrapOffset - 1) * 
 				(self.buffImages[i]:scaledSize().width + self.buffSpacing.x) + self.buffOffset.x, 
 				y + self.buffOffset.y + self.buffImages[i]:scaledSize().height + self.buffSpacing.y)
 		end
@@ -282,7 +283,7 @@ function listitem:updateZone(player, isOutsideZone)
 	local zoneString = ''
 	
 	if player.zone and isOutsideZone then
-		if layout.text.zone.short then
+		if self.layout.text.zone.short then
 			zoneString = '('..res.zones[player.zone]['search']..')'
 		else
 			zoneString = '('..res.zones[player.zone].name..')'
@@ -380,13 +381,13 @@ function listitem:updateBuffs(buffs, isOutsideZone)
 		local buff = buffs[i]
 		
 		local image = nil
-		if layout.buffIcons.alignRight then
+		if self.layout.buffIcons.alignRight then
 			local count = buffs:length()
-			if count > layout.buffIcons.wrap then -- more buffs than the top line
-				if i <= layout.buffIcons.wrap then -- top line
-					image = self.buffImages[layout.buffIcons.wrap - i + 1]
+			if count > self.layout.buffIcons.wrap then -- more buffs than the top line
+				if i <= self.layout.buffIcons.wrap then -- top line
+					image = self.buffImages[self.layout.buffIcons.wrap - i + 1]
 				elseif i <= count then -- bottom line
-					image = self.buffImages[count - i + layout.buffIcons.wrap + 1]
+					image = self.buffImages[count - i + self.layout.buffIcons.wrap + 1]
 				end
 			else
 				image = self.buffImages[count - i + 1]
@@ -398,7 +399,7 @@ function listitem:updateBuffs(buffs, isOutsideZone)
 		end
 		
 		if buff then
-			image:path(windower.addon_path .. layout.buffIcons.path .. tostring(buff) .. '.png')
+			image:path(windower.addon_path .. self.layout.buffIcons.path .. tostring(buff) .. '.png')
 			image:opacity(1)
 		else
 			image:path('')

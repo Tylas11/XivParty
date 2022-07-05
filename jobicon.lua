@@ -31,10 +31,12 @@ local jobs = require('jobs')
 local jobIcon = {}
 jobIcon.__index = jobIcon
 
-function jobIcon:init()
+function jobIcon:init(layout)
 	local obj = {}
 	setmetatable(obj, jobIcon) -- make handle lookup
 	
+	obj.layout = layout
+
 	obj.jobHighlight = utils:createImage(layout.jobIcon.imgHighlight, layout.scale)
 	obj.jobHighlight:opacity(0)
 	obj.jobHighlight:show()
@@ -79,8 +81,8 @@ function jobIcon:update(player, isOutsideZone)
 	local highlightOpacity = 0
 	
 	if not isOutsideZone and player.job then
-		self.jobIcon:path(windower.addon_path .. layout.jobIcon.path .. player.job .. '.png')
-		self.jobBg:color(jobs:getRoleColor(player.job, layout.jobIcon.colors))
+		self.jobIcon:path(windower.addon_path .. self.layout.jobIcon.path .. player.job .. '.png')
+		self.jobBg:color(jobs:getRoleColor(player.job, self.layout.jobIcon.colors))
 		opacity = 1
 		
 		if player.isSelected then

@@ -32,7 +32,7 @@ local listitem = require('listitem')
 local partylist = {}
 partylist.__index = partylist
 
-function partylist:init(party, partySettings)
+function partylist:init(party, partySettings, layout)
     if not party then
 		utils:log('partylist:init missing parameter party!', 4)
 		return
@@ -50,6 +50,7 @@ function partylist:init(party, partySettings)
 	
 	obj.party = party -- list of party members from model.party (or one of the alliances)
     obj.partySettings = partySettings
+	obj.layout = layout
 
     obj.listItems = T{} -- ordered list by party list position, index range 0..5
     obj.setupParty = nil -- list of party members used in setup mode
@@ -57,7 +58,7 @@ function partylist:init(party, partySettings)
     obj.isCtrlDown = false
     obj.hidden = false
 	
-	obj.background = bg:init(partySettings)
+	obj.background = bg:init(partySettings, layout)
 	
 	obj.dragImage = img:init('', obj.background.size.width, obj.background.size.height)
 	obj.dragImage:alpha(0)
@@ -132,11 +133,11 @@ function partylist:pos(x, y)
 			if self.partySettings.alignBottom then
 				item:pos(
 					x + self.listOffset.x, 
-					y + self.listOffset.y - self.background.bottom:scaledSize().height - (count - i) * (layout.list.itemHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
+					y + self.listOffset.y - self.background.bottom:scaledSize().height - (count - i) * (self.layout.list.itemHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
 			else
 				item:pos(
 					x + self.listOffset.x, 
-					y + self.listOffset.y + self.background.top:scaledSize().height + i * (layout.list.itemHeight + self.partySettings.itemSpacing))
+					y + self.listOffset.y + self.background.top:scaledSize().height + i * (self.layout.list.itemHeight + self.partySettings.itemSpacing))
 			end
 		end
 	end
@@ -157,7 +158,7 @@ function partylist:update(force)
 		
 		if player then
 			if not item then
-				item = listitem:init()
+				item = listitem:init(self.layout)
 				self.listItems[i] = item
 				if not self.hidden then
 					item:show()

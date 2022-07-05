@@ -31,9 +31,9 @@ bg.__index = bg
 
 local isDebug = false
 
-function bg:init(ptySet)
-	if not ptySet then
-		utils:log('partylist:init missing parameter ptySet!', 4)
+function bg:init(partySettings, layout)
+	if not partySettings then
+		utils:log('partylist:init missing parameter partySettings!', 4)
 		return
 	end
 
@@ -42,7 +42,8 @@ function bg:init(ptySet)
 	local obj = {}
 	setmetatable(obj, bg) -- make handle lookup
 
-	obj.partySettings = ptySet
+	obj.partySettings = partySettings
+	obj.layout = layout
 
 	obj.hidden = true
 	obj.rowCount = 0
@@ -95,7 +96,7 @@ function bg:resize(rowCount)
 
 	self.rowCount = rowCount
 
-	self.contentHeight = (rowCount * (layout.list.itemHeight) + (rowCount - 1) * self.partySettings.itemSpacing) / layout.scale
+	self.contentHeight = (rowCount * (self.layout.list.itemHeight) + (rowCount - 1) * self.partySettings.itemSpacing) / self.layout.scale
 	self.mid:size(self.sizeMid.x, self.contentHeight)
 	self.mid.image:repeat_xy(1, math.floor(self.contentHeight / self.sizeMid.y))
 	self:pos(self.posX, self.posY) -- refresh position of bottom tile

@@ -29,12 +29,14 @@
 local bar = {}
 bar.__index = bar
 
-function bar:init(barInfo)
+function bar:init(barInfo, layout)
 	utils:log('Initializing bar', 1)
 
 	local obj = {}
 	setmetatable(obj, bar) -- make handle lookup
 	
+	obj.layout = layout
+
 	obj.imgBg = utils:createImage(barInfo.imgBg, layout.scale)
 	obj.imgFg = utils:createImage(barInfo.imgFg, layout.scale)
 	
@@ -79,8 +81,8 @@ end
 
 function bar:pos(x, y)
 	-- this centers the foreground image inside the background image, background assumed to be larger
-	local fgOffsetX = (self.sizeBg.x - self.sizeFg.x) / 2 * layout.scale
-	local fgOffsetY = (self.sizeBg.y - self.sizeFg.y) / 2 * layout.scale
+	local fgOffsetX = (self.sizeBg.x - self.sizeFg.x) / 2 * self.layout.scale
+	local fgOffsetY = (self.sizeBg.y - self.sizeFg.y) / 2 * self.layout.scale
 	
 	self.imgBg:pos(x, y)
 	self.imgFg:pos(x + fgOffsetX, y + fgOffsetY)
@@ -89,7 +91,7 @@ end
 -- must be called every frame for a smooth animation
 function bar:update(targetValue)
 	if self.value ~= targetValue then
-		self.exactValue = self.exactValue + (targetValue - self.exactValue) * layout.bar.animSpeed
+		self.exactValue = self.exactValue + (targetValue - self.exactValue) * self.layout.bar.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
 	    
@@ -108,18 +110,18 @@ function bar:updateGlow(targetValue)
 		local glowWidth = self.sizeFg.x * math.abs(targetValue - self.value)
 		
 		-- center glow vertically on the bar foreground image
-		local glowMidPosY = self.imgFg:pos().y + (self.sizeFg.y / 2 - self.sizeGlow.y / 2) * layout.scale
-		local glowSidesPosY = self.imgFg:pos().y + (self.sizeFg.y / 2 - self.sizeGlowSides.y / 2) * layout.scale
+		local glowMidPosY = self.imgFg:pos().y + (self.sizeFg.y / 2 - self.sizeGlow.y / 2) * self.layout.scale
+		local glowSidesPosY = self.imgFg:pos().y + (self.sizeFg.y / 2 - self.sizeGlowSides.y / 2) * self.layout.scale
 	
 		self.imgGlowMid:opacity(1)
 		self.imgGlowLeft:opacity(1)
 		self.imgGlowRight:opacity(1)
 	
 		self.imgGlowMid:size(glowWidth, self.sizeGlow.y)
-		self.imgGlowMid:pos(self.imgFg:pos().x + self.sizeFg.x * math.min(targetValue, self.value) * layout.scale, glowMidPosY)
+		self.imgGlowMid:pos(self.imgFg:pos().x + self.sizeFg.x * math.min(targetValue, self.value) * self.layout.scale, glowMidPosY)
 			
-		self.imgGlowLeft:pos(self.imgGlowMid:pos().x - self.sizeGlowSides.x * layout.scale, glowSidesPosY)
-		self.imgGlowRight:pos(self.imgGlowMid:pos().x + (glowWidth + self.sizeGlowSides.x) * layout.scale, glowSidesPosY)
+		self.imgGlowLeft:pos(self.imgGlowMid:pos().x - self.sizeGlowSides.x * self.layout.scale, glowSidesPosY)
+		self.imgGlowRight:pos(self.imgGlowMid:pos().x + (glowWidth + self.sizeGlowSides.x) * self.layout.scale, glowSidesPosY)
 	else
 		self.imgGlowMid:opacity(0)
 		self.imgGlowLeft:opacity(0)

@@ -28,6 +28,7 @@
 
 local pl = require('partylist')
 local player = require('player')
+local layoutDefaults = require('layout')
 
 local view = {}
 
@@ -36,6 +37,17 @@ local isSetupEnabled = false
 
 local partyLists = T{} -- UI elements for each party
 local setupParties = T{} -- setup data for each party
+
+local layout
+local layoutAlliance
+
+-- constants
+
+layoutDir = 'layouts/'
+layoutAllianceSuffix = '_alliance'
+layoutAuto = 'auto'
+layout1080 = '1080p'
+layout1440 = '1440p'
 
 function view:init(model)
 	if isInitialized then return end
@@ -47,8 +59,10 @@ function view:init(model)
 	
 	utils:log('Initializing view')
 
+	self:loadLayout(settings.layout)
+
 	for i = 0, 2 do
-		partyLists[i] = pl:init(model.parties[i], self:getSettingsByIndex(i))
+		partyLists[i] = pl:init(model.parties[i], self:getSettingsByIndex(i), i == 0 and layout or layoutAlliance) -- last param: lua style ternary operator
 	end
 
 	isInitialized = true
@@ -71,6 +85,28 @@ function view:dispose()
 	partyLists:clear()
 
 	isInitialized = false
+end
+
+function view:loadLayout(layoutName)
+	if layoutName == layoutAuto then
+		local resY = windower.get_windower_settings().ui_y_res
+		if resY <= 1200 then
+			layoutName = layout1080
+		else
+			layoutName = layout1440
+		end
+	end
+
+	local layoutFile = layoutDir .. layoutName .. '.xml'
+	local layoutAllianceFile = layoutDir .. layoutName .. layoutAllianceSuffix .. '.xml'
+
+	layout = config.load(layoutFile, layoutDefaults)
+
+	if windower.file_exists(windower.addon_path .. layoutAllianceFile) then
+		layoutAlliance = config.load(layoutAllianceFile, layoutDefaults)
+	else
+		layoutAlliance = layout
+	end
 end
 
 function view:getSettingsByIndex(index)

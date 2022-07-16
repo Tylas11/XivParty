@@ -61,7 +61,7 @@ function model:updatePlayers()
 	local party = T(windower.ffxi.get_party())
 	local zone = windower.ffxi.get_info().zone
 	local target = windower.ffxi.get_mob_by_target('t')
-	local subtarget = windower.ffxi.get_mob_by_target('st')
+	local subtarget = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('stpt') or windower.ffxi.get_mob_by_target('stal')
 	
 	for i = 0, 5 do
 		local member = party['p%i':format(i % 6)]

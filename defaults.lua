@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -50,6 +50,8 @@ defaults.posX = 70 -- x screen position of the party list
 defaults.posY = 400 -- y screen position of the party list
 
 defaults.hideSolo = false -- hides the party list when you are not in a party
+defaults.hideAlliance = false -- hides UI for alliance parties
+defaults.hideCutscenes = true -- hides UI during cutscenes or when talking to NPCs
 
 defaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
 defaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off

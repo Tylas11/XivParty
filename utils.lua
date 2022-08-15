@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -36,53 +36,6 @@ local utils = {}
 -- 4 ... error
 utils.level = 3
 
-function utils:createImage(imageInfo, scaleX, scaleY)
-	if not scaleY then
-		scaleY = scaleX
-	end
-	
-	local size = utils:coord(imageInfo.size)
-	local image = img:init(windower.addon_path .. imageInfo.path, size.x, size.y, scaleX, scaleY)
-	
-	if imageInfo.color then
-		local color = utils:colorFromHex(imageInfo.color)
-		image:color(color.r, color.g, color.b)
-		image:alpha(color.a)
-	end
-	
-	return image
-end
-
-function utils:createText(textInfo, right)
-	if right == nil then
-		right = false
-	end
-
-	local textSettings = {
-		flags = {
-			draggable = false,
-			right = right
-		}
-	}
-	
-	local text = texts.new(textSettings)
-	
-	text:font(textInfo.font, 'Arial') -- Arial is the fallback font
-	text:size(textInfo.size)
-	text:bg_visible(false)
-	
-	local color = utils:colorFromHex(textInfo.color)
-	local stroke = utils:colorFromHex(textInfo.stroke)
-	
-	text:color(color.r, color.g, color.b)
-	text:alpha(color.a)
-	text:stroke_color(stroke.r, stroke.g, stroke.b)
-	text:stroke_alpha(stroke.a)
-	text:stroke_width(textInfo.strokeWidth)
-	
-	return text
-end
-
 function utils:colorFromHex(hexString)
 	local length = string.length(hexString)
 
@@ -104,6 +57,7 @@ function utils:colorFromHex(hexString)
 	return color
 end
 
+-- interprets an L{} list with two elements as X,Y coordinates
 function utils:coord(coordList)
 	local coord = {}
 	
@@ -160,7 +114,7 @@ function utils:logTable(t, depth)
 			if type(value) == 'table' then
 				windower.add_to_chat(8, indent .. key)
 			elseif key ~= '_raw' and key ~= '_data' then
-				windower.add_to_chat(8, indent .. key .. ' = ' .. tostring(value))
+				windower.add_to_chat(8, indent .. key .. ' = ' .. tostring(value) .. '(' .. type(value) .. ')')
 			end
 			utils:logTable(value, depth + 3)
 		end

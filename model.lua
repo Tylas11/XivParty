@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,37 +26,31 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- imports
+local classes = require('classes')
 local player = require('player')
 
-local model = {}
-model.__index = model
+-- create the class
+local model = classes.class()
+
+local partyKeys = { 'p%i', 'a1%i', 'a2%i' }
 
 function model:init()
-	local obj = {}
-	setmetatable(obj, model) -- make handle lookup
-	
 	-- NOTE: in lua list indices start with 1. when forced to index 0, iterating with :it() will work but out of order
 	
-	obj.allPlayers = T{} -- unordered list of all players that we ever received data for
+	self.allPlayers = T{} -- unordered list of all players that we ever received data for
 
-	obj.parties = T{}
+	self.parties = T{}
 	for i = 0, 2 do
-		obj.parties[i] = T{} -- lists for members of the main party, first and second alliance parties, ordered by party list position, index ranges 0..5
+		self.parties[i] = T{} -- lists for members of the main party, first and second alliance parties, ordered by party list position, index ranges 0..5
 	end
-	
-	return obj
 end
 
 function model:dispose()
 	self:clear()
-
-	setmetatable(self, nil)
 end
 
 function model:clear()
-	for ap in self.allPlayers:it() do
-		ap:dispose()
-	end
 	self.allPlayers:clear()
 
 	-- items already disposed via allPlayers
@@ -68,12 +62,12 @@ end
 function model:updatePlayers()
 	local members = T(windower.ffxi.get_party())
 	local target = windower.ffxi.get_mob_by_target('t')
-	local subtarget = windower.ffxi.get_mob_by_target('st')
+	local subtarget = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('stpt') or windower.ffxi.get_mob_by_target('stal')
 	
 	for i = 0, 17 do
 		local idx = (i / 6):floor()
-        local key = {'p%i', 'a1%i', 'a2%i'}[idx + 1]:format(i % 6)
-		local member = members[key]
+		local member = members[string.format(partyKeys[idx + 1], i % 6)]
+		
 		if member and member.name then
 			local id
 			if member.mob and member.mob.id > 0 then
@@ -119,16 +113,13 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 			-- use the player with the higher ID (most likely newer, confirmed true for trusts)
 			if foundByName.id > foundById.id then
 				foundPlayer = foundByName
-				foundById:dispose()
 				self.allPlayers:delete(foundById)
 			else
 				foundPlayer = foundById
-				foundByName:dispose()
 				self.allPlayers:delete(foundByName)
 			end
 		else -- merge
 			foundPlayer = foundByName:merge(foundById)
-			foundById:dispose()
 			self.allPlayers:delete(foundById)
 		end
 	else
@@ -140,7 +131,7 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 		
 		if not foundPlayer and not dontCreate then
 			utils:log('Creating new player (' .. debugTag .. ')', 2)
-			foundPlayer = player:init(name, id)
+			foundPlayer = player.new(name, id, self)
 			self.allPlayers:append(foundPlayer)
 		end
 	end
@@ -151,6 +142,19 @@ end
 -- finds player by name, returns nil if not found
 function model:findPlayer(name)
 	return self:getPlayer(name, nil, 'findPlayer', true)
+end
+
+-- finds leader of a party, defaults to main party when no index is specified
+function model:findPartyLeader(partyIndex)
+	if not partyIndex then partyIndex = 0 end
+
+    for player in self.parties[partyIndex]:it() do
+        if player.isLeader then
+            return player
+        end
+    end
+    
+    return nil
 end
 
 function model:refreshFilteredBuffs()

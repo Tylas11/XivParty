@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,11 +26,14 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local bg = require('bg')
-local listitem = require('listitem')
+-- imports
+local classes = require('classes')
+local uiBackground = require('uiBackground')
+local uiListItem = require('uiListItem')
+local uiImage = require('uiImage')
 
-local partylist = {}
-partylist.__index = partylist
+-- create the class
+local partylist = classes.class()
 
 function partylist:init(party, partySettings, layout)
     if not party then
@@ -45,40 +48,34 @@ function partylist:init(party, partySettings, layout)
 
     utils:log('Initializing partylist')
 
-    local obj = {}
-	setmetatable(obj, partylist) -- make handle lookup
-	
-	obj.party = party -- list of party members from model.party (or one of the alliances)
-    obj.partySettings = partySettings
-	obj.layout = layout
+	self.party = party -- list of party members from model.party (or one of the alliances)
+    self.partySettings = partySettings
+	self.layout = layout
 
-    obj.listItems = T{} -- ordered list by party list position, index range 0..5
-    obj.setupParty = nil -- list of party members used in setup mode
-    obj.isSetupEnabled = false
-    obj.isCtrlDown = false
-    obj.hidden = false
+    self.listItems = T{} -- ordered list by party list position, index range 0..5
+    self.setupParty = nil -- list of party members used in setup mode
+    self.isSetupEnabled = false
+    self.isCtrlDown = false
+    self.hidden = false
 	
-	obj.background = bg:init(partySettings, layout)
+	self.background = uiBackground.new(layout.bg, partySettings, layout.scale)
 	
-	obj.dragImage = img:init('', obj.background.size.width, obj.background.size.height)
-	obj.dragImage:alpha(0)
-	obj.dragImage:show()
-    obj.dragged = nil
+	self.dragImage = uiImage.create(nil, self.background.size.width, self.background.size.height)
+	self.dragImage:alpha(0)
+	self.dragImage:show()
+    self.dragged = nil
 	
-	obj.posX = partySettings.posX
-	obj.posY = partySettings.posY
-	obj.listOffset = utils:coord(layout.list.offset)
+	self.posX = partySettings.posX
+	self.posY = partySettings.posY
 	
     -- register windower event handlers
-    obj.keyboardHandlerId = windower.register_event('keyboard', function(key, down)
-        obj:handleWindowerKeyboard(key, down)
+    self.keyboardHandlerId = windower.register_event('keyboard', function(key, down)
+        self:handleWindowerKeyboard(key, down)
     end)
     
-    obj.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
-        return obj:handleWindowerMouse(type, x, y, delta, blocked)
+    self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
+        return self:handleWindowerMouse(type, x, y, delta, blocked)
     end)
-
-	return obj
 end
 
 function partylist:dispose()
@@ -96,8 +93,6 @@ function partylist:dispose()
 		item:dispose()
 	end
 	self.listItems:clear()
-	
-	setmetatable(self, nil)
 end
 
 function partylist:setupEnabled(enable, setupParty)
@@ -132,12 +127,12 @@ function partylist:pos(x, y)
 		if item then
 			if self.partySettings.alignBottom then
 				item:pos(
-					x + self.listOffset.x, 
-					y + self.listOffset.y - self.background.bottom:scaledSize().height - (count - i) * (self.layout.list.itemHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
+					x, 
+					y - self.background.bottom.scaledHeight - (count - i) * (self.layout.list.itemHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
 			else
 				item:pos(
-					x + self.listOffset.x, 
-					y + self.listOffset.y + self.background.top:scaledSize().height + i * (self.layout.list.itemHeight + self.partySettings.itemSpacing))
+					x, 
+					y + self.background.top.scaledHeight + i * (self.layout.list.itemHeight + self.partySettings.itemSpacing))
 			end
 		end
 	end
@@ -158,7 +153,7 @@ function partylist:update(force)
 		
 		if player then
 			if not item then
-				item = listitem:init(self.layout)
+				item = uiListItem.new(self.layout)
 				self.listItems[i] = item
 				if not self.hidden then
 					item:show()
@@ -173,7 +168,7 @@ function partylist:update(force)
 	end
 	
 	if count ~= self.listItems:length() or force then
-		self.background:resize(self.listItems:length())
+		self.background:update(self.listItems:length(), self.layout.list.itemHeight)
 		self.dragImage:size(self.background.size.width, self.background.size.height)
 		
 		self:pos(self.posX, self.posY)
@@ -227,7 +222,7 @@ function partylist:handleWindowerMouse(type, x, y, delta, blocked)
                 end
             
                 if self.partySettings.alignBottom then
-                    self:pos(posX, posY + self.dragImage:size().height)
+                    self:pos(posX, posY + self.dragImage.height)
                 else
                     self:pos(posX, posY)
                 end
@@ -236,8 +231,8 @@ function partylist:handleWindowerMouse(type, x, y, delta, blocked)
         
         -- mouse left click
         elseif type == 1 then
-            if self.dragImage.image:hover(x, y) then
-                self.dragged = {image = self.dragImage.image, x = x - self.dragImage:pos().x, y = y - self.dragImage:pos().y}
+            if self.dragImage:hover(x, y) then
+				self.dragged = { x = x - self.dragImage.posX, y = y - self.dragImage.posY }
                 return true
             end
         
@@ -256,7 +251,7 @@ function partylist:handleWindowerMouse(type, x, y, delta, blocked)
         
         -- mouse scroll
         elseif type == 10 then
-            if self.dragImage.image:hover(x, y) then
+            if self.dragImage:hover(x, y) then
                 self.partySettings.itemSpacing = math.max(0, self.partySettings.itemSpacing + delta)
                 settings:save()
                 

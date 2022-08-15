@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -32,25 +32,21 @@ _addon.version = '1.7.0'
 _addon.commands = {'xp', 'xivparty'}
 
 config = require('config')
-texts  = require('texts')
-images = require('images')
 packets = require('packets')
 res = require('resources')
-logger = require('logger')
-file = require('files')
+require('logger')
 require('strings')
+require('lists')
+require('tables')
 
+local const = require('const')
 utils = require('utils')
-img = require('img')
 require('player')
 
-local md = require('model')
-local model = md:init()
+local model = require('model').new()
 
 settings = require('settings')
-
-local bo = require('buffOrder')
-buffOrder = getBuffOrderWithIdKeys(bo)
+buffOrder = require('buffOrder')
 
 local view = require('view')
 
@@ -84,7 +80,7 @@ windower.register_event('logout', function()
 end)
 
 windower.register_event('status change', function(status)
-	if not hidden and status == 4 then -- hide UI during cutscenes
+	if settings.hideCutscenes and not hidden and status == 4 then -- hide UI during cutscenes
 		hidden = true
 		view:hide()
 	elseif hidden and status ~= 4 then
@@ -105,11 +101,12 @@ function init()
 end
 
 function dispose()
+	if not isInitialized then return end
+
 	utils:log('Disposing...')
-	isInitialized = false
-	
 	view:dispose()
-	model:clear()
+
+	isInitialized = false
 end
 
 -- per frame updating
@@ -192,7 +189,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 			if playerId ~= 0 then -- NOTE: main player buffs are not available here
 				local buffsList = {}
 				
-				for i = 1, 32 do -- starting at 1 to match the offset in windower.ffxi.get_player().buffs
+				for i = 1, const.maxBuffs do -- starting at 1 to match the offset in windower.ffxi.get_player().buffs
 					local buff = original:byte(k*48+5+16+i-1) + 256*( math.floor( original:byte(k*48+5+8+ math.floor((i-1)/4)) / 4^((i-1)%4) )%4) -- Credit: Byrth, GearSwap
 					
 					if buff == 255 then -- empty buff
@@ -208,9 +205,10 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 		end
 	end
 	
-	if id == 0xB then
+	if id == 0xB then -- zoning, also happens on log out
 		utils:log('Zoning...')
 		zoning = true
+		model:clear() -- clear model only when zoning, this allows reloading the UI (for layout changes, etc) without losing party data
 		dispose()
 	elseif id == 0xA and zoning then
 		utils:log('Zoning done.')
@@ -286,6 +284,16 @@ windower.register_event('addon command', function(...)
 	elseif command == 'hidesolo' then
 		local ret = handleCommandOnOff(settings.hideSolo, args[2], 'Party list hiding while solo')
 		settings.hideSolo = ret
+		settings:save()
+	elseif command == 'hidealliance' then
+		local ret = handleCommandOnOff(settings.hideAlliance, args[2], 'Alliance list hiding')
+		dispose()
+		settings.hideAlliance = ret
+		settings:save()
+		init()
+	elseif command == 'hidecutscenes' then
+		local ret = handleCommandOnOff(settings.hideCutscenes, args[2], 'Party list hiding during cutscenes')
+		settings.hideCutscenes = ret
 		settings:save()
 	elseif command == 'alignbottom' then
 		local ret = handleCommandOnOff(settings.alignBottom, args[2], 'Bottom alignment')
@@ -377,17 +385,17 @@ windower.register_event('addon command', function(...)
 			buffs = windower.ffxi.get_player().buffs
 			log('Your active buffs:')
 		end
-		for i = 1, 32 do
+		for i = 1, const.maxBuffs do
 			if buffs[i] then
 				log(getBuffText(buffs[i]))
 			end
 		end
 	elseif command == 'layout' then
 		if args[2] then
-			local isAuto = args[2] == layoutAuto
-			local filename = layoutDir .. args[2] .. '.xml'
+			local isAuto = args[2] == const.layoutAuto
+			local filename = const.layoutDir .. args[2] .. '.xml'
 			
-			if isAuto or file.exists(filename) then
+			if isAuto or windower.file_exists(windower.addon_path .. filename) then
 				if isAuto then
 					log('Enabled automatic resolution based layout selection.')
 				else
@@ -418,6 +426,10 @@ windower.register_event('addon command', function(...)
 			settings:save()
 			settings:load()
 			log('Global settings applied. The job specific settings for ' .. job .. ' will remain saved for later use.')
+		end
+	elseif command == 'debug' then
+		if args[2] == 'savelayout' then
+			view:debugSaveLayout()
 		end
 	else
 		showHelp()

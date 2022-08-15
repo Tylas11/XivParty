@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,9 +26,10 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local pl = require('partylist')
+local partylist = require('partylist')
 local player = require('player')
 local layoutDefaults = require('layout')
+local const = require('const')
 
 local view = {}
 
@@ -36,18 +37,12 @@ local isInitialized = false
 local isSetupEnabled = false
 
 local partyLists = T{} -- UI elements for each party
-local setupParties = T{} -- setup data for each party
+local setupParties = T{} -- setup data for each party (a list of lists of players)
 
 local layout
 local layoutAlliance
 
--- constants
-
-layoutDir = 'layouts/'
-layoutAllianceSuffix = '_alliance'
-layoutAuto = 'auto'
-layout1080 = '1080p'
-layout1440 = '1440p'
+local lastPartyIndex
 
 function view:init(model)
 	if isInitialized then return end
@@ -59,10 +54,16 @@ function view:init(model)
 	
 	utils:log('Initializing view')
 
+	if settings.hideAlliance then
+		lastPartyIndex = 0
+	else
+		lastPartyIndex = 2
+	end
+
 	self:loadLayout(settings.layout)
 
-	for i = 0, 2 do
-		partyLists[i] = pl:init(model.parties[i], self:getSettingsByIndex(i), i == 0 and layout or layoutAlliance) -- last param: lua style ternary operator
+	for i = 0, lastPartyIndex do
+		partyLists[i] = partylist.new(model.parties[i], self:getSettingsByIndex(i), i == 0 and layout or layoutAlliance) -- last param: lua style ternary operator
 	end
 
 	isInitialized = true
@@ -73,32 +74,28 @@ function view:dispose()
 
 	utils:log('Disposing view')
 
-	for i = 0, 2 do
-		if setupParties[i] then
-			for sp in setupParties[i]:it() do
-				sp:dispose()
-			end
-		end
+	for i = 0, lastPartyIndex do
 		partyLists[i]:dispose()
 	end
 	setupParties:clear()
 	partyLists:clear()
 
+	isSetupEnabled = false
 	isInitialized = false
 end
 
 function view:loadLayout(layoutName)
-	if layoutName == layoutAuto then
+	if layoutName == const.layoutAuto then
 		local resY = windower.get_windower_settings().ui_y_res
 		if resY <= 1200 then
-			layoutName = layout1080
+			layoutName = const.layout1080
 		else
-			layoutName = layout1440
+			layoutName = const.layout1440
 		end
 	end
 
-	local layoutFile = layoutDir .. layoutName .. '.xml'
-	local layoutAllianceFile = layoutDir .. layoutName .. layoutAllianceSuffix .. '.xml'
+	local layoutFile = const.layoutDir .. layoutName .. '.xml'
+	local layoutAllianceFile = const.layoutDir .. layoutName .. const.layoutAllianceSuffix .. '.xml'
 
 	layout = config.load(layoutFile, layoutDefaults)
 
@@ -124,7 +121,7 @@ function view:setupEnabled(enable)
 
 	isSetupEnabled = enable
 
-	for i = 0, 2 do
+	for i = 0, lastPartyIndex do
 		if enable and not setupParties[i] then
 			setupParties[i] = self:createSetupData(i == 0)
 		end
@@ -140,15 +137,28 @@ function view:createSetupData(isMainParty)
 		local j = res.jobs[math.random(1,22)].ens
 		local sj = res.jobs[math.random(1,22)].ens
 	
-		local p = player:init('Player' .. tostring(i + 1), (i + 1))
-		p:createSetupData(j, sj, isMainParty)
-		setupParty[i] = p
+		local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
+		setupPlayer:createSetupData(j, sj, isMainParty)
+		setupParty[i] = setupPlayer
 	end
 	
 	setupParty[0].isLeader = true
+	setupParty[0].isAllianceLeader = true
+	setupParty[0].isQuarterMaster = true
+
+	-- NOTE: can't be both selected and out of zone
 	if isMainParty then
-		setupParty[math.random(0,5)].isSelected = true
+		setupParty[math.random(0,2)].isSelected = true
 	end
+
+	-- set a zone that is not the current zone for one player, to show off the zone name display
+	local zone = windower.ffxi.get_info().zone
+	if zone == 0 then
+		zone = zone + 1
+	else
+		zone = zone - 1
+	end
+	setupParty[math.random(3,5)].zone = zone
 
 	return setupParty
 end
@@ -156,7 +166,7 @@ end
 function view:update(force)
 	if not isInitialized then return end
 	
-	for i = 0, 2 do
+	for i = 0, lastPartyIndex do
 		partyLists[i]:update(force)
 	end
 end
@@ -164,7 +174,7 @@ end
 function view:show()
 	if not isInitialized then return end
 	
-	for i = 0, 2 do
+	for i = 0, lastPartyIndex do
 		partyLists[i]:show()
 	end
 end
@@ -172,9 +182,18 @@ end
 function view:hide()
 	if not isInitialized then return end
 
-	for i = 0, 2 do
+	for i = 0, lastPartyIndex do
 		partyLists[i]:hide()
 	end
+end
+
+function view:debugSaveLayout()
+	if not isInitialized then return end
+
+	layout:save()
+	layoutAlliance:save();
+
+	log('Layout saved.')
 end
 
 return view

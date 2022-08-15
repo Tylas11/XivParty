@@ -26,16 +26,48 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local jobDefaults = {}
+-- imports
+local classes = require('classes')
+local uiBase = require('uiBase')
+local uiImage = require('uiImage')
 
-jobDefaults.jobEnabled = false -- when set to false, job specific settings will be ignored and globals used instead
+-- create the class, derive from uiBase
+local uiLeader = classes.class(uiBase)
 
-jobDefaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
-jobDefaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
+function uiLeader:init(leaderLayout, scale)
+	if self.super.init(self, leaderLayout) then
+		self.leaderLayout = leaderLayout
+		self.scale = scale
 
-jobDefaults.buffs = {}
-jobDefaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-jobDefaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
-jobDefaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+		self.imgParty = self:addChild(uiImage.new(leaderLayout.imgParty, scale))
+		self.imgParty:opacity(0)
 
-return jobDefaults
+		self.imgAlliance = self:addChild(uiImage.new(leaderLayout.imgAlliance, scale))
+		self.imgAlliance:opacity(0)
+
+        self.imgQuarterMaster = self:addChild(uiImage.new(leaderLayout.imgQuarterMaster, scale))
+		self.imgQuarterMaster:opacity(0)
+	end
+end
+
+function uiLeader:update(player)
+	if player.isLeader then
+		self.imgParty:opacity(1)
+	else
+		self.imgParty:opacity(0)
+	end
+	
+	if player.isAllianceLeader then
+		self.imgAlliance:opacity(1)
+	else
+		self.imgAlliance:opacity(0)
+	end
+	
+	if player.isQuarterMaster then
+		self.imgQuarterMaster:opacity(1)
+	else
+		self.imgQuarterMaster:opacity(0)
+	end
+end
+
+return uiLeader

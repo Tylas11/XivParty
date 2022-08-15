@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -751,7 +751,7 @@ function getBuffOrderWithIdKeys(b)
 	return ret
 end
 
-return buffOrder
+return getBuffOrderWithIdKeys(buffOrder)
 
 -- CREDITS: based on windower's auto generated buffs.lua
 

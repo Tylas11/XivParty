@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2022, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,16 +26,20 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- imports
+local classes = require('classes')
 local jobs = require('jobs')
+local const= require('const')
 
-local player = {}
-player.__index = player
+-- create the class
+local player = classes.class()
 
 -- either parameter name or id can be nil, but not both
-function player:init(name, id)
+-- model can be nil, only required for party leader lookup for trust levels
+function player:init(name, id, model)
 	if not name and not id then
 		utils:log('player:init missing parameter name or id!', 4)
-		return nil
+		return
 	end
 	
 	local initText = ''
@@ -47,23 +51,9 @@ function player:init(name, id)
 	end
 	utils:log('Initializing player' .. initText, 2)
 
-	local obj = {}
-	setmetatable(obj, player) -- make handle lookup
-
-	obj.name = name
-	obj.id = id
-	
-	return obj
-end
-
-function player:dispose()
-	local displayName = '???'
-	if (self.name) then
-		displayName = self.name
-	end
-	utils:log('Disposing player '..displayName, 2)
-	
-	setmetatable(self, nil)
+	self.name = name
+	self.id = id
+	self.model = model
 end
 
 -- merges data from other player into self
@@ -129,10 +119,12 @@ function player:update(member, target, subtarget)
 				self.job = trustInfo.job
 				self.subJob = trustInfo.subJob
 				
-				local leaderLevel = self:getLeaderLevel()
-				if leaderLevel then
-					self.jobLvl = leaderLevel
-					self.subJobLvl = math.max(1, math.floor(leaderLevel / 2))
+				if self.model then 
+					local partyLeader = self.model:findPartyLeader() -- get leader of main party
+					if partyLeader and partyLeader.jobLvl then
+						self.jobLvl = partyLeader.jobLvl
+						self.subJobLvl = math.max(1, math.floor(partyLeader.jobLvl / 2))
+					end
 				end
 			else
 				utils:log('Failed to get trust info for ' .. self.name, 4)
@@ -155,25 +147,13 @@ function player:update(member, target, subtarget)
 	end
 end
 
-function player:getLeaderLevel()
-	local party = windower.ffxi.get_party()
-	if party.party1_leader then
-		local leader = party['p%i':format(party.party1_leader)]
-		if leader then
-			return leader.main_job_level
-		end
-	end
-
-	return nil
-end
-
 function player:updateBuffs(buffs)
 	self.buffs = buffs -- list of all buffs this player has
 	self.filteredBuffs = T{} -- list of filtered buffs to be displayed
 	
 	if not buffs then return end
 	
-	for i = 1, 32 do
+	for i = 1, const.maxBuffs do
 		buff = buffs[i]
 		
 		if (settings.buffs.filterMode == 'blacklist' and settings.buffFilters[buff]) or 
@@ -246,7 +226,7 @@ function player:createSetupData(job, subJob, isMainParty)
 	self.buffs = {}
 	
 	if isMainParty then
-		for i = 1, 32 do
+		for i = 1, const.maxBuffs do
 			self.buffs[i] = math.random(1, 629)
 		end
 	end

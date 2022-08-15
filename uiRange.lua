@@ -26,16 +26,45 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local jobDefaults = {}
+-- imports
+local classes = require('classes')
+local uiBase = require('uiBase')
+local uiImage = require('uiImage')
 
-jobDefaults.jobEnabled = false -- when set to false, job specific settings will be ignored and globals used instead
+-- create the class, derive from uiBase
+local uiRange = classes.class(uiBase)
 
-jobDefaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
-jobDefaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
+function uiRange:init(rangeLayout, scale)
+	if self.super.init(self, rangeLayout) then
+		self.rangeLayout = rangeLayout
+		self.scale = scale
 
-jobDefaults.buffs = {}
-jobDefaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-jobDefaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
-jobDefaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+		self.imgNear = self:addChild(uiImage.new(rangeLayout.imgNear, scale))
+		self.imgNear:opacity(0)
 
-return jobDefaults
+		self.imgFar = self:addChild(uiImage.new(rangeLayout.imgFar, scale))
+		self.imgFar:opacity(0)
+	end
+end
+
+function uiRange:update(player, isOutsideZone)
+	if not self.enabled then return end
+
+	local opacity = 0
+	local opacityFar = 0
+
+	if player.distance and not isOutsideZone then
+		if settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator then
+			opacity = 1
+			opacityFar = 0
+		elseif settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= settings.rangeIndicatorFar then
+			opacity = 0
+			opacityFar = 1
+		end
+	end
+	
+	self.imgNear:opacity(opacity)
+	self.imgFar:opacity(opacityFar)
+end
+
+return uiRange

@@ -26,16 +26,18 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local jobDefaults = {}
+local const = {
+    barTypeHp = 'barTypeHp',
+    barTypeMp = 'barTypeMp',
+    barTypeTp = 'barTypeTp',
 
-jobDefaults.jobEnabled = false -- when set to false, job specific settings will be ignored and globals used instead
+    layoutDir = 'layouts/',
+    layoutAllianceSuffix = '_alliance',
+    layoutAuto = 'auto',
+    layout1080 = '1080p',
+    layout1440 = '1440p',
 
-jobDefaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
-jobDefaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
+	maxBuffs = 32
+}
 
-jobDefaults.buffs = {}
-jobDefaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-jobDefaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
-jobDefaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
-
-return jobDefaults
+return const

@@ -42,7 +42,7 @@ local const = require('const')
 local uiListItem = classes.class(uiBase)
 
 function uiListItem:init(layout)
-	if self.super.init(self, layout.list) then
+	if self.super.init(self, layout.listItem) then
 		self.layout = layout
 
 		-- order of creation determines Z-order

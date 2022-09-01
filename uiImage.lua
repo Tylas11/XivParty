@@ -39,6 +39,10 @@ local uiImage = classes.class(uiBase)
 
 -- alternative constructor
 function uiImage.create(path, sizeX, sizeY, scale)
+	if not sizeX then
+		sizeX = 0
+		sizeY = 0
+	end
 	if not scale then
 		scale = 1
 	end

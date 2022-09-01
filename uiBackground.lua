@@ -36,15 +36,10 @@ local uiBackground = classes.class(uiBase)
 
 local isDebug = false
 
-function uiBackground:init(bgLayout, partySettings, scale)
+function uiBackground:init(bgLayout, scale)
 	if self.super.init(self, bgLayout) then
 		self.bgLayout = bgLayout
-		self.partySettings = partySettings
 		self.scale = scale
-
-		self.hidden = true
-		self.rowCount = 0
-		self.contentHeight = 0 -- height of the content area (excludes top and bottom tiles)
 
 		self.size = {}
 		self.size.width = 0
@@ -68,47 +63,20 @@ function uiBackground:init(bgLayout, partySettings, scale)
 	end
 end
 
--- TODO: consider making itemSpacing a parameter or just let the whole contentHeight be set from outside
-function uiBackground:update(rowCount, itemHeight)
+-- sets the height of the content area (excludes top and bottom tiles)
+function uiBackground:update(contentHeight)
 	if not self.enabled then return end
 
-	utils:log('BG setting row count: ' .. rowCount, 1)
+	contentHeight = contentHeight / self.scale -- negate vertical scaling, we want to set the height directly
 
-	self.rowCount = rowCount
-	self.contentHeight = (rowCount * itemHeight + (rowCount - 1) * self.partySettings.itemSpacing) / self.scale
-
-	self.mid:size(self.sizeMid.x, self.contentHeight)
-	self.mid:repeat_xy(1, math.floor(self.contentHeight / self.sizeMid.y))
+	self.mid:size(self.sizeMid.x, contentHeight)
+	self.mid:repeat_xy(1, math.floor(contentHeight / self.sizeMid.y))
 
 	self.bottom:offset(self.bottom.offsetX, self.mid.offsetY + self.mid.scaledHeight)
 	
 	-- visible size of the whole background area
 	self.size.width = math.max(math.max(self.top.scaledWidth, self.bottom.scaledWidth), self.mid.scaledWidth)
 	self.size.height = self.top.scaledHeight + self.mid.scaledHeight + self.bottom.scaledHeight
-
-	self:updateVisibility()
-end
-
-function uiBackground:updateVisibility()
-	if not self.hidden and self.rowCount > 0 then
-		self.super.show(self)
-	else
-		self.super.hide(self)
-	end
-end
-
-function uiBackground:show()
-	if not self.enabled then return end
-
-	self.hidden = false
-	self:updateVisibility()
-end
-
-function uiBackground:hide()
-	if not self.enabled then return end
-
-	self.hidden = true
-	self:updateVisibility()
 end
 
 return uiBackground

@@ -58,7 +58,7 @@ function partylist:init(party, partySettings, layout)
     self.isCtrlDown = false
     self.hidden = false
 	
-	self.background = uiBackground.new(layout.bg, partySettings, layout.scale)
+	self.background = uiBackground.new(layout.bg, layout.scale)
 	
 	self.dragImage = uiImage.create(nil, self.background.size.width, self.background.size.height)
 	self.dragImage:alpha(0)
@@ -124,15 +124,18 @@ function partylist:pos(x, y)
 	for i = 0, 5 do
 		local item = self.listItems[i]
 		
+		local row = math.floor(i / self.layout.partyList.columns)
+    	local column = i % self.layout.partyList.columns
+
 		if item then
 			if self.partySettings.alignBottom then
 				item:pos(
 					x, 
-					y - self.background.bottom.scaledHeight - (count - i) * (self.layout.list.itemHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
+					y - (count - i) * (self.layout.partyList.rowHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
 			else
 				item:pos(
-					x, 
-					y + self.background.top.scaledHeight + i * (self.layout.list.itemHeight + self.partySettings.itemSpacing))
+					x + column * (self.layout.partyList.columnWidth + self.partySettings.itemSpacing), 
+					y + row * (self.layout.partyList.rowHeight + self.partySettings.itemSpacing))
 			end
 		end
 	end
@@ -168,17 +171,30 @@ function partylist:update(force)
 	end
 	
 	if count ~= self.listItems:length() or force then
-		self.background:update(self.listItems:length(), self.layout.list.itemHeight)
+		local rowCount = math.floor((self.listItems:length() - 1) / self.layout.partyList.columns) + 1
+		local contentHeight = rowCount * self.layout.partyList.rowHeight + (rowCount - 1) * self.partySettings.itemSpacing
+		
+		self.background:update(contentHeight)
+		self:updateBackgroundVisibility()
+
 		self.dragImage:size(self.background.size.width, self.background.size.height)
 		
 		self:pos(self.posX, self.posY)
 	end
 end
 
+function partylist:updateBackgroundVisibility()
+	if not self.hidden and self.listItems:length() > 0 then
+		self.background:show()
+	else
+		self.background:hide()
+	end
+end
+
 function partylist:show()
 	self.hidden = false
 	
-	self.background:show()
+	self:updateBackgroundVisibility()
 	self.dragImage:show()
 	
 	for item in self.listItems:it() do
@@ -189,7 +205,7 @@ end
 function partylist:hide()
 	self.hidden = true
 	
-	self.background:hide()
+	self:updateBackgroundVisibility()
 	self.dragImage:hide()
 	
 	for item in self.listItems:it() do
@@ -217,8 +233,8 @@ function partylist:handleWindowerMouse(type, x, y, delta, blocked)
                 local posY = y - self.dragged.y
                 
                 if self.isCtrlDown then -- grid snap
-                    posX = math.floor(posX /10) * 10
-                    posY = math.floor(posY /10) * 10
+                    posX = math.floor(posX / 10) * 10
+                    posY = math.floor(posY / 10) * 10
                 end
             
                 if self.partySettings.alignBottom then

@@ -33,15 +33,20 @@ local layout = {}
 
 layout.scale = 1 -- image scale factor. does not affect offsets, spacings or font sizes. intended for easier creation of multi resolution layouts
 
-layout.list = {}
-layout.list.enabled = true
-layout.list.offset = L{ 30, 0 } -- distance between edge of the mid background part and party list items
-layout.list.itemHeight = 46 -- overall height of a party list item (top to bottom, including all texts, images). not affected by scale
+layout.partyList = {}
+layout.partyList.rows = 6
+layout.partyList.columns = 1
+layout.partyList.rowHeight = 46
+layout.partyList.columnWidth = 0
+
+layout.listItem = {}
+layout.listItem.enabled = true
+layout.listItem.offset = L{ 30, 0 } -- distance between edge of the mid background part and party list items
 
 -- Background
 layout.bg = {}
 layout.bg.enabled = true
-layout.bg.offset = L{ 0, 0 }
+layout.bg.offset = L{ 0, -21 }
 
 layout.bg.imgTop = {}
 layout.bg.imgTop.enabled = true

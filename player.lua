@@ -239,7 +239,7 @@ function player:createSetupData(job, subJob)
 	self.buffs = {}
 	
 	for i = 1, 32 do
-		self.buffs[i] = math.random(1, 629)
+		self.buffs[i] = math.random(1, 631)
 	end
 	
 	self:updateBuffs(self.buffs)

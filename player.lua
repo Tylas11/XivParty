@@ -227,7 +227,7 @@ function player:createSetupData(job, subJob, isMainParty)
 	
 	if isMainParty then
 		for i = 1, const.maxBuffs do
-			self.buffs[i] = math.random(1, 629)
+			self.buffs[i] = math.random(1, 631)
 		end
 	end
 	

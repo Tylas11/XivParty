@@ -28,21 +28,20 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 
--- create the class, derive from uiBase
-local uiRange = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiRange = classes.class(uiContainer)
 
-function uiRange:init(rangeLayout, scale)
-	if self.super.init(self, rangeLayout) then
+function uiRange:init(rangeLayout)
+	if self.super:init(rangeLayout) then
 		self.rangeLayout = rangeLayout
-		self.scale = scale
 
-		self.imgNear = self:addChild(uiImage.new(rangeLayout.imgNear, scale))
+		self.imgNear = self:addChild(uiImage.new(rangeLayout.imgNear))
 		self.imgNear:opacity(0)
 
-		self.imgFar = self:addChild(uiImage.new(rangeLayout.imgFar, scale))
+		self.imgFar = self:addChild(uiImage.new(rangeLayout.imgFar))
 		self.imgFar:opacity(0)
 	end
 end

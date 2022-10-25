@@ -28,74 +28,73 @@
 
 -- imports
 local classes = require('classes')
+local uiContainer = require('uiContainer')
 local uiBackground = require('uiBackground')
 local uiListItem = require('uiListItem')
 local uiImage = require('uiImage')
 
 -- create the class
-local partylist = classes.class()
+local uiPartyList = classes.class(uiContainer)
 
-function partylist:init(party, partySettings, layout)
+function uiPartyList:init(party, partySettings, layout)
     if not party then
-		utils:log('partylist:init missing parameter party!', 4)
+		utils:log('uiPartyList:init missing parameter party!', 4)
 		return
 	end
 
     if not partySettings then
-		utils:log('partylist:init missing parameter partySettings!', 4)
+		utils:log('uiPartyList:init missing parameter partySettings!', 4)
 		return
 	end
 
-    utils:log('Initializing partylist')
+	-- TODO: validate layout, rows * columns must always equal 6! (is this technically necessary?)
 
-	self.party = party -- list of party members from model.party (or one of the alliances)
-    self.partySettings = partySettings
-	self.layout = layout
+	if self.super:init(layout.partyList) then
+		self.party = party -- list of party members from model.party (or one of the alliances)
+		self.partySettings = partySettings
+		self.layout = layout
 
-    self.listItems = T{} -- ordered list by party list position, index range 0..5
-    self.setupParty = nil -- list of party members used in setup mode
-    self.isSetupEnabled = false
-    self.isCtrlDown = false
-    self.hidden = false
-	
-	self.background = uiBackground.new(layout.bg, layout.scale)
-	
-	self.dragImage = uiImage.create(nil, self.background.size.width, self.background.size.height)
-	self.dragImage:alpha(0)
-	self.dragImage:show()
-    self.dragged = nil
-	
-	self.posX = partySettings.posX
-	self.posY = partySettings.posY
-	
-    -- register windower event handlers
-    self.keyboardHandlerId = windower.register_event('keyboard', function(key, down)
-        self:handleWindowerKeyboard(key, down)
-    end)
-    
-    self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
-        return self:handleWindowerMouse(type, x, y, delta, blocked)
-    end)
+		self.listItems = T{} -- ordered list by party list position, index range 0..5
+		self.setupParty = nil -- list of party members used in setup mode
+		self.isSetupEnabled = false
+		self.isCtrlDown = false
+		self.hidden = false
+
+		self.posX = partySettings.posX
+		self.posY = partySettings.posY
+		
+		self.background = self:addChild(uiBackground.new(layout.bg))
+		self.bgPos = utils:coord(layout.bg.offset)
+		
+		self.dragImage = self:addChild(uiImage.create())
+		self.dragImage:alpha(0)
+		self.dragImage:show()
+		self.dragged = nil
+		
+		-- register windower event handlers
+		self.keyboardHandlerId = windower.register_event('keyboard', function(key, down)
+			self:handleWindowerKeyboard(key, down)
+		end)
+		
+		self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
+			return self:handleWindowerMouse(type, x, y, delta, blocked)
+		end)
+
+		self:layoutElement()
+	end
 end
 
-function partylist:dispose()
-	utils:log('Disposing partylist')
-	
+function uiPartyList:dispose()
     windower.unregister_event(self.keyboardHandlerId)
     windower.unregister_event(self.mouseHandlerId)
 
 	self.isSetupEnabled = false
-	
-	self.background:dispose()
-	self.dragImage:dispose()
-	
-	for item in self.listItems:it() do
-		item:dispose()
-	end
 	self.listItems:clear()
+
+	self.super:dispose()
 end
 
-function partylist:setupEnabled(enable, setupParty)
+function uiPartyList:setupEnabled(enable, setupParty)
 	if enable ~= nil then
 		if enable ~= self.isSetupEnabled then
 			self.isSetupEnabled = enable
@@ -106,42 +105,7 @@ function partylist:setupEnabled(enable, setupParty)
 	return self.isSetupEnabled
 end
 
-function partylist:pos(x, y)
-	-- top/left corner, when aligned to bottom: bottom/left corner
-	self.posX = x
-	self.posY = y
-
-	if self.partySettings.alignBottom then
-		self.background:pos(x, y - self.background.size.height)
-		self.dragImage:pos(x, y - self.background.size.height)
-	else
-		self.background:pos(x, y)
-		self.dragImage:pos(x, y)
-	end
-	
-	local count = self.listItems:length()
-	
-	for i = 0, 5 do
-		local item = self.listItems[i]
-		
-		local row = math.floor(i / self.layout.partyList.columns)
-    	local column = i % self.layout.partyList.columns
-
-		if item then
-			if self.partySettings.alignBottom then
-				item:pos(
-					x, 
-					y - (count - i) * (self.layout.partyList.rowHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
-			else
-				item:pos(
-					x + column * (self.layout.partyList.columnWidth + self.partySettings.itemSpacing), 
-					y + row * (self.layout.partyList.rowHeight + self.partySettings.itemSpacing))
-			end
-		end
-	end
-end
-
-function partylist:update(force)
+function uiPartyList:update(force)
 	local count = self.listItems:length()
 	
 	for i = 0, 5 do
@@ -156,7 +120,8 @@ function partylist:update(force)
 		
 		if player then
 			if not item then
-				item = uiListItem.new(self.layout)
+				item = self:addChild(uiListItem.new(self.layout))
+
 				self.listItems[i] = item
 				if not self.hidden then
 					item:show()
@@ -166,6 +131,7 @@ function partylist:update(force)
 			item:update(player)
 		elseif item then
 			item:dispose()
+			self:removeChild(item)
 			self.listItems[i] = nil
 		end
 	end
@@ -177,13 +143,44 @@ function partylist:update(force)
 		self.background:update(contentHeight)
 		self:updateBackgroundVisibility()
 
-		self.dragImage:size(self.background.size.width, self.background.size.height)
+		self.dragImage:size(self.layout.partyList.columns * self.layout.partyList.columnWidth, rowCount * self.layout.partyList.rowHeight)
 		
-		self:pos(self.posX, self.posY)
+		self:updateGrid(rowCount)
 	end
 end
 
-function partylist:updateBackgroundVisibility()
+function uiPartyList:updateGrid(rowCount)
+	-- TODO: refactor this so we dont need to mess with these image positions
+	if self.partySettings.alignBottom then
+		self.background:pos(self.bgPos.x, self.bgPos.y - rowCount * self.layout.partyList.rowHeight)
+		self.dragImage:pos(0, -rowCount * self.layout.partyList.rowHeight)
+	else
+		self.background:pos(self.bgPos.x, self.bgPos.y)
+		self.dragImage:pos(0, 0)
+	end
+	
+	local count = self.listItems:length()
+	
+	for i = 0, 5 do
+		local item = self.listItems[i]
+		if item then
+			local row = math.floor(i / self.layout.partyList.columns)
+    		local column = i % self.layout.partyList.columns
+
+			if self.partySettings.alignBottom then
+				item:pos(
+					0, 
+					-(count - i) * (self.layout.partyList.rowHeight + self.partySettings.itemSpacing) + self.partySettings.itemSpacing)
+			else
+				item:pos(
+					column * (self.layout.partyList.columnWidth + self.partySettings.itemSpacing), 
+					row * (self.layout.partyList.rowHeight + self.partySettings.itemSpacing))
+			end
+		end
+	end
+end
+
+function uiPartyList:updateBackgroundVisibility()
 	if not self.hidden and self.listItems:length() > 0 then
 		self.background:show()
 	else
@@ -191,7 +188,7 @@ function partylist:updateBackgroundVisibility()
 	end
 end
 
-function partylist:show()
+function uiPartyList:show()
 	self.hidden = false
 	
 	self:updateBackgroundVisibility()
@@ -202,7 +199,7 @@ function partylist:show()
 	end
 end
 
-function partylist:hide()
+function uiPartyList:hide()
 	self.hidden = true
 	
 	self:updateBackgroundVisibility()
@@ -213,17 +210,15 @@ function partylist:hide()
 	end
 end
 
-function partylist:handleWindowerKeyboard(key, down)
+function uiPartyList:handleWindowerKeyboard(key, down)
     if key == 29 then -- ctrl
         self.isCtrlDown = down
     end
 end
 
 -- handle drag and drop
-function partylist:handleWindowerMouse(type, x, y, delta, blocked)
-    if blocked then
-        return 
-    end
+function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
+    if blocked then return end
 
     if self.isSetupEnabled then
         -- mouse drag
@@ -248,7 +243,7 @@ function partylist:handleWindowerMouse(type, x, y, delta, blocked)
         -- mouse left click
         elseif type == 1 then
             if self.dragImage:hover(x, y) then
-				self.dragged = { x = x - self.dragImage.posX, y = y - self.dragImage.posY }
+				self.dragged = { x = x - self.dragImage.absolutePos.x, y = y - self.dragImage.absolutePos.y }
                 return true
             end
         
@@ -268,10 +263,15 @@ function partylist:handleWindowerMouse(type, x, y, delta, blocked)
         -- mouse scroll
         elseif type == 10 then
             if self.dragImage:hover(x, y) then
-                self.partySettings.itemSpacing = math.max(0, self.partySettings.itemSpacing + delta)
-                settings:save()
+                --self.partySettings.itemSpacing = math.max(0, self.partySettings.itemSpacing + delta)
+                --settings:save()
                 
-                self:update(true) -- force a redraw
+                --self:update(true) -- force a redraw
+
+				-- TODO: this is the coolest thing ever! but it needs to be saved in party settings
+				local sx = math.max(0.25, self.scaleX + delta / 100)
+				local sy = math.max(0.25, self.scaleY + delta / 100)
+				self:scale(sx, sy)
             end
         end
     end
@@ -279,4 +279,4 @@ function partylist:handleWindowerMouse(type, x, y, delta, blocked)
     return false
 end
 
-return partylist
+return uiPartyList

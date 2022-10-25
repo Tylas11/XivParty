@@ -28,21 +28,20 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiBar = require('uiBar')
 local uiText = require('uiText')
 local const = require('const')
 
--- create the class, derive from uiBase
-local uiStatusBar = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiStatusBar = classes.class(uiContainer)
 
-function uiStatusBar:init(statusBarLayout, barType, scale)
-	if self.super.init(self, statusBarLayout) then
+function uiStatusBar:init(statusBarLayout, barType)
+	if self.super:init(statusBarLayout) then
 		self.statusBarLayout = statusBarLayout
 		self.barType = barType
-		self.scale = scale
 
-		self.bar = self:addChild(uiBar.new(statusBarLayout.bar, scale))
+		self.bar = self:addChild(uiBar.new(statusBarLayout.bar))
 		self.text = self:addChild(uiText.new(statusBarLayout.text))
 
 		if self.barType == const.barTypeHp then

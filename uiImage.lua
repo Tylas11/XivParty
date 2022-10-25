@@ -31,20 +31,21 @@ local images = require('images')
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiElement = require('uiElement')
 local utils = require('utils')
 
--- create the class, derive from uiBase
-local uiImage = classes.class(uiBase)
+-- create the class, derive from uiElement
+local uiImage = classes.class(uiElement)
 
 -- alternative constructor
-function uiImage.create(path, sizeX, sizeY, scale)
+function uiImage.create(path, sizeX, sizeY, scaleX, scaleY)
 	if not sizeX then
 		sizeX = 0
 		sizeY = 0
 	end
-	if not scale then
-		scale = 1
+	if not scaleX then
+		scaleX = 1
+		scaleY = 1
 	end
 
 	local imageLayout = {}
@@ -52,23 +53,19 @@ function uiImage.create(path, sizeX, sizeY, scale)
 	imageLayout.offset = L{ 0, 0 }
 	imageLayout.path = path
 	imageLayout.size = L{ sizeX, sizeY }
+	imageLayout.scale = L{ scaleX, scaleY }
 
-	return uiImage.new(imageLayout, scale)
+	return uiImage.new(imageLayout)
 end
 
-function uiImage:init(imgLayout, scale)
-    if self.super.init(self, imgLayout) then
+function uiImage:init(imgLayout)
+    if self.super:init(imgLayout) then
 		self.wrappedImage = images.new()
 		self.wrappedImage:draggable(false)
     	self.wrappedImage:fit(false) -- scaling only works when 'fit' is false
 		
 		self.currentAlpha = 255
 		self.currentOpacity = 1.0
-
-		self.currentScale = 1
-		if scale then
-			self.currentScale = scale
-		end
 
 		if imgLayout and imgLayout.path and imgLayout.path ~= '' then
 			self:path(imgLayout.path)
@@ -91,14 +88,19 @@ function uiImage:dispose()
     if not self.enabled then return end
 
     images.destroy(self.wrappedImage)
-    self.super.dispose(self) -- TODO: this class doesnt have any children and actually shouldnt even support them. might want an additional base class to solve this
+
+	self.super:dispose()
 end
 
 -- apply the UI element's position and offset
-function uiImage:applyPos()
+function uiImage:applyLayout()
 	if not self.enabled then return end
 
-	self.wrappedImage:pos(self.posX + self.offsetX, self.posY + self.offsetY)
+	self.absoluteWidth = self.width * self.absoluteScale.x;
+	self.absoluteHeight = self.height * self.absoluteScale.y
+
+	self.wrappedImage:pos(self.absolutePos.x, self.absolutePos.y)
+	self.wrappedImage:size(self.absoluteWidth, self.absoluteHeight)
 end
 
 -- sets the image file path
@@ -116,19 +118,8 @@ function uiImage:size(w, h)
 	if self.width ~= w or self.height ~= h then
 		self.width = w;
 		self.height = h;
-		self.scaledWidth = self.width * self.currentScale;
-		self.scaledHeight = self.height * self.currentScale;
 		
-		self.wrappedImage:size(self.scaledWidth, self.scaledHeight)
-	end
-end
-
-function uiImage:scale(s)
-	if not self.enabled then return end
-
-	if self.currentScale ~= s then
-		self.currentScale = s
-		self:size(self.sizeX, self.sizeY) -- apply the new scale
+		self:applyLayout()
 	end
 end
 

@@ -28,17 +28,16 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 local const = require('const')
 
--- create the class, derive from uiBase
-local uiBuffIcons = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiBuffIcons = classes.class(uiContainer)
 
-function uiBuffIcons:init(buffLayout, scale)
-	if self.super.init(self, buffLayout) then
+function uiBuffIcons:init(buffLayout)
+	if self.super:init(buffLayout) then
 		self.buffLayout = buffLayout
-		self.scale = scale
 
 		self.spacing = utils:coord(buffLayout.spacing)
 		self.size = utils:coord(buffLayout.size)
@@ -65,14 +64,14 @@ function uiBuffIcons:init(buffLayout, scale)
 			if not row then break end -- cut off any icons that exceed row definitions from the layout
 
 			local column = self:getColumn(i, row)
-			local iconOffset = tonumber(buffLayout.offsetByRow[row]) * (self.size.x * scale + self.spacing.x)
+			local iconOffset = tonumber(buffLayout.offsetByRow[row]) * (self.size.x * self.scaleX + self.spacing.x)
 
 			imgLayout.offset = L{
-				iconOffset + (column - 1) * (self.size.x * scale + self.spacing.x), 
-				(row - 1) * self.size.y * scale + (row - 1) * self.spacing.y
+				iconOffset + (column - 1) * (self.size.x * self.scaleX + self.spacing.x), 
+				(row - 1) * self.size.y * self.scaleY + (row - 1) * self.spacing.y
 			}
 
-			self.buffImages[i] = self:addChild(uiImage.new(imgLayout, scale))
+			self.buffImages[i] = self:addChild(uiImage.new(imgLayout))
 			self.buffImages[i]:opacity(0)
         end
 	end

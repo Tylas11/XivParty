@@ -83,7 +83,7 @@ end
 
 function utils:log(text, level)
 	if level == nil then
-		level = 2
+		level = 2 -- default log level: info
 	end	
 
 	if self.level <= level and text then

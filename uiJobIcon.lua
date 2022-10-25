@@ -28,31 +28,30 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 local jobs = require('jobs')
 
--- create the class, derive from uiBase
-local uiJobIcon = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiJobIcon = classes.class(uiContainer)
 
-function uiJobIcon:init(jobIconLayout, scale)
-	if self.super.init(self, jobIconLayout) then
+function uiJobIcon:init(jobIconLayout)
+	if self.super:init(jobIconLayout) then
 		self.jobIconLayout = jobIconLayout
-		self.scale = scale
 
-		self.jobHighlight = self:addChild(uiImage.new(jobIconLayout.imgHighlight, scale))
+		self.jobHighlight = self:addChild(uiImage.new(jobIconLayout.imgHighlight))
 		self.jobHighlight:opacity(0)
 		
-		self.jobBg = self:addChild(uiImage.new(jobIconLayout.imgBg, scale))
+		self.jobBg = self:addChild(uiImage.new(jobIconLayout.imgBg))
 		self.jobBg:opacity(0)
 		
-		self.jobGradient = self:addChild(uiImage.new(jobIconLayout.imgGradient, scale))
+		self.jobGradient = self:addChild(uiImage.new(jobIconLayout.imgGradient))
 		self.jobGradient:opacity(0)
 		
-		self.jobIcon = self:addChild(uiImage.new(jobIconLayout.imgIcon, scale))
+		self.jobIcon = self:addChild(uiImage.new(jobIconLayout.imgIcon))
 		self.jobIcon:opacity(0)
 		
-		self.jobFrame = self:addChild(uiImage.new(jobIconLayout.imgFrame, scale))
+		self.jobFrame = self:addChild(uiImage.new(jobIconLayout.imgFrame))
 		self.jobFrame:opacity(0)
 	end
 end

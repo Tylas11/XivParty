@@ -28,7 +28,7 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiJobIcon = require('uiJobIcon')
 local uiStatusBar = require('uiStatusBar')
 local uiLeader= require('uiLeader')
@@ -38,22 +38,22 @@ local uiText = require('uiText')
 local uiImage = require('uiImage')
 local const = require('const')
 
--- create the class, derive from uiBase
-local uiListItem = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiListItem = classes.class(uiContainer)
 
 function uiListItem:init(layout)
-	if self.super.init(self, layout.listItem) then
+	if self.super:init(layout.listItem) then
 		self.layout = layout
 
 		-- order of creation determines Z-order
-		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon, layout.scale))
+		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon))
 		
-		self.cursor = self:addChild(uiImage.new(layout.cursor, layout.scale))
+		self.cursor = self:addChild(uiImage.new(layout.cursor))
 		self.cursor:opacity(0)
 		
-		self.hpBar = self:addChild(uiStatusBar.new(layout.hp, const.barTypeHp, layout.scale))
-		self.mpBar = self:addChild(uiStatusBar.new(layout.mp, const.barTypeMp, layout.scale))
-		self.tpBar = self:addChild(uiStatusBar.new(layout.tp, const.barTypeTp, layout.scale))
+		self.hpBar = self:addChild(uiStatusBar.new(layout.hp, const.barTypeHp))
+		self.mpBar = self:addChild(uiStatusBar.new(layout.mp, const.barTypeMp))
+		self.tpBar = self:addChild(uiStatusBar.new(layout.tp, const.barTypeTp))
 		
 		self.nameText = self:addChild(uiText.new(layout.text.name))
 		self.zoneText = self:addChild(uiText.new(layout.text.zone))
@@ -61,10 +61,10 @@ function uiListItem:init(layout)
 		self.jobText = self:addChild(uiText.new(layout.text.job))
 		self.subJobText = self:addChild(uiText.new(layout.text.subJob))
 		
-		self.leader = self:addChild(uiLeader.new(layout.leader, scale))
+		self.leader = self:addChild(uiLeader.new(layout.leader))
 		
-		self.range = self:addChild(uiRange.new(layout.range, layout.scale))
-		self.buffIcons = self:addChild(uiBuffIcons.new(layout.buffIcons, layout.scale))
+		self.range = self:addChild(uiRange.new(layout.range))
+		self.buffIcons = self:addChild(uiBuffIcons.new(layout.buffIcons))
 	end
 end
 
@@ -76,13 +76,13 @@ function uiListItem:update(player)
 	self.hpBar:update(player, isOutsideZone)
 	self.mpBar:update(player, isOutsideZone)
 	self.tpBar:update(player, isOutsideZone)
-
+	
 	if player.name then
 		self.nameText:update(player.name)
 	else
 		self.nameText:update('???')
 	end
-	
+
 	self.jobIcon:update(player, isOutsideZone)
 	self:updateZone(player, isOutsideZone)
 	self:updateJob(player, isOutsideZone)

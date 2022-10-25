@@ -28,24 +28,23 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 local utils = require('utils')
 
--- create the class, derive from uiBase
-local uiBar = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiBar = classes.class(uiContainer)
 
-function uiBar:init(barLayout, scale)
-	if self.super.init(self, barLayout) then
+function uiBar:init(barLayout)
+	if self.super:init(barLayout) then
 		self.barLayout = barLayout
-		self.scale = scale
 
-		self.imgBg = self:addChild(uiImage.new(barLayout.imgBg, scale))
-		self.imgFg = self:addChild(uiImage.new(barLayout.imgFg, scale))
+		self.imgBg = self:addChild(uiImage.new(barLayout.imgBg))
+		self.imgFg = self:addChild(uiImage.new(barLayout.imgFg))
 
-		self.imgGlowMid = self:addChild(uiImage.new(barLayout.imgGlowMid, scale))
-		self.imgGlowLeft = self:addChild(uiImage.new(barLayout.imgGlowSides, scale))
-		self.imgGlowRight = self:addChild(uiImage.new(barLayout.imgGlowSides, scale))
+		self.imgGlowMid = self:addChild(uiImage.new(barLayout.imgGlowMid))
+		self.imgGlowLeft = self:addChild(uiImage.new(barLayout.imgGlowSides))
+		self.imgGlowRight = self:addChild(uiImage.new(barLayout.imgGlowSides))
 		
 		self.isDimmed = false
 		self.value = 1
@@ -87,10 +86,11 @@ function uiBar:updateGlow(targetValue)
 		self.imgGlowRight:opacity(1)
 	
 		self.imgGlowMid:size(glowWidth, self.sizeGlow.y)
-		self.imgGlowMid:pos(self.imgFg.posX + self.sizeFg.x * math.min(targetValue, self.value) * self.scale, self.imgFg.posY)
-			
-		self.imgGlowLeft:pos(self.imgGlowMid.posX - self.sizeGlowSides.x * self.scale, self.imgGlowMid.posY)
-		self.imgGlowRight:pos(self.imgGlowMid.posX + (glowWidth + self.sizeGlowSides.x) * self.scale, self.imgGlowMid.posY)
+
+		-- NOTE: the x positions must be based on a different image's position, otherwise these updates would keep increasing posX forever
+		self.imgGlowMid:pos(self.imgFg.posX + self.sizeFg.x * math.min(targetValue, self.value), self.imgGlowMid.posY)
+		self.imgGlowLeft:pos(self.imgGlowMid.posX - self.sizeGlowSides.x, self.imgGlowMid.posY)
+		self.imgGlowRight:pos(self.imgGlowMid.posX + (glowWidth + self.sizeGlowSides.x), self.imgGlowMid.posY)
 	else
 		self.imgGlowMid:opacity(0)
 		self.imgGlowLeft:opacity(0)

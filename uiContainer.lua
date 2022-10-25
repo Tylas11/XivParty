@@ -31,147 +31,90 @@ require('tables')
 
 -- imports
 local classes = require('classes')
+local uiElement = require('uiElement')
 local utils = require('utils')
 
--- create the class
-local uiBase = classes.class()
+-- create the class, derive from uiElement
+local uiContainer = classes.class(uiElement)
 
 -- constructor
--- NOTE: always call this using super.init(self) instead of super:init(), otherwise self will refer to super and you cannot read any variables set on self!
 -- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and an 'offset' (L{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
-function uiBase:init(baseLayout)
-    self.parent = nil
+function uiContainer:init(baseLayout)
+    self.super:init(baseLayout)
+
     self.children = T{}
-
-    self.enabled = true
-    if baseLayout and baseLayout.enabled ~= nil then
-        self.enabled = baseLayout.enabled
-    end
-
-    self.offsetX = 0
-    self.offsetY = 0
-    if baseLayout and baseLayout.offset then
-        local offset = utils:coord(baseLayout.offset)
-        self.offsetX = offset.x
-        self.offsetY = offset.y
-    end
-
-    self.posX = 0
-    self.posY = 0
 
     return self.enabled
 end
 
 -- disposes and removes all children
 -- override this to free any resources created during init (also call super:dispose!)
-function uiBase:dispose()
+function uiContainer:dispose()
     if not self.enabled then return end
 
     for child in self.children:it() do
         child:dispose()
     end
     self:clearChildren()
+
+    self.super:dispose()
 end
 
 -- adds a child UI element
--- @param child UI element derived from uiBase
+-- @param child UI element derived from uiElement
 -- @return the added child element
-function uiBase:addChild(child)
+function uiContainer:addChild(child)
     if not self.enabled then return end
 
-    if not child:instanceOf(uiBase) then
-        utils:log('Failed to add UI child. Class must derive from uiBase!', 4)
+    if not child:instanceOf(uiElement) then
+        utils:log('Failed to add UI child. Class must derive from uiElement!', 4)
         return nil
     end
 
     self.children:append(child)
     child.parent = self
+    child:layoutElement()
 
     return child
 end
 
 -- removes a child UI element
--- @param child UI element that has been added using uiBase:addChild() before
-function uiBase:removeChild(child)
+-- @param child UI element that has been added using addChild() before
+function uiContainer:removeChild(child)
     if not self.enabled then return end
 
-    if not self.children:delete(child) then
-        utils:log('Failed to remove UI child, not found!', 4)
-        return
-    end
+    if not self.children:delete(child) then return end
 
     child.parent = nil
+    child:layoutElement()
 end
 
 -- removes all child UI elements
-function uiBase:clearChildren()
+function uiContainer:clearChildren()
     if not self.enabled then return end
 
     for child in self.children:it() do
         child.parent = nil
+        child:layoutElement()
     end
 
     self.children:clear()
 end
 
--- sets the position of this UI element. children will have their position set relative to their parent
--- @param x horizontal position in screen coordinates (origin: left)
--- @param y vertical position in screen coordinates (origin: top)
-function uiBase:pos(x, y)
+-- calculates the element's and its children's absolute position and scale based on its parent
+function uiContainer:layoutElement()
     if not self.enabled then return end
 
-    if self.posX ~= x or self.posY ~= y then
-        self.posX = x
-	    self.posY = y
-
-        self:applyPos()
-    end
-end
-
--- sets the offset of this UI element. children will have their position set relative to their parent
--- @param x horizontal offset in screen coordinates (origin: left)
--- @param y vertical offset in screen coordinates (origin: top)
-function uiBase:offset(x, y)
-    if not self.enabled then return end
-
-    if self.offsetX ~= x or self.offsetY ~= y then
-        self.offsetX = x
-	    self.offsetY = y
-
-        self:applyPos()
-    end
-end
-
--- applies the position and offset to all children
--- should not be called directly as it doesn't filter for unchanged positions, can be useful to force a reposition though
--- override this method if you need to set positions of custom elements that are not derived from uiBase
-function uiBase:applyPos()
-    if not self.enabled then return end
-
-    -- apply the UI element's position offset
-    local x = self.posX + self.offsetX
-    local y = self.posY + self.offsetY
+    self.super:layoutElement()
 
     for child in self.children:it() do
-        child:pos(x, y)
-    end
-end
-
--- TODO: maybe the update method isnt a good idea, what about image and text elements? they usually dont need the "player" as input
-
--- updates the UI element and all its children. to be called during pre-render
--- @param ... parameters to be passed on to child elements. children must use the same parameters as their parent
-function uiBase:update(...)
-    if not self.enabled then return end
-
-    for child in self.children:it() do
-        child:update(...)
+        child:layoutElement()
     end
 end
 
 -- shows the UI element and all its children
-function uiBase:show()
+function uiContainer:show()
     if not self.enabled then return end
 
     for child in self.children:it() do
@@ -180,7 +123,7 @@ function uiBase:show()
 end
 
 -- hides the UI element and all its children
-function uiBase:hide()
+function uiContainer:hide()
     if not self.enabled then return end
 
     for child in self.children:it() do
@@ -188,4 +131,4 @@ function uiBase:hide()
     end
 end
 
-return uiBase
+return uiContainer

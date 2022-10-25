@@ -28,24 +28,23 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 
--- create the class, derive from uiBase
-local uiLeader = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiLeader = classes.class(uiContainer)
 
-function uiLeader:init(leaderLayout, scale)
-	if self.super.init(self, leaderLayout) then
+function uiLeader:init(leaderLayout)
+	if self.super:init(leaderLayout) then
 		self.leaderLayout = leaderLayout
-		self.scale = scale
 
-		self.imgParty = self:addChild(uiImage.new(leaderLayout.imgParty, scale))
+		self.imgParty = self:addChild(uiImage.new(leaderLayout.imgParty))
 		self.imgParty:opacity(0)
 
-		self.imgAlliance = self:addChild(uiImage.new(leaderLayout.imgAlliance, scale))
+		self.imgAlliance = self:addChild(uiImage.new(leaderLayout.imgAlliance))
 		self.imgAlliance:opacity(0)
 
-        self.imgQuarterMaster = self:addChild(uiImage.new(leaderLayout.imgQuarterMaster, scale))
+        self.imgQuarterMaster = self:addChild(uiImage.new(leaderLayout.imgQuarterMaster))
 		self.imgQuarterMaster:opacity(0)
 	end
 end

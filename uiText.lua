@@ -31,14 +31,14 @@ local texts = require('texts')
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiElement = require('uiElement')
 local utils = require('utils')
 
--- create the class, derive from uiBase
-local uiText = classes.class(uiBase)
+-- create the class, derive from uiElement
+local uiText = classes.class(uiElement)
 
 function uiText:init(textLayout)
-    if self.super.init(self, textLayout) then
+    if self.super:init(textLayout) then
         local alignRight = textLayout.alignRight
         if alignRight == nil then alignRight = false end -- 'alignRight' might not exist in the layout for this text
 
@@ -55,8 +55,9 @@ function uiText:init(textLayout)
         self.wrappedText:bg_visible(false)
 
         self.wrappedText:font(textLayout.font, 'Arial') -- Arial is the fallback font
-	    self.wrappedText:size(textLayout.size)
-        
+        self.fontSize = textLayout.size
+        self.strokeWidth = textLayout.strokeWidth
+
         local color = utils:colorFromHex(textLayout.color)
         local stroke = utils:colorFromHex(textLayout.stroke)
         
@@ -64,8 +65,6 @@ function uiText:init(textLayout)
         self.wrappedText:alpha(color.a)
         self.wrappedText:stroke_color(stroke.r, stroke.g, stroke.b)
         self.wrappedText:stroke_alpha(stroke.a)
-        
-        self.wrappedText:stroke_width(textLayout.strokeWidth)
 
         self.text = nil
         self.textColor = {}
@@ -77,15 +76,15 @@ function uiText:dispose()
     if not self.enabled then return end
 
     texts.destroy(self.wrappedText)
-    self.super.dispose(self)
+
+    self.super:dispose()
 end
 
-function uiText:applyPos()
+function uiText:applyLayout()
     if not self.enabled then return end
 
-    -- apply offset
-    local x = self.posX + self.offsetX
-    local y = self.posY + self.offsetY
+    local x = self.absolutePos.x
+    local y = self.absolutePos.y
 
     if self.alignRight then
         -- right aligned text coordinates start at the right side of the screen
@@ -93,6 +92,8 @@ function uiText:applyPos()
     end
     
     self.wrappedText:pos(x, y)
+    self.wrappedText:size(self.fontSize * self.absoluteScale.y)
+    self.wrappedText:stroke_width(self.strokeWidth * self.absoluteScale.x)
 end
 
 function uiText:update(text)

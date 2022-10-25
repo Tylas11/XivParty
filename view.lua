@@ -26,7 +26,7 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local partylist = require('partylist')
+local uiPartyList = require('uiPartyList')
 local player = require('player')
 local layoutDefaults = require('layout')
 local const = require('const')
@@ -52,8 +52,6 @@ function view:init(model)
 		return
 	end
 	
-	utils:log('Initializing view')
-
 	if settings.hideAlliance then
 		lastPartyIndex = 0
 	else
@@ -63,7 +61,7 @@ function view:init(model)
 	self:loadLayout(settings.layout)
 
 	for i = 0, lastPartyIndex do
-		partyLists[i] = partylist.new(model.parties[i], self:getSettingsByIndex(i), i == 0 and layout or layoutAlliance) -- last param: lua style ternary operator
+		partyLists[i] = uiPartyList.new(model.parties[i], self:getSettingsByIndex(i), i == 0 and layout or layoutAlliance) -- last param: lua style ternary operator
 	end
 
 	isInitialized = true
@@ -71,8 +69,6 @@ end
 
 function view:dispose()
 	if not isInitialized then return end
-
-	utils:log('Disposing view')
 
 	for i = 0, lastPartyIndex do
 		partyLists[i]:dispose()
@@ -111,7 +107,7 @@ function view:getSettingsByIndex(index)
 	if index == 1 then return settings.alliance1 end
 	if index == 2 then return settings.alliance2 end
 
-	utils:log('getSettingsByIndex: index ' .. tostring(index) .. 'not found!', 4)
+	utils:log('view:getSettingsByIndex: index ' .. tostring(index) .. 'not found!', 4)
 	return nil
 end
 

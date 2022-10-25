@@ -296,8 +296,10 @@ windower.register_event('addon command', function(...)
 		settings.hideCutscenes = ret
 		settings:save()
 	elseif command == 'alignbottom' then
-		local ret = handleCommandOnOff(settings.alignBottom, args[2], 'Bottom alignment')
-		settings.alignBottom = ret
+		local ret = handleCommandOnOff(settings.party.alignBottom, args[2], 'Bottom alignment')
+		settings.party.alignBottom = ret
+		settings.alliance1.alignBottom = ret
+		settings.alliance2.alignBottom = ret
 		settings:save()
 		view:update(true) -- force a redraw
 	elseif command == 'customorder' then

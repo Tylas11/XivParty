@@ -28,18 +28,17 @@
 
 -- imports
 local classes = require('classes')
-local uiBase = require('uiBase')
+local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 
--- create the class, derive from uiBase
-local uiBackground = classes.class(uiBase)
+-- create the class, derive from uiContainer
+local uiBackground = classes.class(uiContainer)
 
 local isDebug = false
 
-function uiBackground:init(bgLayout, scale)
-	if self.super.init(self, bgLayout) then
+function uiBackground:init(bgLayout)
+	if self.super:init(bgLayout) then
 		self.bgLayout = bgLayout
-		self.scale = scale
 
 		self.size = {}
 		self.size.width = 0
@@ -47,9 +46,9 @@ function uiBackground:init(bgLayout, scale)
 
 		self.sizeMid = utils:coord(bgLayout.imgMid.size)
 
-		self.top = self:addChild(uiImage.new(bgLayout.imgTop, scale))
-		self.mid = self:addChild(uiImage.new(bgLayout.imgMid, scale))
-		self.bottom = self:addChild(uiImage.new(bgLayout.imgBottom, scale))
+		self.top = self:addChild(uiImage.new(bgLayout.imgTop))
+		self.mid = self:addChild(uiImage.new(bgLayout.imgMid))
+		self.bottom = self:addChild(uiImage.new(bgLayout.imgBottom))
 
 		if isDebug then -- debug background
 			self.top:path('')
@@ -67,16 +66,16 @@ end
 function uiBackground:update(contentHeight)
 	if not self.enabled then return end
 
-	contentHeight = contentHeight / self.scale -- negate vertical scaling, we want to set the height directly
+	contentHeight = contentHeight / self.scaleY -- negate vertical scaling, we want to set the height directly
 
 	self.mid:size(self.sizeMid.x, contentHeight)
 	self.mid:repeat_xy(1, math.floor(contentHeight / self.sizeMid.y))
 
-	self.bottom:offset(self.bottom.offsetX, self.mid.offsetY + self.mid.scaledHeight)
+	self.bottom:pos(self.bottom.posX, self.mid.posY + self.mid.height)
 	
 	-- visible size of the whole background area
-	self.size.width = math.max(math.max(self.top.scaledWidth, self.bottom.scaledWidth), self.mid.scaledWidth)
-	self.size.height = self.top.scaledHeight + self.mid.scaledHeight + self.bottom.scaledHeight
+	self.size.width = math.max(math.max(self.top.absoluteWidth, self.bottom.absoluteWidth), self.mid.absoluteWidth)
+	self.size.height = self.top.absoluteHeight + self.mid.absoluteHeight + self.bottom.absoluteHeight
 end
 
 return uiBackground

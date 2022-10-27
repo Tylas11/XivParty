@@ -40,6 +40,7 @@ function uiBar:init(barLayout)
 		self.barLayout = barLayout
 
 		self.imgBg = self:addChild(uiImage.new(barLayout.imgBg))
+		self.imgBar = self:addChild(uiImage.new(barLayout.imgBar))
 		self.imgFg = self:addChild(uiImage.new(barLayout.imgFg))
 
 		self.imgGlowMid = self:addChild(uiImage.new(barLayout.imgGlowMid))
@@ -50,8 +51,7 @@ function uiBar:init(barLayout)
 		self.value = 1
 		self.exactValue = 1
 		
-		self.sizeBg = utils:coord(barLayout.imgBg.size)
-		self.sizeFg = utils:coord(barLayout.imgFg.size)
+		self.sizeBar = utils:coord(barLayout.imgBar.size)
 		self.sizeGlow = utils:coord(barLayout.imgGlowMid.size)
 		self.sizeGlowSides = utils:coord(barLayout.imgGlowSides.size)
 		
@@ -67,11 +67,14 @@ function uiBar:update(targetValue)
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
 	    
+		local multiplier
 		if self.isDimmed then -- animate bar, glow hidden while dimmed
-			self.imgFg:size(self.sizeFg.x * self.value, self.sizeFg.y)
+			multiplier = self.value
 		else -- instantly move the bar, the glow will be animated instead
-			self.imgFg:size(self.sizeFg.x * targetValue, self.sizeFg.y)
+			multiplier = targetValue
 		end
+
+		self.imgBar:size((self.sizeBar.x - 2 * self.barLayout.barOverlap) * multiplier + self.barLayout.barOverlap, self.sizeBar.y)
 	end
 	
 	self:updateGlow(targetValue)
@@ -79,16 +82,16 @@ end
 
 function uiBar:updateGlow(targetValue)
 	if not self.isDimmed and math.abs(targetValue - self.value) > 0.01 then
-		local glowWidth = self.sizeFg.x * math.abs(targetValue - self.value)
-		
+		local glowWidth = (self.sizeBar.x - 2 * self.barLayout.barOverlap) * math.abs(targetValue - self.value)
+		local glowPosX = self.imgBar.posX + (self.sizeBar.x - 2 * self.barLayout.barOverlap) * math.min(targetValue, self.value) + self.barLayout.barOverlap
+
 		self.imgGlowMid:opacity(1)
 		self.imgGlowLeft:opacity(1)
 		self.imgGlowRight:opacity(1)
 	
 		self.imgGlowMid:size(glowWidth, self.sizeGlow.y)
 
-		-- NOTE: the x positions must be based on a different image's position, otherwise these updates would keep increasing posX forever
-		self.imgGlowMid:pos(self.imgFg.posX + self.sizeFg.x * math.min(targetValue, self.value), self.imgGlowMid.posY)
+		self.imgGlowMid:pos(glowPosX, self.imgGlowMid.posY)
 		self.imgGlowLeft:pos(self.imgGlowMid.posX - self.sizeGlowSides.x, self.imgGlowMid.posY)
 		self.imgGlowRight:pos(self.imgGlowMid.posX + (glowWidth + self.sizeGlowSides.x), self.imgGlowMid.posY)
 	else
@@ -100,7 +103,7 @@ end
 
 function uiBar:opacity(o)
 	self.isDimmed = o < 1
-	self.imgFg:opacity(o)
+	self.imgBar:opacity(o)
 end
 
 return uiBar

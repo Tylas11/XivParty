@@ -47,34 +47,42 @@
         <hp>
             <bar>
                 <animSpeed>0.1</animSpeed>
+                <barOverlap>1</barOverlap>
                 <enabled>true</enabled>
+                <imgBar>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <offset>1,1</offset>
+                    <path>assets/XivBar.png</path>
+                    <size>104,8</size>
+                </imgBar>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>0,0</offset>
-                    <path>assets/BarBG.png</path>
-                    <size>107,10</size>
+                    <offset>-2,-2</offset>
+                    <path>assets/XivBarBG.png</path>
+                    <size>110,14</size>
                 </imgBg>
                 <imgFg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,2</offset>
-                    <path>assets/BarFG.png</path>
-                    <size>103,6</size>
+                    <offset>-2,-2</offset>
+                    <path>assets/XivBarFG.png</path>
+                    <size>110,14</size>
                 </imgFg>
                 <imgGlowMid>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,-11</offset>
-                    <path>assets/BarGlowMid.png</path>
-                    <size>6,32</size>
+                    <offset>2,-17</offset>
+                    <path>assets/XivBarGlowMid.png</path>
+                    <size>6,44</size>
                 </imgGlowMid>
                 <imgGlowSides>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,-11</offset>
-                    <path>assets/BarGlowSides.png</path>
-                    <size>3,32</size>
+                    <offset>2,-16</offset>
+                    <path>assets/XivBarGlowSides.png</path>
+                    <size>2,42</size>
                 </imgGlowSides>
                 <offset>0,0</offset>
             </bar>
@@ -173,34 +181,42 @@
         <mp>
             <bar>
                 <animSpeed>0.1</animSpeed>
+                <barOverlap>1</barOverlap>
                 <enabled>true</enabled>
+                <imgBar>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <offset>1,1</offset>
+                    <path>assets/XivBar.png</path>
+                    <size>104,8</size>
+                </imgBar>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>0,0</offset>
-                    <path>assets/BarBG.png</path>
-                    <size>107,10</size>
+                    <offset>-2,-2</offset>
+                    <path>assets/XivBarBG.png</path>
+                    <size>110,14</size>
                 </imgBg>
                 <imgFg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,2</offset>
-                    <path>assets/BarFG.png</path>
-                    <size>103,6</size>
+                    <offset>-2,-2</offset>
+                    <path>assets/XivBarFG.png</path>
+                    <size>110,14</size>
                 </imgFg>
                 <imgGlowMid>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,-11</offset>
-                    <path>assets/BarGlowMid.png</path>
-                    <size>6,32</size>
+                    <offset>2,-17</offset>
+                    <path>assets/XivBarGlowMid.png</path>
+                    <size>6,44</size>
                 </imgGlowMid>
                 <imgGlowSides>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,-11</offset>
-                    <path>assets/BarGlowSides.png</path>
-                    <size>3,32</size>
+                    <offset>2,-16</offset>
+                    <path>assets/XivBarGlowSides.png</path>
+                    <size>2,42</size>
                 </imgGlowSides>
                 <offset>0,0</offset>
             </bar>
@@ -285,34 +301,42 @@
         <tp>
             <bar>
                 <animSpeed>0.1</animSpeed>
+                <barOverlap>1</barOverlap>
                 <enabled>true</enabled>
+                <imgBar>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <offset>1,1</offset>
+                    <path>assets/XivBar.png</path>
+                    <size>104,8</size>
+                </imgBar>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>0,0</offset>
-                    <path>assets/BarBG.png</path>
-                    <size>107,10</size>
+                    <offset>-2,-2</offset>
+                    <path>assets/XivBarBG.png</path>
+                    <size>110,14</size>
                 </imgBg>
                 <imgFg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,2</offset>
-                    <path>assets/BarFG.png</path>
-                    <size>103,6</size>
+                    <offset>-2,-2</offset>
+                    <path>assets/XivBarFG.png</path>
+                    <size>110,14</size>
                 </imgFg>
                 <imgGlowMid>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,-11</offset>
-                    <path>assets/BarGlowMid.png</path>
-                    <size>6,32</size>
+                    <offset>2,-17</offset>
+                    <path>assets/XivBarGlowMid.png</path>
+                    <size>6,44</size>
                 </imgGlowMid>
                 <imgGlowSides>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>2,-11</offset>
-                    <path>assets/BarGlowSides.png</path>
-                    <size>3,32</size>
+                    <offset>2,-16</offset>
+                    <path>assets/XivBarGlowSides.png</path>
+                    <size>2,42</size>
                 </imgGlowSides>
                 <offset>0,0</offset>
             </bar>

@@ -90,33 +90,41 @@ layout.hp.bar = {}
 layout.hp.bar.enabled = true
 layout.hp.bar.offset = L{ 0, 0 }
 layout.hp.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
+layout.hp.bar.barOverlap = 1 -- number of pixels (on each side) the imgBar is wider than the opening in the imgFg
 
 layout.hp.bar.imgBg = {}
 layout.hp.bar.imgBg.enabled = true
-layout.hp.bar.imgBg.offset = L{ 0, 0 }
-layout.hp.bar.imgBg.path = 'assets/BarBG.png'
-layout.hp.bar.imgBg.size = L{ 107, 10 }
+layout.hp.bar.imgBg.offset = L{ -2, -2 }
+layout.hp.bar.imgBg.path = 'assets/XivBarBG.png'
+layout.hp.bar.imgBg.size = L{ 110, 14 }
 layout.hp.bar.imgBg.color = '#FFFFFFFF'
+
+layout.hp.bar.imgBar = {}
+layout.hp.bar.imgBar.enabled = true
+layout.hp.bar.imgBar.offset = L{ 1, 1 } -- centered inside the foreground image = fg.offset + (fg.size - bar.size) / 2
+layout.hp.bar.imgBar.path = 'assets/XivBar.png'
+layout.hp.bar.imgBar.size = L{ 104, 8 }
+layout.hp.bar.imgBar.color = '#FFFFFFFF'
 
 layout.hp.bar.imgFg = {}
 layout.hp.bar.imgFg.enabled = true
-layout.hp.bar.imgFg.offset = L{ 2, 2 } -- centered inside the background image = (bg.size - fg.size) / 2
-layout.hp.bar.imgFg.path = 'assets/BarFG.png'
-layout.hp.bar.imgFg.size = L{ 103, 6 }
+layout.hp.bar.imgFg.offset = L{ -2, -2 }
+layout.hp.bar.imgFg.path = 'assets/XivBarFG.png'
+layout.hp.bar.imgFg.size = L{ 110, 14 }
 layout.hp.bar.imgFg.color = '#FFFFFFFF'
 
 layout.hp.bar.imgGlowMid = {}
 layout.hp.bar.imgGlowMid.enabled = true
-layout.hp.bar.imgGlowMid.offset = L{ 2, -11 } -- centered inside foreground image = fg.offset.y + (fg.size.y - glow.size.y ) / 2
-layout.hp.bar.imgGlowMid.path = 'assets/BarGlowMid.png'
-layout.hp.bar.imgGlowMid.size = L{ 6, 32 }
+layout.hp.bar.imgGlowMid.offset = L{ 2, -17 } -- centered inside foreground image = bar.offset.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+layout.hp.bar.imgGlowMid.path = 'assets/XivBarGlowMid.png'
+layout.hp.bar.imgGlowMid.size = L{ 6, 44 }
 layout.hp.bar.imgGlowMid.color = '#FFFFFFFF'
 
 layout.hp.bar.imgGlowSides = {}
 layout.hp.bar.imgGlowSides.enabled = true
-layout.hp.bar.imgGlowSides.offset = L{ 2, -11 }
-layout.hp.bar.imgGlowSides.path = 'assets/BarGlowSides.png'
-layout.hp.bar.imgGlowSides.size = L{ 3, 32 }
+layout.hp.bar.imgGlowSides.offset = L{ 2, -16 } -- centered inside foreground image = bar.offset.y + (bar.size.y - glowSides.size.y ) / 2, x position set in code
+layout.hp.bar.imgGlowSides.path = 'assets/XivBarGlowSides.png'
+layout.hp.bar.imgGlowSides.size = L{ 2, 42 }
 layout.hp.bar.imgGlowSides.color = '#FFFFFFFF'
 
 -- MP bar
@@ -138,33 +146,41 @@ layout.mp.bar = {}
 layout.mp.bar.enabled = true
 layout.mp.bar.offset = L{ 0, 0 }
 layout.mp.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
+layout.mp.bar.barOverlap = 1 -- number of pixels (on each side) the imgBar is wider than the opening in the imgFg
 
 layout.mp.bar.imgBg = {}
 layout.mp.bar.imgBg.enabled = true
-layout.mp.bar.imgBg.offset = L{ 0, 0 }
-layout.mp.bar.imgBg.path = 'assets/BarBG.png'
-layout.mp.bar.imgBg.size = L{ 107, 10 }
+layout.mp.bar.imgBg.offset = L{ -2, -2 }
+layout.mp.bar.imgBg.path = 'assets/XivBarBG.png'
+layout.mp.bar.imgBg.size = L{ 110, 14 }
 layout.mp.bar.imgBg.color = '#FFFFFFFF'
+
+layout.mp.bar.imgBar = {}
+layout.mp.bar.imgBar.enabled = true
+layout.mp.bar.imgBar.offset = L{ 1, 1 } -- centered inside the foreground image = fg.offset + (fg.size - bar.size) / 2
+layout.mp.bar.imgBar.path = 'assets/XivBar.png'
+layout.mp.bar.imgBar.size = L{ 104, 8 }
+layout.mp.bar.imgBar.color = '#FFFFFFFF'
 
 layout.mp.bar.imgFg = {}
 layout.mp.bar.imgFg.enabled = true
-layout.mp.bar.imgFg.offset = L{ 2, 2 } -- centered inside the background image = (bg.size - fg.size) / 2
-layout.mp.bar.imgFg.path = 'assets/BarFG.png'
-layout.mp.bar.imgFg.size = L{ 103, 6 }
+layout.mp.bar.imgFg.offset = L{ -2, -2 }
+layout.mp.bar.imgFg.path = 'assets/XivBarFG.png'
+layout.mp.bar.imgFg.size = L{ 110, 14 }
 layout.mp.bar.imgFg.color = '#FFFFFFFF'
 
 layout.mp.bar.imgGlowMid = {}
 layout.mp.bar.imgGlowMid.enabled = true
-layout.mp.bar.imgGlowMid.offset = L{ 2, -11 } -- centered inside foreground image = fg.offset.y + (fg.size.y - glow.size.y ) / 2
-layout.mp.bar.imgGlowMid.path = 'assets/BarGlowMid.png'
-layout.mp.bar.imgGlowMid.size = L{ 6, 32 }
+layout.mp.bar.imgGlowMid.offset = L{ 2, -17 } -- centered inside foreground image = bar.offset.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+layout.mp.bar.imgGlowMid.path = 'assets/XivBarGlowMid.png'
+layout.mp.bar.imgGlowMid.size = L{ 6, 44 }
 layout.mp.bar.imgGlowMid.color = '#FFFFFFFF'
 
 layout.mp.bar.imgGlowSides = {}
 layout.mp.bar.imgGlowSides.enabled = true
-layout.mp.bar.imgGlowSides.offset = L{ 2, -11 }
-layout.mp.bar.imgGlowSides.path = 'assets/BarGlowSides.png'
-layout.mp.bar.imgGlowSides.size = L{ 3, 32 }
+layout.mp.bar.imgGlowSides.offset = L{ 2, -16 } -- centered inside foreground image = bar.offset.y + (bar.size.y - glowSides.size.y ) / 2, x position set in code
+layout.mp.bar.imgGlowSides.path = 'assets/XivBarGlowSides.png'
+layout.mp.bar.imgGlowSides.size = L{ 2, 42 }
 layout.mp.bar.imgGlowSides.color = '#FFFFFFFF'
 
 -- TP bar
@@ -187,33 +203,41 @@ layout.tp.bar = {}
 layout.tp.bar.enabled = true
 layout.tp.bar.offset = L{ 0, 0 }
 layout.tp.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
+layout.tp.bar.barOverlap = 1 -- number of pixels (on each side) the imgBar is wider than the opening in the imgFg
 
 layout.tp.bar.imgBg = {}
 layout.tp.bar.imgBg.enabled = true
-layout.tp.bar.imgBg.offset = L{ 0, 0 }
-layout.tp.bar.imgBg.path = 'assets/BarBG.png'
-layout.tp.bar.imgBg.size = L{ 107, 10 }
+layout.tp.bar.imgBg.offset = L{ -2, -2 }
+layout.tp.bar.imgBg.path = 'assets/XivBarBG.png'
+layout.tp.bar.imgBg.size = L{ 110, 14 }
 layout.tp.bar.imgBg.color = '#FFFFFFFF'
+
+layout.tp.bar.imgBar = {}
+layout.tp.bar.imgBar.enabled = true
+layout.tp.bar.imgBar.offset = L{ 1, 1 } -- centered inside the foreground image = fg.offset + (fg.size - bar.size) / 2
+layout.tp.bar.imgBar.path = 'assets/XivBar.png'
+layout.tp.bar.imgBar.size = L{ 104, 8 }
+layout.tp.bar.imgBar.color = '#FFFFFFFF'
 
 layout.tp.bar.imgFg = {}
 layout.tp.bar.imgFg.enabled = true
-layout.tp.bar.imgFg.offset = L{ 2, 2 } -- centered inside the background image = (bg.size - fg.size) / 2
-layout.tp.bar.imgFg.path = 'assets/BarFG.png'
-layout.tp.bar.imgFg.size = L{ 103, 6 }
+layout.tp.bar.imgFg.offset = L{ -2, -2 }
+layout.tp.bar.imgFg.path = 'assets/XivBarFG.png'
+layout.tp.bar.imgFg.size = L{ 110, 14 }
 layout.tp.bar.imgFg.color = '#FFFFFFFF'
 
 layout.tp.bar.imgGlowMid = {}
 layout.tp.bar.imgGlowMid.enabled = true
-layout.tp.bar.imgGlowMid.offset = L{ 2, -11 } -- centered inside foreground image = fg.offset.y + (fg.size.y - glow.size.y ) / 2
-layout.tp.bar.imgGlowMid.path = 'assets/BarGlowMid.png'
-layout.tp.bar.imgGlowMid.size = L{ 6, 32 }
+layout.tp.bar.imgGlowMid.offset = L{ 2, -17 } -- centered inside foreground image = bar.offset.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+layout.tp.bar.imgGlowMid.path = 'assets/XivBarGlowMid.png'
+layout.tp.bar.imgGlowMid.size = L{ 6, 44 }
 layout.tp.bar.imgGlowMid.color = '#FFFFFFFF'
 
 layout.tp.bar.imgGlowSides = {}
 layout.tp.bar.imgGlowSides.enabled = true
-layout.tp.bar.imgGlowSides.offset = L{ 2, -11 }
-layout.tp.bar.imgGlowSides.path = 'assets/BarGlowSides.png'
-layout.tp.bar.imgGlowSides.size = L{ 3, 32 }
+layout.tp.bar.imgGlowSides.offset = L{ 2, -16 } -- centered inside foreground image = bar.offset.y + (bar.size.y - glowSides.size.y ) / 2, x position set in code
+layout.tp.bar.imgGlowSides.path = 'assets/XivBarGlowSides.png'
+layout.tp.bar.imgGlowSides.size = L{ 2, 42 }
 layout.tp.bar.imgGlowSides.color = '#FFFFFFFF'
 
 -- job icon

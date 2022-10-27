@@ -62,8 +62,8 @@ function utils:coord(coordList)
 	local coord = {}
 	
 	if coordList then
-		coord.x = coordList[1]
-		coord.y = coordList[2]
+		coord.x = tonumber(coordList[1])
+		coord.y = tonumber(coordList[2])
 	end
 	
 	if not coord.x then coord.x = 0 end

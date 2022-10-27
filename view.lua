@@ -142,10 +142,8 @@ function view:createSetupData(isMainParty)
 	setupParty[0].isAllianceLeader = true
 	setupParty[0].isQuarterMaster = true
 
-	-- NOTE: can't be both selected and out of zone
-	if isMainParty then
-		setupParty[math.random(0,2)].isSelected = true
-	end
+	-- NOTE: can't be both selected and out of zone, so range only 0-2
+	setupParty[math.random(0,2)].isSelected = true
 
 	-- set a zone that is not the current zone for one player, to show off the zone name display
 	local zone = windower.ffxi.get_info().zone

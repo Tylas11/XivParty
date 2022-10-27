@@ -50,6 +50,8 @@ function uiLeader:init(leaderLayout)
 end
 
 function uiLeader:update(player)
+	if not self.enabled then return end
+
 	if player.isLeader then
 		self.imgParty:opacity(1)
 	else

@@ -48,13 +48,13 @@ function uiListItem:init(layout)
 		-- order of creation determines Z-order
 		self.cursor = self:addChild(uiImage.new(layout.cursor))
 		self.cursor:opacity(0)
-
-		-- TODO: might need z-order support in layout (ffxi layout the cursor must be above the icon, ffxiv layout it must be below)
-		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon))
 		
 		self.hpBar = self:addChild(uiStatusBar.new(layout.hp, const.barTypeHp))
 		self.mpBar = self:addChild(uiStatusBar.new(layout.mp, const.barTypeMp))
 		self.tpBar = self:addChild(uiStatusBar.new(layout.tp, const.barTypeTp))
+
+		-- TODO: might need z-order support in layout (ffxi layout the cursor must be above the icon, ffxiv layout it must be below)
+		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon))
 		
 		self.nameText = self:addChild(uiText.new(layout.text.name))
 		self.zoneText = self:addChild(uiText.new(layout.text.zone))

@@ -8,21 +8,21 @@
                 <enabled>true</enabled>
                 <offset>0,0</offset>
                 <path>assets/XivAllyBgBottom.png</path>
-                <size>482,7</size>
+                <size>318,5</size>
             </imgBottom>
             <imgMid>
                 <color>#FFFFFFC0</color>
                 <enabled>true</enabled>
-                <offset>0,7</offset>
+                <offset>0,5</offset>
                 <path>assets/XivAllyBgMid.png</path>
-                <size>482,64</size>
+                <size>318,42</size>
             </imgMid>
             <imgTop>
                 <color>#FFFFFFC0</color>
                 <enabled>true</enabled>
                 <offset>0,0</offset>
                 <path>assets/XivAllyBgTop.png</path>
-                <size>482,7</size>
+                <size>318,5</size>
             </imgTop>
             <offset>0,0</offset>
         </bg>
@@ -33,53 +33,53 @@
             <color>#FFFFFFFF</color>
             <enabled>true</enabled>
             <offset>0,0</offset>
-            <path>assets/XivAllyCursorXiv.png</path>
-            <size>170,80</size>
+            <path>assets/XivAllyCursor.png</path>
+            <size>113,53</size>
         </cursor>
         <hp>
             <bar>
                 <animSpeed>0.1</animSpeed>
-                <barOverlap>2</barOverlap>
+                <barOverlap>1</barOverlap>
                 <enabled>true</enabled>
                 <imgBar>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>7,7</offset>
+                    <offset>5,5</offset>
                     <path>assets/XivAllyBar.png</path>
-                    <size>84,40</size>
+                    <size>55,26</size>
                 </imgBar>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
                     <offset>0,0</offset>
                     <path>assets/XivAllyBarBG.png</path>
-                    <size>98,54</size>
+                    <size>65,35</size>
                 </imgBg>
                 <imgFg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
                     <offset>0,0</offset>
                     <path>assets/XivAllyBarFG.png</path>
-                    <size>98,54</size>
+                    <size>65,35</size>
                 </imgFg>
                 <imgGlowMid>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>9,-17</offset>
+                    <offset>0,-12</offset>
                     <path>assets/XivAllyBarGlowMid.png</path>
-                    <size>12,88</size>
+                    <size>8,60</size>
                 </imgGlowMid>
                 <imgGlowSides>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>9,-17</offset>
+                    <offset>0,-12</offset>
                     <path>assets/XivAllyBarGlowSides.png</path>
-                    <size>4,88</size>
+                    <size>3,60</size>
                 </imgGlowSides>
                 <offset>0,0</offset>
             </bar>
             <enabled>true</enabled>
-            <offset>59,12</offset>
+            <offset>42,8</offset>
             <text>
                 <enabled>false</enabled>
             </text>
@@ -128,9 +128,9 @@
                 <path />
                 <size>36,36</size>
             </imgIcon>
-            <offset>16,17</offset>
+            <offset>11,10</offset>
             <path>assets/jobIcons/</path>
-            <scale>1.25,1.25</scale>
+            <scale>0.9,0.9</scale>
         </jobIcon>
         <leader>
             <enabled>false</enabled>
@@ -164,11 +164,11 @@
             <enabled>false</enabled>
         </mp>
         <partyList>
-            <columnWidth>156</columnWidth>
+            <columnWidth>102</columnWidth>
             <columns>3</columns>
-            <rowHeight>64</rowHeight>
+            <rowHeight>42</rowHeight>
             <rows>2</rows>
-            <scale>0.66,0.66</scale>
+            <scale>1,1</scale>
         </partyList>
         <range>
             <enabled>false</enabled>

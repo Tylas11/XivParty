@@ -64,7 +64,7 @@ function uiPartyList:init(party, partySettings, layout)
 		self.posY = partySettings.posY
 		
 		self.background = self:addChild(uiBackground.new(layout.bg))
-		self.bgPos = utils:coord(layout.bg.offset)
+		self.bgPos = utils:coord(layout.bg.pos)
 		
 		self.dragImage = self:addChild(uiImage.create())
 		self.dragImage:alpha(0)
@@ -80,7 +80,9 @@ function uiPartyList:init(party, partySettings, layout)
 			return self:handleWindowerMouse(type, x, y, delta, blocked)
 		end)
 
-		self:layoutElement()
+		-- initialize UI, as there is no parent element to call these for us
+		self.layoutElement()
+		self:createPrimitives()
 	end
 end
 

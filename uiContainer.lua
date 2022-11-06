@@ -38,20 +38,20 @@ local utils = require('utils')
 local uiContainer = classes.class(uiElement)
 
 -- constructor
--- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and an 'offset' (L{ x, y } from windower lists library)
+-- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
 function uiContainer:init(baseLayout)
     self.super:init(baseLayout)
 
     self.children = T{}
 
-    return self.enabled
+    return self.isEnabled
 end
 
 -- disposes and removes all children
 -- override this to free any resources created during init (also call super:dispose!)
 function uiContainer:dispose()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     for child in self.children:it() do
         child:dispose()
@@ -65,7 +65,7 @@ end
 -- @param child UI element derived from uiElement
 -- @return the added child element
 function uiContainer:addChild(child)
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     if not child:instanceOf(uiElement) then
         utils:log('Failed to add UI child. Class must derive from uiElement!', 4)
@@ -74,7 +74,11 @@ function uiContainer:addChild(child)
 
     self.children:append(child)
     child.parent = self
+
     child:layoutElement()
+    if self.isCreated then
+        child:createPrimitives()
+    end
 
     return child
 end
@@ -82,7 +86,7 @@ end
 -- removes a child UI element
 -- @param child UI element that has been added using addChild() before
 function uiContainer:removeChild(child)
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     if not self.children:delete(child) then return end
 
@@ -92,7 +96,7 @@ end
 
 -- removes all child UI elements
 function uiContainer:clearChildren()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     for child in self.children:it() do
         child.parent = nil
@@ -102,9 +106,25 @@ function uiContainer:clearChildren()
     self.children:clear()
 end
 
+-- creates the windower primitives of all child UI elements in their z-order
+-- design convention: add all children that require z-ordering before calling this. adding children afterwards will 
+-- always place primitives on top of existing ones regardless of configured z-order
+function uiContainer:createPrimitives()
+    if not self.isEnabled then return end
+
+    -- sort children by z-order ascending
+    utils:insertionSort(self.children, function(a, b) return a.zOrder > b.zOrder end)
+
+    for child in self.children:it() do
+        child:createPrimitives()
+    end
+
+    self.super:createPrimitives()
+end
+
 -- calculates the element's and its children's absolute position and scale based on its parent
 function uiContainer:layoutElement()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     self.super:layoutElement()
 
@@ -115,7 +135,7 @@ end
 
 -- shows the UI element and all its children
 function uiContainer:show()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     for child in self.children:it() do
         child:show()
@@ -124,7 +144,7 @@ end
 
 -- hides the UI element and all its children
 function uiContainer:hide()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     for child in self.children:it() do
         child:hide()

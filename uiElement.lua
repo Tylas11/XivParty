@@ -37,22 +37,23 @@ local utils = require('utils')
 local uiElement = classes.class()
 
 -- constructor
--- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and an 'offset' (L{ x, y } from windower lists library)
+-- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
 function uiElement:init(baseLayout)
     self.parent = nil
+    self.isCreated = false
 
-    self.enabled = true
+    self.isEnabled = true
     if baseLayout and baseLayout.enabled ~= nil then
-        self.enabled = baseLayout.enabled
+        self.isEnabled = baseLayout.enabled
     end
 
     self.posX = 0
     self.posY = 0
-    if baseLayout and baseLayout.offset then
-        local offset = utils:coord(baseLayout.offset) -- TODO: rename to pos in layout
-        self.posX = offset.x
-        self.posY = offset.y
+    if baseLayout and baseLayout.pos then
+        local pos = utils:coord(baseLayout.pos)
+        self.posX = pos.x
+        self.posY = pos.y
     end
     
     self.scaleX = 1
@@ -67,17 +68,32 @@ function uiElement:init(baseLayout)
     self.absolutePos = { x = 0, y = 0 }
     self.absoluteScale = { x = 1, y = 1 }
 
-    return self.enabled
+    self.zOrder = 0
+    if baseLayout and baseLayout.zOrder then
+        self.zOrder = baseLayout.zOrder
+    end
+
+    return self.isEnabled
 end
 
--- override this to free any resources created during init (also call super:dispose!)
+-- override this to free any resources created during init or createPrimitives (also call super:dispose!)
 function uiElement:dispose()
-    self.enabled = false -- disposed elements are not meant to be reused, so deactivate them
+    self.isEnabled = false -- disposed elements are not meant to be reused, so deactivate them
+    self.isCreated = false
+end
+
+-- override this function to create the windower primitives of this element
+-- design convention: derived classes shall store all values that need to be set on the primitives,
+-- even if they havent been created yet, and apply them on creation. this function must be safe
+-- to be called multiple times without creating duplicate primitives.
+function uiElement:createPrimitives()
+    self.isCreated = true
+    self:applyLayout()
 end
 
 -- calculates the element's absolute position and scale based on its parent
 function uiElement:layoutElement()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     if self.parent then
         self.absolutePos.x = self.parent.absolutePos.x + self.posX * self.parent.absoluteScale.x
@@ -103,7 +119,7 @@ end
 -- @param x horizontal position in screen coordinates (origin: left)
 -- @param y vertical position in screen coordinates (origin: top)
 function uiElement:pos(x, y)
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     if self.posX ~= x or self.posY ~= y then
         self.posX = x
@@ -113,11 +129,11 @@ function uiElement:pos(x, y)
     end
 end
 
--- scales the UI element. scaling affects the offset and size of all children of this element
+-- scales the UI element. scaling affects the pos and size of all children of this element
 -- @param x horizontal scale factor
 -- @param y vertical scale factor
 function uiElement:scale(x, y)
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     if self.scaleX ~= x or self.scaleY ~= y then
         self.scaleX = x

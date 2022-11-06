@@ -57,7 +57,7 @@ function uiJobIcon:init(jobIconLayout)
 end
 
 function uiJobIcon:update(player, isOutsideZone)
-	if not self.enabled then return end
+	if not self.isEnabled then return end
 
 	local opacity = 0
 	local highlightOpacity = 0

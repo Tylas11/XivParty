@@ -47,7 +47,7 @@ function uiRange:init(rangeLayout)
 end
 
 function uiRange:update(player, isOutsideZone)
-	if not self.enabled then return end
+	if not self.isEnabled then return end
 
 	local opacity = 0
 	local opacityFar = 0

@@ -58,7 +58,7 @@ The HP/MP/TP bars each use a background and foreground image which can be set se
 #### Buff Icons
 Buffs are positioned at the left edge of the TP bar and extend to the right. They wrap around to a second row when there are more buffs than the "wrap" count set in the layout. The "wrapOffset" will push the second row by a number of icon widths to the right.
 
-The icons can be configured to align right and extend to the left by setting "alignRight" to true. They will still start at the left edge of the TP bar, so a negative X "offset" is recommended to move them outside the party list window.
+The icons can be configured to align right and extend to the left by setting "alignRight" to true. They will still start at the left edge of the TP bar, so a negative X "pos" is recommended to move them outside the party list window.
 
 #### Job Icons
 Consist of five separate images (front to back): frame, icon, gradient, background and highlight. The image files are 64 x 64 but are currently displayed at a smaller size. The icon can be scaled up in the layout by setting the respective size values. The background image color is set in code based on the job's role and can be customized in the layout. Job roles can be changed or added in jobs.lua, when adding new roles also add a color entry with the same name in the layout. 

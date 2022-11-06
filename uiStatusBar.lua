@@ -57,7 +57,7 @@ function uiStatusBar:init(statusBarLayout, barType)
 end
 
 function uiStatusBar:update(player, isOutsideZone)
-	if not self.enabled then return end
+	if not self.isEnabled then return end
 
 	local val = nil
 	local valPercent = nil

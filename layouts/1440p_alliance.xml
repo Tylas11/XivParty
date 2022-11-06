@@ -6,25 +6,25 @@
             <imgBottom>
                 <color>#FFFFFFC0</color>
                 <enabled>true</enabled>
-                <offset>0,0</offset>
                 <path>assets/XivAllyBgBottom.png</path>
+                <pos>0,0</pos>
                 <size>318,5</size>
             </imgBottom>
             <imgMid>
                 <color>#FFFFFFC0</color>
                 <enabled>true</enabled>
-                <offset>0,5</offset>
                 <path>assets/XivAllyBgMid.png</path>
+                <pos>0,5</pos>
                 <size>318,42</size>
             </imgMid>
             <imgTop>
                 <color>#FFFFFFC0</color>
                 <enabled>true</enabled>
-                <offset>0,0</offset>
                 <path>assets/XivAllyBgTop.png</path>
+                <pos>0,0</pos>
                 <size>318,5</size>
             </imgTop>
-            <offset>0,0</offset>
+            <pos>0,0</pos>
         </bg>
         <buffIcons>
             <enabled>false</enabled>
@@ -32,9 +32,10 @@
         <cursor>
             <color>#FFFFFFFF</color>
             <enabled>true</enabled>
-            <offset>0,0</offset>
             <path>assets/XivAllyCursor.png</path>
+            <pos>0,0</pos>
             <size>113,53</size>
+            <zOrder>0</zOrder>
         </cursor>
         <hp>
             <bar>
@@ -44,45 +45,49 @@
                 <imgBar>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>5,5</offset>
                     <path>assets/XivAllyBar.png</path>
+                    <pos>5,5</pos>
                     <size>55,26</size>
                 </imgBar>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>0,0</offset>
                     <path>assets/XivAllyBarBG.png</path>
+                    <pos>0,0</pos>
                     <size>65,35</size>
                 </imgBg>
                 <imgFg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>0,0</offset>
                     <path>assets/XivAllyBarFG.png</path>
+                    <pos>0,0</pos>
                     <size>65,35</size>
                 </imgFg>
                 <imgGlowMid>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>0,-12</offset>
                     <path>assets/XivAllyBarGlowMid.png</path>
+                    <pos>0,-12</pos>
                     <size>8,60</size>
                 </imgGlowMid>
                 <imgGlowSides>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <offset>0,-12</offset>
                     <path>assets/XivAllyBarGlowSides.png</path>
+                    <pos>0,-12</pos>
                     <size>3,60</size>
                 </imgGlowSides>
-                <offset>0,0</offset>
+                <pos>0,0</pos>
             </bar>
             <enabled>true</enabled>
-            <offset>42,8</offset>
+            <hpOrangeColor>#F8BA80FF</hpOrangeColor>
+            <hpRedColor>#FC8182FF</hpRedColor>
+            <hpYellowColor>#F3F37CFF</hpYellowColor>
+            <pos>42,8</pos>
             <text>
                 <enabled>false</enabled>
             </text>
+            <zOrder>1</zOrder>
         </hp>
         <jobIcon>
             <colors>
@@ -96,66 +101,68 @@
             <imgBg>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <offset>0,0</offset>
                 <path>assets/jobIcons/bg.png</path>
+                <pos>0,0</pos>
                 <size>36,36</size>
             </imgBg>
             <imgFrame>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <offset>0,0</offset>
                 <path>assets/jobIcons/frame.png</path>
+                <pos>0,0</pos>
                 <size>36,36</size>
             </imgFrame>
             <imgGradient>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <offset>0,0</offset>
                 <path>assets/jobIcons/gradient.png</path>
+                <pos>0,0</pos>
                 <size>36,36</size>
             </imgGradient>
             <imgHighlight>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <offset>-13,-13</offset>
                 <path>assets/jobIcons/highlight.png</path>
+                <pos>-13,-13</pos>
                 <size>62,62</size>
             </imgHighlight>
             <imgIcon>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <offset>0,-0.25</offset>
                 <path />
+                <pos>0,-0.25</pos>
                 <size>36,36</size>
             </imgIcon>
-            <offset>11,10</offset>
             <path>assets/jobIcons/</path>
+            <pos>11,10</pos>
             <scale>0.9,0.9</scale>
+            <zOrder>2</zOrder>
         </jobIcon>
         <leader>
             <enabled>false</enabled>
             <imgAlliance>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <offset>0,-5</offset>
                 <path>assets/Leader.png</path>
+                <pos>0,-5</pos>
                 <size>7,5</size>
             </imgAlliance>
             <imgParty>
                 <color>#E6E159FF</color>
                 <enabled>true</enabled>
-                <offset>0,0</offset>
                 <path>assets/Leader.png</path>
+                <pos>0,0</pos>
                 <size>7,5</size>
             </imgParty>
             <imgQuarterMaster>
                 <color>#66E659FF</color>
                 <enabled>true</enabled>
-                <offset>0,-10</offset>
                 <path>assets/Leader.png</path>
+                <pos>0,-10</pos>
                 <size>7,5</size>
             </imgQuarterMaster>
-            <offset>88,15</offset>
+            <pos>88,15</pos>
+            <zOrder>3</zOrder>
         </leader>
         <listItem>
             <enabled>true</enabled>
@@ -175,42 +182,16 @@
         </range>
         <text>
             <job>
-                <color>#F0FFFFFF</color>
                 <enabled>false</enabled>
-                <font>Arial</font>
-                <offset>30,0</offset>
-                <size>8</size>
-                <stroke>#062D54C8</stroke>
-                <strokeWidth>1</strokeWidth>
             </job>
             <name>
-                <color>#F0FFFFFF</color>
                 <enabled>false</enabled>
-                <font>Arial</font>
-                <offset>95,1</offset>
-                <size>15</size>
-                <stroke>#062D54C8</stroke>
-                <strokeWidth>2</strokeWidth>
             </name>
             <subJob>
-                <color>#F0FFFFFF</color>
                 <enabled>false</enabled>
-                <font>Arial</font>
-                <offset>39,9</offset>
-                <size>8</size>
-                <stroke>#062D54C8</stroke>
-                <strokeWidth>1</strokeWidth>
             </subJob>
             <zone>
-                <alignRight>false</alignRight>
-                <color>#F0FFFFFF</color>
                 <enabled>false</enabled>
-                <font>Arial</font>
-                <offset>292,1</offset>
-                <short>false</short>
-                <size>13</size>
-                <stroke>#062D54C8</stroke>
-                <strokeWidth>2</strokeWidth>
             </zone>
         </text>
         <tp>

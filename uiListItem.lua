@@ -45,7 +45,6 @@ function uiListItem:init(layout)
 	if self.super:init(layout.listItem) then
 		self.layout = layout
 
-		-- order of creation determines Z-order
 		self.cursor = self:addChild(uiImage.new(layout.cursor))
 		self.cursor:opacity(0)
 		
@@ -53,7 +52,6 @@ function uiListItem:init(layout)
 		self.mpBar = self:addChild(uiStatusBar.new(layout.mp, const.barTypeMp))
 		self.tpBar = self:addChild(uiStatusBar.new(layout.tp, const.barTypeTp))
 
-		-- TODO: might need z-order support in layout (ffxi layout the cursor must be above the icon, ffxiv layout it must be below)
 		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon))
 		
 		self.nameText = self:addChild(uiText.new(layout.text.name))
@@ -70,14 +68,14 @@ function uiListItem:init(layout)
 end
 
 function uiListItem:update(player)
-	if not self.enabled or not player then return end
+	if not self.isEnabled or not player then return end
 
 	local isOutsideZone = player.zone and player.zone ~= windower.ffxi.get_info().zone -- TODO: this is needed quite often, maybe it should be a property of player
 
 	self.hpBar:update(player, isOutsideZone)
 	self.mpBar:update(player, isOutsideZone)
 	self.tpBar:update(player, isOutsideZone)
-	
+
 	if player.name then
 		self.nameText:update(player.name)
 	else

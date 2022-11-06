@@ -46,7 +46,7 @@ function uiBuffIcons:init(buffLayout)
         self.buffImages = {}
 
 		if not self:validateLayout(self.buffLayout) then
-			self.enabled = false
+			self.isEnabled = false
 			return
 		end
 
@@ -66,7 +66,7 @@ function uiBuffIcons:init(buffLayout)
 			local column = self:getColumn(i, row)
 			local iconOffset = tonumber(buffLayout.offsetByRow[row]) * (self.size.x * self.scaleX + self.spacing.x)
 
-			imgLayout.offset = L{
+			imgLayout.pos = L{
 				iconOffset + (column - 1) * (self.size.x * self.scaleX + self.spacing.x), 
 				(row - 1) * self.size.y * self.scaleY + (row - 1) * self.spacing.y
 			}
@@ -145,7 +145,7 @@ function uiBuffIcons:getMaxBuffCount()
 end
 
 function uiBuffIcons:update(player, isOutsideZone)
-	if not self.enabled then return end
+	if not self.isEnabled then return end
 
 	local buffs = player.filteredBuffs
 	if not buffs or isOutsideZone then

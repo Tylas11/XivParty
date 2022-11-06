@@ -37,80 +37,120 @@ local utils = require('utils')
 -- create the class, derive from uiElement
 local uiText = classes.class(uiElement)
 
+-- static storage for private variables, access using private[self] to keep separate values for each instance
+local private = {}
+
 function uiText:init(textLayout)
     if self.super:init(textLayout) then
-        local alignRight = textLayout.alignRight
-        if alignRight == nil then alignRight = false end -- 'alignRight' might not exist in the layout for this text
+        private[self] = {}
 
-        self.alignRight = alignRight
+        private[self].alignRight = false
+        if textLayout and textLayout.alignRight ~= nil then
+            private[self].alignRight = textLayout.alignRight
+        end
 
-        local textSettings = {
-            flags = {
-                draggable = false,
-                right = alignRight
-            }
-        }
+        private[self].color = {}
+		private[self].color.r = 255
+		private[self].color.g = 255
+		private[self].color.b = 255
+		private[self].color.a = 255
+		if textLayout and textLayout.color then
+			local c = utils:colorFromHex(textLayout.color)
+			if c then
+				private[self].color = c
+			end
+		end
 
-        self.wrappedText = texts.new(textSettings)
-        self.wrappedText:bg_visible(false)
+        private[self].stroke = {}
+		private[self].stroke.r = 255
+		private[self].stroke.g = 255
+		private[self].stroke.b = 255
+		private[self].stroke.a = 255
+		if textLayout and textLayout.stroke then
+			local s = utils:colorFromHex(textLayout.stroke)
+			if s then
+				private[self].stroke = s
+			end
+		end
 
-        self.wrappedText:font(textLayout.font, 'Arial') -- Arial is the fallback font
-        self.fontSize = textLayout.size
-        self.strokeWidth = textLayout.strokeWidth
-
-        local color = utils:colorFromHex(textLayout.color)
-        local stroke = utils:colorFromHex(textLayout.stroke)
-        
-        self.wrappedText:color(color.r, color.g, color.b)
-        self.wrappedText:alpha(color.a)
-        self.wrappedText:stroke_color(stroke.r, stroke.g, stroke.b)
-        self.wrappedText:stroke_alpha(stroke.a)
-
-        self.text = nil
-        self.textColor = {}
-        self.textAlpha = nil
+        private[self].font = textLayout.font
+        private[self].fontSize = textLayout.size
+        private[self].strokeWidth = textLayout.strokeWidth
     end
 end
 
 function uiText:dispose()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
-    texts.destroy(self.wrappedText)
+    if self.isCreated then
+        texts.destroy(self.wrappedText)
+    end
+    private[self] = nil
 
     self.super:dispose()
 end
 
+-- NOTE: z-ordering for texts works, but only relative to other texts. windower seems to always place texts above images!
+function uiText:createPrimitives()
+    if not self.isEnabled or self.isCreated then return end
+
+    local textSettings = {
+        flags = {
+            draggable = false,
+            right = private[self].alignRight
+        }
+    }
+
+    self.wrappedText = texts.new(textSettings)
+    self.wrappedText:bg_visible(false)
+    self.wrappedText:font(private[self].font, 'Arial') -- Arial is the fallback font
+    self.wrappedText:text(private[self].text)
+
+    self.wrappedText:color(private[self].color.r, private[self].color.g, private[self].color.b)
+    self.wrappedText:alpha(private[self].color.a)
+    self.wrappedText:stroke_color(private[self].stroke.r, private[self].stroke.g, private[self].stroke.b)
+    self.wrappedText:stroke_alpha(private[self].stroke.a)
+
+    -- if visible is not yet set (nil), this will do nothing
+    self.wrappedText:visible(private[self].visible)
+
+    self.super:createPrimitives() -- this will call applyLayout()
+end
+
 function uiText:applyLayout()
-    if not self.enabled then return end
+    if not self.isEnabled or not self.isCreated then return end
 
     local x = self.absolutePos.x
     local y = self.absolutePos.y
 
-    if self.alignRight then
+    if private[self].alignRight then
         -- right aligned text coordinates start at the right side of the screen
         x = x - windower.get_windower_settings().ui_x_res
     end
     
     self.wrappedText:pos(x, y)
-    self.wrappedText:size(self.fontSize * self.absoluteScale.y)
-    self.wrappedText:stroke_width(self.strokeWidth * self.absoluteScale.x)
+    self.wrappedText:size(private[self].fontSize * self.absoluteScale.y)
+    self.wrappedText:stroke_width(private[self].strokeWidth * self.absoluteScale.x)
 end
 
 function uiText:update(text)
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
-	if text ~= self.text then
-		self.text = text
-		self.wrappedText:text(text)
+	if private[self].text ~= text then
+		private[self].text = text
+
+        if self.isCreated then
+		    self.wrappedText:text(private[self].text)
+        end
 	end
 end
 
 function uiText:color(r,g,b)
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
     local a = nil
 
-    -- color object returned by utils:colorFromHex
+    -- color table returned by utils:colorFromHex
     if type(r) == 'table' and r.r and r.g and r.b and r.a then
         a = r.a
         b = r.b
@@ -118,12 +158,14 @@ function uiText:color(r,g,b)
         r = r.r
     end
 
-    if self.textColor.r ~= r or self.textColor.g ~= g or self.textColor.b ~= b then
-        self.textColor.r = r
-        self.textColor.g = g
-        self.textColor.b = b
+    if private[self].color.r ~= r or private[self].color.g ~= g or private[self].color.b ~= b then
+        private[self].color.r = r
+        private[self].color.g = g
+        private[self].color.b = b
 
-        self.wrappedText:color(r,g,b)
+        if self.isCreated then
+            self.wrappedText:color(r,g,b)
+        end
     end
 
     if a then
@@ -132,24 +174,39 @@ function uiText:color(r,g,b)
 end
 
 function uiText:alpha(a)
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
-    if self.textAlpha ~= a then
-	    self.textAlpha = a
-	    self.wrappedText:alpha(a)
+    if private[self].color.a ~= a then
+	    private[self].color.a = a
+
+        if self.isCreated then
+	        self.wrappedText:alpha(a)
+        end
     end
 end
 
 function uiText:show()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
-	self.wrappedText:show()
+	if not private[self].visible then
+		private[self].visible = true
+
+		if self.isCreated then
+			self.wrappedText:show()
+		end
+	end
 end
 
 function uiText:hide()
-    if not self.enabled then return end
+    if not self.isEnabled then return end
 
-	self.wrappedText:hide()
+	if private[self].visible then
+		private[self].visible = false
+
+		if self.isCreated then
+			self.wrappedText:hide()
+		end
+	end
 end
 
 return uiText

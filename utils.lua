@@ -81,6 +81,22 @@ function utils:round(num, numDecimalPlaces)
 	return math.floor(num + 0.5)
 end
 
+-- stable in-place sorting
+-- @param func a comparison function that returns true when a > b
+function utils:insertionSort(array, func)
+    local len = #array
+    for j = 2, len do
+        local key = array[j]
+        local i = j - 1
+        while i > 0 and func(array[i], key) do
+            array[i + 1] = array[i]
+            i = i - 1
+        end
+        array[i + 1] = key
+    end
+    return array
+end
+
 function utils:log(text, level)
 	if level == nil then
 		level = 2 -- default log level: info

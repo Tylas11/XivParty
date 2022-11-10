@@ -36,8 +36,6 @@ local uiLeader = classes.class(uiContainer)
 
 function uiLeader:init(leaderLayout)
 	if self.super:init(leaderLayout) then
-		self.leaderLayout = leaderLayout
-
 		self.imgParty = self:addChild(uiImage.new(leaderLayout.imgParty))
 		self.imgParty:opacity(0)
 

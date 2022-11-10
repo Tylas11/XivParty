@@ -304,29 +304,30 @@ layout.jobIcon.imgHighlight.color = '#FFFFFFFF'
 -- leader icons
 layout.leader = {}
 layout.leader.enabled = true
-layout.leader.pos = L{ 88, 15 }
+layout.leader.pos = L{ -24, -9 }
 layout.leader.zOrder = 9
+layout.leader.scale = { 1, 1 }
 
 layout.leader.imgParty = {}
 layout.leader.imgParty.enabled = true
 layout.leader.imgParty.pos = L{ 0, 0 }
-layout.leader.imgParty.path = 'assets/Leader.png'
-layout.leader.imgParty.size = L{ 7, 5 }
-layout.leader.imgParty.color = '#E6E159FF'
+layout.leader.imgParty.path = 'assets/XivLeader.png'
+layout.leader.imgParty.size = L{ 24, 24 }
+layout.leader.imgParty.color = '#FFFFFFFF'
 
 layout.leader.imgAlliance = {}
 layout.leader.imgAlliance.enabled = true
-layout.leader.imgAlliance.pos = L{ 0, -5 }
-layout.leader.imgAlliance.path = 'assets/Leader.png'
-layout.leader.imgAlliance.size = L{ 7, 5 }
+layout.leader.imgAlliance.pos = L{ 0, 13 }
+layout.leader.imgAlliance.path = 'assets/XivAllianceLeader.png'
+layout.leader.imgAlliance.size = L{ 24, 24 }
 layout.leader.imgAlliance.color = '#FFFFFFFF'
 
 layout.leader.imgQuarterMaster = {}
 layout.leader.imgQuarterMaster.enabled = true
-layout.leader.imgQuarterMaster.pos = L{ 0, -10 }
-layout.leader.imgQuarterMaster.path = 'assets/Leader.png'
-layout.leader.imgQuarterMaster.size = L{ 7, 5 }
-layout.leader.imgQuarterMaster.color = '#66E659FF'
+layout.leader.imgQuarterMaster.pos = L{ 0, 26 }
+layout.leader.imgQuarterMaster.path = 'assets/XivQuarterMaster.png'
+layout.leader.imgQuarterMaster.size = L{ 24, 24 }
+layout.leader.imgQuarterMaster.color = '#FFFFFFFF'
 
 -- range indicator
 layout.range = {}

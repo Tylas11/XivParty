@@ -47,21 +47,21 @@ function uiListItem:init(layout)
 
 		self.cursor = self:addChild(uiImage.new(layout.cursor))
 		self.cursor:opacity(0)
-		
+
 		self.hpBar = self:addChild(uiStatusBar.new(layout.hp, const.barTypeHp))
 		self.mpBar = self:addChild(uiStatusBar.new(layout.mp, const.barTypeMp))
 		self.tpBar = self:addChild(uiStatusBar.new(layout.tp, const.barTypeTp))
 
 		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon))
-		
+
 		self.nameText = self:addChild(uiText.new(layout.text.name))
 		self.zoneText = self:addChild(uiText.new(layout.text.zone))
-		
+
 		self.jobText = self:addChild(uiText.new(layout.text.job))
 		self.subJobText = self:addChild(uiText.new(layout.text.subJob))
-		
+
 		self.leader = self:addChild(uiLeader.new(layout.leader))
-		
+
 		self.range = self:addChild(uiRange.new(layout.range))
 		self.buffIcons = self:addChild(uiBuffIcons.new(layout.buffIcons))
 	end

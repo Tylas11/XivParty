@@ -62,6 +62,8 @@ end
 
 -- must be called every frame for a smooth animation
 function uiBar:update(targetValue)
+	if not self.isEnabled then return end
+
 	if self.value ~= targetValue then
 		self.exactValue = self.exactValue + (targetValue - self.exactValue) * self.barLayout.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
@@ -102,6 +104,8 @@ function uiBar:updateGlow(targetValue)
 end
 
 function uiBar:opacity(o)
+	if not self.isEnabled then return end
+	
 	self.isDimmed = o < 1
 	self.imgBar:opacity(o)
 end

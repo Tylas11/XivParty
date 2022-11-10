@@ -159,25 +159,25 @@
             <imgAlliance>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <path>assets/Leader.png</path>
-                <pos>0,-5</pos>
-                <size>7,5</size>
+                <path>assets/XivAllianceLeader.png</path>
+                <pos>0,13</pos>
+                <size>24,24</size>
             </imgAlliance>
             <imgParty>
-                <color>#E6E159FF</color>
+                <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <path>assets/Leader.png</path>
+                <path>assets/XivLeader.png</path>
                 <pos>0,0</pos>
-                <size>7,5</size>
+                <size>24,24</size>
             </imgParty>
             <imgQuarterMaster>
-                <color>#66E659FF</color>
+                <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <path>assets/Leader.png</path>
-                <pos>0,-10</pos>
-                <size>7,5</size>
+                <path>assets/XivQuarterMaster.png</path>
+                <pos>0,26</pos>
+                <size>24,24</size>
             </imgQuarterMaster>
-            <pos>88,15</pos>
+            <pos>-24,-9</pos>
             <zOrder>9</zOrder>
         </leader>
         <listItem>

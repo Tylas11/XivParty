@@ -139,29 +139,30 @@
             <zOrder>2</zOrder>
         </jobIcon>
         <leader>
-            <enabled>false</enabled>
+            <enabled>true</enabled>
             <imgAlliance>
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <path>assets/Leader.png</path>
-                <pos>0,-5</pos>
-                <size>7,5</size>
+                <path>assets/XivAllianceLeader.png</path>
+                <pos>0,12</pos>
+                <size>24,24</size>
             </imgAlliance>
             <imgParty>
-                <color>#E6E159FF</color>
+                <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <path>assets/Leader.png</path>
+                <path>assets/XivLeader.png</path>
                 <pos>0,0</pos>
-                <size>7,5</size>
+                <size>24,24</size>
             </imgParty>
             <imgQuarterMaster>
-                <color>#66E659FF</color>
+                <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
-                <path>assets/Leader.png</path>
-                <pos>0,-10</pos>
-                <size>7,5</size>
+                <path>assets/XivQuarterMaster.png</path>
+                <pos>0,24</pos>
+                <size>24,24</size>
             </imgQuarterMaster>
-            <pos>88,15</pos>
+            <pos>0,6</pos>
+            <scale>0.8,0.8</scale>
             <zOrder>3</zOrder>
         </leader>
         <listItem>

@@ -8,21 +8,21 @@
                 <enabled>true</enabled>
                 <path>assets/XivAllyBgBottom.png</path>
                 <pos>0,0</pos>
-                <size>318,5</size>
+                <size>327,5</size>
             </imgBottom>
             <imgMid>
                 <color>#FFFFFFC0</color>
                 <enabled>true</enabled>
                 <path>assets/XivAllyBgMid.png</path>
                 <pos>0,5</pos>
-                <size>318,42</size>
+                <size>327,42</size>
             </imgMid>
             <imgTop>
                 <color>#FFFFFFC0</color>
                 <enabled>true</enabled>
                 <path>assets/XivAllyBgTop.png</path>
                 <pos>0,0</pos>
-                <size>318,5</size>
+                <size>327,5</size>
             </imgTop>
             <pos>0,0</pos>
         </bg>
@@ -34,7 +34,7 @@
             <enabled>true</enabled>
             <path>assets/XivAllyCursor.png</path>
             <pos>0,0</pos>
-            <size>113,53</size>
+            <size>116,53</size>
             <zOrder>0</zOrder>
         </cursor>
         <hp>
@@ -46,44 +46,41 @@
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
                     <path>assets/XivAllyBar.png</path>
-                    <pos>5,5</pos>
-                    <size>55,26</size>
+                    <pos>3,0</pos>
+                    <size>58,64</size>
+                    <snapToRaster>true</snapToRaster>
                 </imgBar>
                 <imgBg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
                     <path>assets/XivAllyBarBG.png</path>
                     <pos>0,0</pos>
-                    <size>65,35</size>
+                    <size>64,64</size>
+                    <snapToRaster>true</snapToRaster>
                 </imgBg>
                 <imgFg>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
                     <path>assets/XivAllyBarFG.png</path>
                     <pos>0,0</pos>
-                    <size>65,35</size>
+                    <size>64,64</size>
+                    <snapToRaster>true</snapToRaster>
                 </imgFg>
-                <imgGlowMid>
+                <imgGlow>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/XivAllyBarGlowMid.png</path>
-                    <pos>0,-12</pos>
-                    <size>8,60</size>
-                </imgGlowMid>
-                <imgGlowSides>
-                    <color>#FFFFFFFF</color>
-                    <enabled>true</enabled>
-                    <path>assets/XivAllyBarGlowSides.png</path>
-                    <pos>0,-12</pos>
-                    <size>3,60</size>
-                </imgGlowSides>
+                    <path>assets/XivAllyBarGlow.png</path>
+                    <pos>3,0</pos>
+                    <size>8,64</size>
+                    <snapToRaster>true</snapToRaster>
+                </imgGlow>
                 <pos>0,0</pos>
             </bar>
             <enabled>true</enabled>
             <hpOrangeColor>#F8BA80FF</hpOrangeColor>
             <hpRedColor>#FC8182FF</hpRedColor>
             <hpYellowColor>#F3F37CFF</hpYellowColor>
-            <pos>42,8</pos>
+            <pos>43,-6</pos>
             <text>
                 <enabled>false</enabled>
             </text>
@@ -130,12 +127,13 @@
                 <color>#FFFFFFFF</color>
                 <enabled>true</enabled>
                 <path />
-                <pos>0,-0.25</pos>
+                <pos>0,0</pos>
                 <size>36,36</size>
             </imgIcon>
             <path>assets/jobIcons/</path>
-            <pos>11,10</pos>
+            <pos>10,10</pos>
             <scale>0.9,0.9</scale>
+            <snapToRaster>true</snapToRaster>
             <zOrder>2</zOrder>
         </jobIcon>
         <leader>
@@ -172,7 +170,7 @@
             <enabled>false</enabled>
         </mp>
         <partyList>
-            <columnWidth>102</columnWidth>
+            <columnWidth>105</columnWidth>
             <columns>3</columns>
             <rowHeight>42</rowHeight>
             <rows>2</rows>

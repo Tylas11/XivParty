@@ -26,6 +26,7 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
 require('lists')
 
 -- the order of entires in this list defines the sort order of buffs for all party members
@@ -743,7 +744,7 @@ local buffOrder = L{
 	{id=232,en="(N/A)",ja="（未使用）",enl="(N/A)",jal="（未使用）"},
 }
 
-function getBuffOrderWithIdKeys(b)
+local function getBuffOrderWithIdKeys(b)
 	local ret = {}
 	local sort = 0
 	for entry in b:it() do

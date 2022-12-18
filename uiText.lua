@@ -84,6 +84,7 @@ function uiText:dispose()
 
     if self.isCreated then
         texts.destroy(self.wrappedText)
+        RefCountText = RefCountText - 1
     end
     private[self] = nil
 
@@ -102,6 +103,7 @@ function uiText:createPrimitives()
     }
 
     self.wrappedText = texts.new(textSettings)
+    RefCountText = RefCountText + 1
     self.wrappedText:bg_visible(false)
     self.wrappedText:font(private[self].font, 'Arial') -- Arial is the fallback font
     self.wrappedText:text(private[self].text)

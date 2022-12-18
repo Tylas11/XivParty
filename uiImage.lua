@@ -98,6 +98,7 @@ function uiImage:dispose()
 
 	if self.isCreated then
     	images.destroy(self.wrappedImage)
+		RefCountImage = RefCountImage - 1
 	end
 	private[self] = nil
 
@@ -108,6 +109,7 @@ function uiImage:createPrimitives()
 	if not self.isEnabled or self.isCreated then return end
 
 	self.wrappedImage = images.new()
+	RefCountImage = RefCountImage + 1
 	self.wrappedImage:draggable(false)
 	self.wrappedImage:fit(false) -- scaling only works when 'fit' is false
 
@@ -128,7 +130,7 @@ end
 function uiImage:applyLayout()
 	if not self.isEnabled then return end
 
-	self.absoluteWidth = self.width * self.absoluteScale.x;
+	self.absoluteWidth = self.width * self.absoluteScale.x
 	self.absoluteHeight = self.height * self.absoluteScale.y
 
 	if self.isCreated then
@@ -171,7 +173,7 @@ function uiImage:repeat_xy(x, y)
 		private[self].repeatY = y
 
 		if self.isCreated then
-			self.wrappedImage:repeat_xy(x, y) -- TODO: scale this as well? need to test with ffxi bg texture
+			self.wrappedImage:repeat_xy(x, y)
 		end
 	end
 end

@@ -26,10 +26,15 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
+local res = require('resources')
+
 -- imports
 local classes = require('classes')
 local jobs = require('jobs')
+local buffOrder = require('buffOrder')
 local const= require('const')
+local utils = require('utils')
 
 -- create the class
 local player = classes.class()
@@ -41,7 +46,7 @@ function player:init(name, id, model)
 		utils:log('player:init missing parameter name or id!', 4)
 		return
 	end
-	
+
 	local initText = ''
 	if name then
 		initText = initText .. '. Name = ' .. name
@@ -63,33 +68,33 @@ function player:merge(other)
 
 	if other.name then self.name = other.name end
 	if other.id and other.id > 0 then self.id = other.id end
-	
+
 	if other.hp then self.hp = other.hp end
 	if other.mp then self.mp = other.mp end
 	if other.tp then self.tp = other.tp end
 	if other.hpp then self.hpp = other.hpp end
 	if other.mpp then self.mpp = other.mpp end
 	if other.tpp then self.tpp = other.tpp end
-	
+
 	if other.isSelected ~= nil then self.isSelected = other.isSelected end
 	if other.isSubTarget ~= nil then self.isSubTarget = other.isSubTarget end
 	if other.distance then self.distance = other.distance end
 	if other.zone then self.zone = other.zone end
-	
+
 	if other.isTrust ~= nil then self.isTrust = other.isTrust end
-	
+
 	if other.job then self.job = other.job end
 	if other.jobLvl then self.jobLvl = other.jobLvl end
 	if other.subJob then self.subJob = other.subJob end
 	if other.subJobLvl then self.subJobLvl = other.subJobLvl end
-	
+
 	if other.buffs then self.buffs = other.buffs end
 	if other.filteredBuffs then self.filteredBuffs = other.filteredBuffs end
-	
+
 	if other.isLeader ~= nil then self.isLeader = other.isLeader end
 	if other.isAllianceLeader ~= nil then self.isAllianceLeader = other.isAllianceLeader end
 	if other.isQuarterMaster ~= nil then self.isQuarterMaster = other.isQuarterMaster end
-	
+
 	return self
 end
 
@@ -105,20 +110,20 @@ function player:update(member, target, subtarget)
 
 	self.isSelected = target and member.mob and target.id == member.mob.id
 	self.isSubTarget = subtarget and member.mob and subtarget.id == member.mob.id
-	
+
 	self.zone = member.zone
-	
+
 	if member.mob then
 		self.id = member.mob.id
 		self.distance = member.mob.distance
 		self.isTrust = member.mob.is_npc
-		
+
 		if self.isTrust and (self.job == nil or self.jobLvl == nil or self.jobLvl == 0) then -- optimization: only update if job/lvl not set
 			local trustInfo = jobs:getTrustInfo(self.name, member.mob.models[1])
 			if trustInfo then
 				self.job = trustInfo.job
 				self.subJob = trustInfo.subJob
-				
+
 				if self.model then 
 					local partyLeader = self.model:findPartyLeader() -- get leader of main party
 					if partyLeader and partyLeader.jobLvl then
@@ -127,19 +132,19 @@ function player:update(member, target, subtarget)
 					end
 				end
 			else
-				utils:log('Failed to get trust info for ' .. self.name, 4)
+				utils:log('Failed to get trust info for ' .. self.name, 3) -- TODO: this message spams if it triggers, probably best to disable it
 			end
 		end
 	else
 		self.distance = 99999 -- no mob means player too far to target
 	end
-	
+
 	local mainPlayer = windower.ffxi.get_player()
 	if member.name == mainPlayer.name then -- set buffs and job info for main player
 		self:updateBuffs(mainPlayer.buffs)
 		self.job = res.jobs[mainPlayer.main_job_id].ens
 		self.jobLvl = mainPlayer.main_job_level
-		
+
 		if mainPlayer.sub_job_id then -- only if subjob is set
 			self.subJob = res.jobs[mainPlayer.sub_job_id].ens
 			self.subJobLvl = mainPlayer.sub_job_level
@@ -147,26 +152,39 @@ function player:update(member, target, subtarget)
 	end
 end
 
+local function buffOrderCompare(a, b)
+	local orderA = buffOrder[a]
+	local orderB = buffOrder[b]
+
+	if not orderA then
+		return false
+	elseif not orderB then
+		return true
+	end
+
+	return buffOrder[a] < buffOrder[b]
+end
+
 function player:updateBuffs(buffs)
 	self.buffs = buffs -- list of all buffs this player has
 	self.filteredBuffs = T{} -- list of filtered buffs to be displayed
-	
+
 	if not buffs then return end
-	
+
 	for i = 1, const.maxBuffs do
-		buff = buffs[i]
-		
-		if (settings.buffs.filterMode == 'blacklist' and settings.buffFilters[buff]) or 
-		   (settings.buffs.filterMode == 'whitelist' and not settings.buffFilters[buff]) then
+		local buff = buffs[i]
+
+		if (Settings.buffs.filterMode == 'blacklist' and Settings.buffFilters[buff]) or 
+		   (Settings.buffs.filterMode == 'whitelist' and not Settings.buffFilters[buff]) then
 			buff = nil
 		end
-		
+
 		if buff then
 			self.filteredBuffs:append(buff)
 		end
 	end
-	
-	if settings.buffs.customOrder then
+
+	if Settings.buffs.customOrder then
 		self.filteredBuffs:sort(buffOrderCompare)
 	else
 		self.filteredBuffs:sort()
@@ -190,13 +208,13 @@ function player:updateJobFromPacket(packet)
 	local mJobLvl = packet['Main job level']
 	local sJob =  packet['Sub job']
 	local sJobLvl = packet['Sub job level']
-	
+
 	if (mJob and mJobLvl and sJob and sJobLvl and mJobLvl > 0) then
 		self.job = res.jobs[mJob].ens
 		self.jobLvl = mJobLvl
 		self.subJob = res.jobs[sJob].ens
 		self.subJobLvl = sJobLvl
-		
+
 		utils:log('Set job info: '.. self.job ..tostring(mJobLvl)..'/'.. self.subJob ..tostring(sJobLvl), 0)
 	else
 		utils:log('Unusable job info. Dropping.', 0)
@@ -210,41 +228,28 @@ function player:createSetupData(job, subJob, isMainParty)
 	self.hpp = self.hp / 2500 * 100
 	self.mpp = math.random(50, 100)
 	self.tpp = math.min(self.tp / 1000 * 100, 100)
-	
+
 	self.zone = windower.ffxi.get_info().zone
-	
+
 	self.isSelected = false
 	self.isSubTarget = false
 	self.distance = math.random(0, 400)
 	self.isTrust = false
-	
+
 	self.job = job
 	self.jobLvl = 99
 	self.subJob = subJob
 	self.subJobLvl = 49
-	
+
 	self.buffs = {}
-	
+
 	if isMainParty then
 		for i = 1, const.maxBuffs do
 			self.buffs[i] = math.random(1, 631)
 		end
 	end
-	
+
 	self:updateBuffs(self.buffs)
-end
-
-function buffOrderCompare(a, b)
-	local orderA = buffOrder[a]
-	local orderB = buffOrder[b]
-
-	if not orderA then
-		return false
-	elseif not orderB then
-		return true
-	end
-	
-	return buffOrder[a] < buffOrder[b]
 end
 
 return player

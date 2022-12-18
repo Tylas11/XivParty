@@ -31,24 +31,20 @@ _addon.author = 'Tylas'
 _addon.version = '1.7.0'
 _addon.commands = {'xp', 'xivparty'}
 
-config = require('config')
-packets = require('packets')
-res = require('resources')
+-- windower library imports
+local packets = require('packets')
+local res = require('resources')
 require('logger')
 require('strings')
 require('lists')
 require('tables')
 
+-- imports
 local const = require('const')
-utils = require('utils')
-require('player')
-
-local model = require('model').new()
-
-settings = require('settings')
-buffOrder = require('buffOrder')
-
+local utils = require('utils')
 local view = require('view')
+local model = require('model').new()
+Settings = require('settings')
 
 local isLoaded = false
 local isInitialized = false
@@ -57,20 +53,25 @@ local hidden = false
 
 math.randomseed(os.time())
 
+-- debugging
+
+RefCountImage = 0
+RefCountText = 0
+
 -- initialization / dispose / events
 
 windower.register_event('load', function()
 	if windower.ffxi.get_info().logged_in then
-		settings:init(model)
-		settings:load()
+		Settings:init(model)
+		Settings:load()
 		isLoaded = true
 	end
 end)
 
 windower.register_event('login', function()
 	if not isLoaded then
-		settings:init(model)
-		settings:load()
+		Settings:init(model)
+		Settings:load()
 		isLoaded = true
 	end
 end)
@@ -80,7 +81,7 @@ windower.register_event('logout', function()
 end)
 
 windower.register_event('status change', function(status)
-	if settings.hideCutscenes and not hidden and status == 4 then -- hide UI during cutscenes
+	if Settings.hideCutscenes and not hidden and status == 4 then -- hide UI during cutscenes
 		hidden = true
 		view:hide()
 	elseif hidden and status ~= 4 then
@@ -89,18 +90,22 @@ windower.register_event('status change', function(status)
 	end
 end)
 
-function init()
-	if settings.hideSolo and isSolo() then return end
+local function isSolo()
+	return windower.ffxi.get_party().party1_leader == nil
+end
+
+local function init()
+	if Settings.hideSolo and isSolo() then return end
 	if isInitialized then return end
-	
+
 	utils:log('Initializing...')
 	view:init(model)
 	view:show()
-	
+
 	isInitialized = true
 end
 
-function dispose()
+local function dispose()
 	if not isInitialized then return end
 
 	utils:log('Disposing...')
@@ -109,14 +114,19 @@ function dispose()
 	isInitialized = false
 end
 
+local function zoningFinished()
+	zoning = false
+	init()
+end
+
 -- per frame updating
 
 windower.register_event('prerender', function()
 	if zoning then return end
-	
-	settings:update()
-	
-	if settings.hideSolo then
+
+	Settings:update()
+
+	if Settings.hideSolo then
 		if not isSolo() and not isInitialized then
 			init()
 		elseif isSolo() and isInitialized then
@@ -125,9 +135,9 @@ windower.register_event('prerender', function()
 	elseif windower.ffxi.get_info().logged_in and not isInitialized then
 		init()
 	end
-    
+
 	if not isInitialized then return end
-	
+
 	model:updatePlayers()
 	view:update()
 end)
@@ -149,14 +159,14 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				end
 			end
 		end
-	
+
 		if id == 0xDF then -- char update
 			local packet = packets.parse('incoming', original)
 			if packet then
 				local playerId = packet['ID']
 				if playerId and playerId > 0 then
 					utils:log('PACKET: Char update for player ID: '..playerId, 0)
-					
+
 					local foundPlayer = model:getPlayer(nil, playerId, 'char')
 					foundPlayer:updateJobFromPacket(packet)
 				else
@@ -164,7 +174,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				end
 			end
 		end
-		
+
 		if id == 0xDD then -- party member update
 			local packet = packets.parse('incoming', original)
 			if packet then
@@ -172,7 +182,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				local playerId = packet['ID']
 				if name and playerId and playerId > 0 then
 					utils:log('PACKET: Party member update for '..name, 0)
-					
+
 					local foundPlayer = model:getPlayer(name, playerId, 'party')
 					foundPlayer:updateJobFromPacket(packet)
 				else
@@ -181,30 +191,30 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 			end
 		end
 	end
-	
+
 	if not zoning and id == 0x076 then -- party buffs (Credit: Kenshi, PartyBuffs)
 		for k = 0, 4 do
 			local playerId = original:unpack('I', k*48+5)
-			
+
 			if playerId ~= 0 then -- NOTE: main player buffs are not available here
 				local buffsList = {}
-				
+
 				for i = 1, const.maxBuffs do -- starting at 1 to match the offset in windower.ffxi.get_player().buffs
 					local buff = original:byte(k*48+5+16+i-1) + 256*( math.floor( original:byte(k*48+5+8+ math.floor((i-1)/4)) / 4^((i-1)%4) )%4) -- Credit: Byrth, GearSwap
-					
+
 					if buff == 255 then -- empty buff
 						buff = nil
 					end
 					buffsList[i] = buff
 				end
-				
+
 				local foundPlayer = model:getPlayer(nil, playerId, 'buffs')
 				foundPlayer:updateBuffs(buffsList)
 				utils:log('Updated buffs for player with ID ' .. tostring(playerId), 1)
 			end
 		end
 	end
-	
+
 	if id == 0xB then -- zoning, also happens on log out
 		utils:log('Zoning...')
 		zoning = true
@@ -216,13 +226,66 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 	end
 end)
 
--- utilities
+-- commands / help
 
-function isSolo()
-	return windower.ffxi.get_party().party1_leader == nil
+-- TODO: update help with hide alliance, hide cutscenes and possibly more commands
+local function showHelp()
+	log('Commands: //xivparty or //xp')
+	log('filter - hides specified buffs in party list. Use command \"buffs\" to find out IDs.')
+	log('   add <ID> - adds filter for a buff (e.g. //xp filter add 123)')
+	log('   remove <ID> - removes filter for a buff')
+	log('   clear - removes all filters')
+	log('   list - shows list of currently set filters')
+	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
+	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
+	log('range <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
+	log('customOrder - toggles custom buff order (customize in bufforder.lua)')
+	log('hideSolo - hides the party list while solo')
+	log('alignBottom - expands the party list from bottom to top')
+	log('job - toggles job specific settings for current job')
+	log('setup - move the UI using drag and drop, hold CTRL for grid snap, mouse wheel to scale the UI')
+	log('layout <file> - loads a UI layout file')
 end
 
-function checkBuff(buffId)
+local function handleCommand(currentValue, argsString, text, option1String, option1Value, option2String, option2Value, isNowText)
+	local setValue
+	if not isNowText then
+		isNowText = 'is now'
+	end
+
+	if argsString and string.lower(argsString) == option1String then
+		setValue = option1Value
+	elseif argsString and string.lower(argsString) == option2String then
+		setValue = option2Value
+	elseif not argsString or argsString == '' then
+		if currentValue == option1Value then
+			setValue = option2Value
+		else
+			setValue = option1Value
+		end
+	else
+		error('Unknown parameter \'' .. argsString .. '\'.')
+		return currentValue
+	end
+
+	local setString = option1String
+	if setValue == option2Value then
+		setString = option2String
+	end
+	log(text .. ' ' .. isNowText .. ' ' .. setString .. '.')
+
+	return setValue
+end
+
+local function handleCommandOnOff(currentValue, argsString, text, plural)
+	local isNowText = nil
+	if plural then
+		isNowText = 'are now'
+	end
+	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false, isNowText)
+end
+
+local function checkBuff(buffId)
 	if buffId and res.buffs[buffId] then
 		return true
 	elseif not buffId then
@@ -230,11 +293,11 @@ function checkBuff(buffId)
 	else
 		error('Buff with ID ' .. buffId .. ' not found.')
 	end
-	
+
 	return false
 end
 
-function getBuffText(buffId)
+local function getBuffText(buffId)
 	local buffData = res.buffs[buffId]
 	if buffData then
 		return buffData.en .. ' (' .. buffData.id .. ')'
@@ -243,7 +306,7 @@ function getBuffText(buffId)
 	end
 end
 
-function getRange(arg)
+local function getRange(arg)
 	if not arg then return nil end
 
 	local range = string.lower(arg)
@@ -252,20 +315,13 @@ function getRange(arg)
 	else
 		range = tonumber(range)
 	end
-	
+
 	if not range then
 		error('Invalid range \'' .. arg .. '\'.')
 	end
-	
+
 	return range
 end
-
-function zoningFinished()
-	zoning = false
-	init()
-end
-
--- commands / help
 
 windower.register_event('addon command', function(...)
 	local args = T{...}
@@ -273,7 +329,7 @@ windower.register_event('addon command', function(...)
 	if args[1] then
 		command = string.lower(args[1])
 	end
-	
+
 	if command == 'setup' then
 		if not isInitialized then
 			error('Party list not initialized. Join a party or disable hiding while solo.')
@@ -282,52 +338,53 @@ windower.register_event('addon command', function(...)
 			view:setupEnabled(ret)
 		end
 	elseif command == 'hidesolo' then
-		local ret = handleCommandOnOff(settings.hideSolo, args[2], 'Party list hiding while solo')
-		settings.hideSolo = ret
-		settings:save()
+		local ret = handleCommandOnOff(Settings.hideSolo, args[2], 'Party list hiding while solo')
+		Settings.hideSolo = ret
+		Settings:save()
 	elseif command == 'hidealliance' then
-		local ret = handleCommandOnOff(settings.hideAlliance, args[2], 'Alliance list hiding')
+		local ret = handleCommandOnOff(Settings.hideAlliance, args[2], 'Alliance list hiding')
 		dispose()
-		settings.hideAlliance = ret
-		settings:save()
+		Settings.hideAlliance = ret
+		Settings:save()
 		init()
 	elseif command == 'hidecutscenes' then
-		local ret = handleCommandOnOff(settings.hideCutscenes, args[2], 'Party list hiding during cutscenes')
-		settings.hideCutscenes = ret
-		settings:save()
+		local ret = handleCommandOnOff(Settings.hideCutscenes, args[2], 'Party list hiding during cutscenes')
+		Settings.hideCutscenes = ret
+		Settings:save()
 	elseif command == 'alignbottom' then
-		local ret = handleCommandOnOff(settings.party.alignBottom, args[2], 'Bottom alignment')
-		settings.party.alignBottom = ret
-		settings.alliance1.alignBottom = ret
-		settings.alliance2.alignBottom = ret
-		settings:save()
+		local ret = handleCommandOnOff(Settings.party.alignBottom, args[2], 'Bottom alignment')
+		-- TODO: maybe we want to set these separately?
+		Settings.party.alignBottom = ret
+		Settings.alliance1.alignBottom = ret
+		Settings.alliance2.alignBottom = ret
+		Settings:save()
 		view:update(true) -- force a redraw
 	elseif command == 'customorder' then
-		local ret = handleCommandOnOff(settings.buffs.customOrder, args[2], 'Custom buff order')
-		settings.buffs.customOrder = ret
-		settings:save()
+		local ret = handleCommandOnOff(Settings.buffs.customOrder, args[2], 'Custom buff order')
+		Settings.buffs.customOrder = ret
+		Settings:save()
 	elseif command == 'range' then
 		if args[2] then
 			local range1 = getRange(args[2])
 			local range2 = getRange(args[3])
 			if range1 then
-				settings.rangeIndicator = range1
+				Settings.rangeIndicator = range1
 				if range2 then
-					settings.rangeIndicatorFar = range2
-					if settings.rangeIndicator > settings.rangeIndicatorFar then
-						settings.rangeIndicator = range2
-						settings.rangeIndicatorFar = range1
+					Settings.rangeIndicatorFar = range2
+					if Settings.rangeIndicator > Settings.rangeIndicatorFar then
+						Settings.rangeIndicator = range2
+						Settings.rangeIndicatorFar = range1
 					end
 					log('Range indicators set to ' .. tostring(range1) .. ' / ' .. tostring(range2) .. '.')
 				else
-					settings.rangeIndicatorFar = 0
+					Settings.rangeIndicatorFar = 0
 					if range1 > 0 then
 						log('Range indicator set to ' .. tostring(range1) .. '.')
 					else
 						log('Range indicator disabled.')
 					end
 				end
-				settings:save()
+				Settings:save()
 			end
 		else
 			showHelp()
@@ -337,35 +394,35 @@ windower.register_event('addon command', function(...)
 		if subCommand == 'add' then
 			local buffId = tonumber(args[3])
 			if checkBuff(buffId) then
-				settings.buffFilters[buffId] = true
-				settings:save()
+				Settings.buffFilters[buffId] = true
+				Settings:save()
 				model:refreshFilteredBuffs()
 				log('Added buff filter for ' .. getBuffText(buffId))
 			end
 		elseif subCommand == 'remove' then
 			local buffId = tonumber(args[3])
 			if checkBuff(buffId) then
-				settings.buffFilters[buffId] = nil
-				settings:save()
+				Settings.buffFilters[buffId] = nil
+				Settings:save()
 				model:refreshFilteredBuffs()
 				log('Removed buff filter for ' .. getBuffText(buffId))
 			end
 		elseif subCommand == 'clear' then
-			settings.buffFilters = T{}
-			settings:save()
+			Settings.buffFilters = T{}
+			Settings:save()
 			model:refreshFilteredBuffs()
 			log('All buff filters cleared.')
 		elseif subCommand == 'list' then
-			log('Currently active buff filters (' .. settings.buffs.filterMode .. '):')
-			for buffId, doFilter in pairs(settings.buffFilters) do
+			log('Currently active buff filters (' .. Settings.buffs.filterMode .. '):')
+			for buffId, doFilter in pairs(Settings.buffFilters) do
 				if doFilter then
 					log(getBuffText(buffId))
 				end
 			end
 		elseif subCommand == 'mode' then
-			local ret = handleCommand(settings.buffs.filterMode, args[3], 'Filter mode', 'blacklist', 'blacklist', 'whitelist', 'whitelist')
-			settings.buffs.filterMode = ret
-			settings:save()
+			local ret = handleCommand(Settings.buffs.filterMode, args[3], 'Filter mode', 'blacklist', 'blacklist', 'whitelist', 'whitelist')
+			Settings.buffs.filterMode = ret
+			Settings:save()
 			model:refreshFilteredBuffs()
 		else
 			showHelp()
@@ -394,19 +451,18 @@ windower.register_event('addon command', function(...)
 		end
 	elseif command == 'layout' then
 		if args[2] then
-			local isAuto = args[2] == const.layoutAuto
-			local filename = const.layoutDir .. args[2] .. '.xml'
-			
-			if isAuto or windower.file_exists(windower.addon_path .. filename) then
-				if isAuto then
-					log('Enabled automatic resolution based layout selection.')
-				else
-					log('Loading layout \'' .. args[2] .. '\'.')
-				end
-				
+			if args[2]:endswith(const.xmlExtension) then
+				args[2] = args[2]:slice(1, #args[2] - #const.xmlExtension) -- trim the file extension
+			end
+
+			local filename = const.layoutDir .. args[2] .. const.xmlExtension
+
+			if windower.file_exists(windower.addon_path .. filename) then
+				log('Loading layout \'' .. args[2] .. '\'.')
+
 				dispose()
-				settings.layout = args[2]
-				settings:save()
+				Settings.layout = args[2]
+				Settings:save()
 				init()
 			else
 				error('The layout file \'' .. filename .. '\' does not exist!')
@@ -416,80 +472,26 @@ windower.register_event('addon command', function(...)
 		end
 	elseif command == 'job' then
 		local job = windower.ffxi.get_player().main_job
-		local ret = handleCommandOnOff(settings.jobEnabled, args[2], 'Job specific settings for ' .. job, true)
-		
+		local ret = handleCommandOnOff(Settings.jobEnabled, args[2], 'Job specific settings for ' .. job, true)
+
 		if ret then
-			if not settings.jobEnabled then
-				settings:load(true, true)
+			if not Settings.jobEnabled then
+				Settings:load(true, true)
 				log('Settings changes to range and buffs will now only affect this job.')
 			end
-		elseif settings.jobEnabled then
-			settings.jobEnabled = false
-			settings:save()
-			settings:load()
+		elseif Settings.jobEnabled then
+			Settings.jobEnabled = false
+			Settings:save()
+			Settings:load()
 			log('Global settings applied. The job specific settings for ' .. job .. ' will remain saved for later use.')
 		end
 	elseif command == 'debug' then
 		if args[2] == 'savelayout' then
 			view:debugSaveLayout()
+		elseif args[2] == 'refcount' then
+			log('Images: ' .. RefCountImage .. ', Texts: ' .. RefCountText)
 		end
 	else
 		showHelp()
 	end
 end)
-
-function handleCommandOnOff(currentValue, argsString, text, plural)
-	local isNowText = nil
-	if plural then
-		isNowText = 'are now'
-	end
-	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false, isNowText)
-end
-
-function handleCommand(currentValue, argsString, text, option1String, option1Value, option2String, option2Value, isNowText)
-	local setValue
-	if not isNowText then
-		isNowText = 'is now'
-	end
-
-	if argsString and string.lower(argsString) == option1String then
-		setValue = option1Value
-	elseif argsString and string.lower(argsString) == option2String then
-		setValue = option2Value
-	elseif not argsString or argsString == '' then
-		if currentValue == option1Value then
-			setValue = option2Value
-		else
-			setValue = option1Value
-		end
-	else
-		error('Unknown parameter \'' .. argsString .. '\'.')
-		return currentValue
-	end
-	
-	local setString = option1String
-	if setValue == option2Value then
-		setString = option2String
-	end
-	log(text .. ' ' .. isNowText .. ' ' .. setString .. '.')
-	
-	return setValue
-end
-
-function showHelp()
-	log('Commands: //xivparty or //xp')
-	log('filter - hides specified buffs in party list. Use command \"buffs\" to find out IDs.')
-	log('   add <ID> - adds filter for a buff (e.g. //xp filter add 123)')
-	log('   remove <ID> - removes filter for a buff')
-	log('   clear - removes all filters')
-	log('   list - shows list of currently set filters')
-	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
-	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
-	log('range <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
-	log('customOrder - toggles custom buff order (customize in bufforder.lua)')
-	log('hideSolo - hides the party list while solo')
-	log('alignBottom - expands the party list from bottom to top')
-	log('job - toggles job specific settings for current job')
-	log('setup - move the UI via drag and drop, hold CTRL for grid snap, mouse wheel to adjust space between party members')
-	log('layout <file> - loads a UI layout file. Use \'auto\' to enable resolution based selection.')
-end

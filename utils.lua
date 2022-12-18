@@ -26,6 +26,9 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
+require('strings')
+
 local utils = {}
 
 -- log levels:

@@ -26,7 +26,10 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
 require('lists')
+
+-- imports
 local utils = require('utils')
 
 local jobs = {}
@@ -136,6 +139,7 @@ jobs.trusts = L{
 	{ name = 'Zazarg', job = 'MNK' },
 	{ name = 'Zeid', job = 'DRK', model = 3010 },
 	{ name = 'Zeid', job = 'DRK', model = 3086 }, -- Zeid II
+	{ name = 'Matsui-P', job = 'NIN', subJob = 'BLM' },
 	-- ranged
 	{ name = 'Elivira', job = 'RNG', subJob = 'WAR' },
 	{ name = 'Makki-Chebukki', job = 'RNG' },

@@ -26,6 +26,9 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
+local res = require('resources')
+
 -- imports
 local classes = require('classes')
 local uiContainer = require('uiContainer')

@@ -32,6 +32,7 @@ local uiContainer = require('uiContainer')
 local uiBar = require('uiBar')
 local uiText = require('uiText')
 local const = require('const')
+local utils = require('utils')
 
 -- create the class, derive from uiContainer
 local uiStatusBar = classes.class(uiContainer)

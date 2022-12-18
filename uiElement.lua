@@ -73,6 +73,11 @@ function uiElement:init(baseLayout)
         self.zOrder = baseLayout.zOrder
     end
 
+    self.snapToRaster = false
+    if baseLayout and baseLayout.snapToRaster ~= nil then
+        self.snapToRaster = baseLayout.snapToRaster
+    end
+
     return self.isEnabled
 end
 
@@ -105,6 +110,11 @@ function uiElement:layoutElement()
         self.absolutePos.y = self.posY
         self.absoluteScale.x = self.scaleX
         self.absoluteScale.y = self.scaleY
+    end
+
+    if self.snapToRaster then
+        self.absolutePos.x = math.floor(self.absolutePos.x)
+        self.absolutePos.y = math.floor(self.absolutePos.y)
     end
 
     self:applyLayout()

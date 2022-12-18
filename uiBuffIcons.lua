@@ -31,6 +31,7 @@ local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 local const = require('const')
+local utils = require('utils')
 
 -- create the class, derive from uiContainer
 local uiBuffIcons = classes.class(uiContainer)

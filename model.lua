@@ -29,6 +29,7 @@
 -- imports
 local classes = require('classes')
 local player = require('player')
+local utils = require('utils')
 
 -- create the class
 local model = classes.class()
@@ -37,7 +38,7 @@ local partyKeys = { 'p%i', 'a1%i', 'a2%i' }
 
 function model:init()
 	-- NOTE: in lua list indices start with 1. when forced to index 0, iterating with :it() will work but out of order
-	
+
 	self.allPlayers = T{} -- unordered list of all players that we ever received data for
 
 	self.parties = T{}
@@ -63,11 +64,11 @@ function model:updatePlayers()
 	local members = T(windower.ffxi.get_party())
 	local target = windower.ffxi.get_mob_by_target('t')
 	local subtarget = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('stpt') or windower.ffxi.get_mob_by_target('stal')
-	
+
 	for i = 0, 17 do
 		local idx = (i / 6):floor()
 		local member = members[string.format(partyKeys[idx + 1], i % 6)]
-		
+
 		if member and member.name then
 			local id
 			if member.mob and member.mob.id > 0 then
@@ -75,7 +76,7 @@ function model:updatePlayers()
 			end
 			local foundPlayer = self:getPlayer(member.name, id, 'member')
 			foundPlayer:update(member, target, subtarget)
-			
+
 			self.parties[idx][i % 6] = foundPlayer
 		else
 			self.parties[idx][i % 6] = nil
@@ -89,12 +90,12 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 	local foundPlayer
 	local foundByName
 	local foundById
-	
+
 	if not name and not id then
 		utils:log('Attempted a player lookup without name and ID.', 4)
 		return nil
 	end
-	
+
 	for ap in self.allPlayers:it() do
 		if name and ap.name == name then
 			foundByName = ap
@@ -103,13 +104,13 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 			foundById = ap
 		end
 	end
-	
+
 	-- found by both, but they are not the same object
 	if foundByName and foundById and foundByName ~= foundById then
 		-- both have an ID but it is not the same, this can happen if players/trusts left the party and are still in the allPlayers list
 		if foundByName.id ~= nil and foundById.id ~= nil and foundByName.id > 0 and foundById.id > 0 and foundByName.id ~= foundById.id then
 			utils:log('ID conflict finding player, returning player with higher ID.', 2)
-		
+
 			-- use the player with the higher ID (most likely newer, confirmed true for trusts)
 			if foundByName.id > foundById.id then
 				foundPlayer = foundByName
@@ -128,14 +129,14 @@ function model:getPlayer(name, id, debugTag, dontCreate)
 		else
 			foundPlayer = foundById
 		end
-		
+
 		if not foundPlayer and not dontCreate then
 			utils:log('Creating new player (' .. debugTag .. ')', 2)
 			foundPlayer = player.new(name, id, self)
 			self.allPlayers:append(foundPlayer)
 		end
 	end
-	
+
 	return foundPlayer
 end
 
@@ -148,18 +149,18 @@ end
 function model:findPartyLeader(partyIndex)
 	if not partyIndex then partyIndex = 0 end
 
-    for player in self.parties[partyIndex]:it() do
-        if player.isLeader then
-            return player
+    for p in self.parties[partyIndex]:it() do
+        if p.isLeader then
+            return p
         end
     end
-    
+
     return nil
 end
 
 function model:refreshFilteredBuffs()
-	for player in self.allPlayers:it() do -- TODO: alliance members might not have buff information, could only iterate the main party list as a minor optimization
-		player:refreshFilteredBuffs()
+	for p in self.parties[0]:it() do -- alliance members do not have buff information, only iterate the main party list as a minor optimization
+		p:refreshFilteredBuffs()
 	end
 end
 

@@ -32,11 +32,13 @@ local uiContainer = require('uiContainer')
 local uiBackground = require('uiBackground')
 local uiListItem = require('uiListItem')
 local uiImage = require('uiImage')
+local const = require('const')
+local utils = require('utils')
 
 -- create the class
 local uiPartyList = classes.class(uiContainer)
 
-function uiPartyList:init(party, partySettings, layout)
+function uiPartyList:init(party, partySettings, layout, isMainParty)
     if not party then
 		utils:log('uiPartyList:init missing parameter party!', 4)
 		return
@@ -60,8 +62,31 @@ function uiPartyList:init(party, partySettings, layout)
 		self.isCtrlDown = false
 		self.hidden = false
 
-		self.posX = partySettings.posX
-		self.posY = partySettings.posY
+		local scale = utils:coord(partySettings.scale)
+		local pos = utils:coord(partySettings.pos)
+
+		-- initialize the UI position and scale based on the screen resolution
+		if scale.x == 0 and scale.y == 0 then
+			local resY = windower.get_windower_settings().ui_y_res
+			scale.x = utils:round(resY / const.baseResY, 2)
+			scale.y = scale.x
+
+			pos.x = pos.x * scale.x
+			pos.y = pos.y * scale.y
+
+			if isMainParty then
+				log('Initializing UI scale: ' .. scale.x)
+				log('Type "//xp setup" to change UI position and scale using drag & drop and the mouse wheel.')
+			end
+
+			partySettings.scale = L{ scale.x, scale.y }
+			Settings:save()
+		end
+
+        self.posX = pos.x
+        self.posY = pos.y
+		self.scaleX = scale.x
+		self.scaleY = scale.y
 		
 		self.background = self:addChild(uiBackground.new(layout.bg))
 		self.bgPos = utils:coord(layout.bg.pos)
@@ -235,7 +260,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
                 end
             
                 if self.partySettings.alignBottom then
-                    self:pos(posX, posY + self.dragImage.height)
+                    self:pos(posX, posY + self.dragImage.height) -- TODO: re-test this
                 else
                     self:pos(posX, posY)
                 end
@@ -252,11 +277,10 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
         -- mouse left release
         elseif type == 2 then
             if self.dragged then
-                self.partySettings.posX = self.posX
-                self.partySettings.posY = self.posY
+                self.partySettings.pos = L{ self.posX, self.posY }
                 
-                utils:log('Saving position: ' .. self.posX .. ', ' .. self.posY)
-                settings:save()
+                log('Position: ' .. self.posX .. ', ' .. self.posY)
+                Settings:save()
                 
                 self.dragged = nil
                 return true
@@ -265,15 +289,16 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
         -- mouse scroll
         elseif type == 10 then
             if self.dragImage:hover(x, y) then
-                --self.partySettings.itemSpacing = math.max(0, self.partySettings.itemSpacing + delta)
-                --settings:save()
-                
-                --self:update(true) -- force a redraw
-
-				-- TODO: this is the coolest thing ever! but it needs to be saved in party settings
 				local sx = math.max(0.25, self.scaleX + delta / 100)
 				local sy = math.max(0.25, self.scaleY + delta / 100)
 				self:scale(sx, sy)
+
+				self.partySettings.scale = L{ sx, sy }
+
+				log('Scale: ' .. sx .. ', ' .. sy)
+                Settings:save()
+
+				return true
             end
         end
     end

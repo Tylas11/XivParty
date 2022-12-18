@@ -26,10 +26,16 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
+local config = require('config')
+local res = require('resources')
+
+-- imports
 local uiPartyList = require('uiPartyList')
 local player = require('player')
 local layoutDefaults = require('layout')
 local const = require('const')
+local utils = require('utils')
 
 local view = {}
 
@@ -52,16 +58,20 @@ function view:init(model)
 		return
 	end
 	
-	if settings.hideAlliance then
+	if Settings.hideAlliance then
 		lastPartyIndex = 0
 	else
 		lastPartyIndex = 2
 	end
 
-	self:loadLayout(settings.layout)
+	self:loadLayout(Settings.layout)
 
 	for i = 0, lastPartyIndex do
-		partyLists[i] = uiPartyList.new(model.parties[i], self:getSettingsByIndex(i), i == 0 and layout or layoutAlliance) -- last param: lua style ternary operator
+		partyLists[i] = uiPartyList.new(
+			model.parties[i], 
+			self:getSettingsByIndex(i), 
+			i == 0 and layout or layoutAlliance, -- lua style ternary operator
+		    i == 0)
 	end
 
 	isInitialized = true
@@ -81,15 +91,6 @@ function view:dispose()
 end
 
 function view:loadLayout(layoutName)
-	if layoutName == const.layoutAuto then
-		local resY = windower.get_windower_settings().ui_y_res
-		if resY <= 1200 then
-			layoutName = const.layout1080
-		else
-			layoutName = const.layout1440
-		end
-	end
-
 	local layoutFile = const.layoutDir .. layoutName .. '.xml'
 	local layoutAllianceFile = const.layoutDir .. layoutName .. const.layoutAllianceSuffix .. '.xml'
 
@@ -103,9 +104,9 @@ function view:loadLayout(layoutName)
 end
 
 function view:getSettingsByIndex(index)
-	if index == 0 then return settings.party end
-	if index == 1 then return settings.alliance1 end
-	if index == 2 then return settings.alliance2 end
+	if index == 0 then return Settings.party end
+	if index == 1 then return Settings.alliance1 end
+	if index == 2 then return Settings.alliance2 end
 
 	utils:log('view:getSettingsByIndex: index ' .. tostring(index) .. 'not found!', 4)
 	return nil

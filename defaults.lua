@@ -28,26 +28,23 @@
 
 local defaults = {}
 
-defaults.layout = 'auto' -- active UI layout, found in XivParty/layouts directory. use 'auto' for automatic resolution based selection
+defaults.layout = 'xiv' -- active UI layout, found in XivParty/layouts directory
 
-defaults.party = {} -- TODO: meaningful default positions and comments here!
-defaults.party.posX = 70
-defaults.party.posY = 400
+defaults.party = {}
+defaults.party.pos = L{ 40, 690 }
+defaults.party.scale = L{ 0, 0 } -- scale 0 will trigger screen resolution based autoscaling
 defaults.party.itemSpacing = 0 -- distance between party list items
 defaults.party.alignBottom = false -- expands the party list from bottom to top
 defaults.alliance1 = {}
-defaults.alliance1.posX = 100
-defaults.alliance1.posY = 600
-defaults.alliance1.itemSpacing = 0 -- distance between party list items
-defaults.alliance1.alignBottom = false -- expands the party list from bottom to top
+defaults.alliance1.pos = L{ 2220, 760 }
+defaults.alliance1.scale = L{ 0, 0 }
+defaults.alliance1.itemSpacing = 0
+defaults.alliance1.alignBottom = false
 defaults.alliance2 = {}
-defaults.alliance2.posX = 130
-defaults.alliance2.posY = 800
-defaults.alliance2.itemSpacing = 0 -- distance between party list items
-defaults.alliance2.alignBottom = false -- expands the party list from bottom to top
-
-defaults.posX = 70 -- x screen position of the party list
-defaults.posY = 400 -- y screen position of the party list
+defaults.alliance2.pos = L{ 2220, 860 }
+defaults.alliance2.scale = L{ 0, 0 }
+defaults.alliance2.itemSpacing = 0
+defaults.alliance2.alignBottom = false
 
 defaults.hideSolo = false -- hides the party list when you are not in a party
 defaults.hideAlliance = false -- hides UI for alliance parties

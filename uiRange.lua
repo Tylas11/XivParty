@@ -53,10 +53,10 @@ function uiRange:update(player, isOutsideZone)
 	local opacityFar = 0
 
 	if player.distance and not isOutsideZone then
-		if settings.rangeIndicator > 0 and player.distance:sqrt() <= settings.rangeIndicator then
+		if Settings.rangeIndicator > 0 and player.distance:sqrt() <= Settings.rangeIndicator then
 			opacity = 1
 			opacityFar = 0
-		elseif settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= settings.rangeIndicatorFar then
+		elseif Settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= Settings.rangeIndicatorFar then
 			opacity = 0
 			opacityFar = 1
 		end

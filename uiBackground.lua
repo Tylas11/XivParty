@@ -30,6 +30,7 @@
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
+local utils = require('utils')
 
 -- create the class, derive from uiContainer
 local uiBackground = classes.class(uiContainer)

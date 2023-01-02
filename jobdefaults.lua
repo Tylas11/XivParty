@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,16 +26,17 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local jobDefaults = {}
+local jobDefaults = {
+	jobEnabled = false, -- when set to false, job specific settings will be ignored and globals used instead
 
-jobDefaults.jobEnabled = false -- when set to false, job specific settings will be ignored and globals used instead
+	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
+	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
 
-jobDefaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
-jobDefaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
-
-jobDefaults.buffs = {}
-jobDefaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-jobDefaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
-jobDefaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+	buffs = {
+		filters = '', -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
+		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
+		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+	}
+}
 
 return jobDefaults

@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -37,25 +37,25 @@ local uiBackground = classes.class(uiContainer)
 
 local isDebug = false
 
-function uiBackground:init(bgLayout)
-	if self.super:init(bgLayout) then
-		self.bgLayout = bgLayout
+function uiBackground:init(layout)
+	if self.super:init(layout) then
+		self.layout = layout
 
 		self.size = {}
 		self.size.width = 0
 		self.size.height = 0
 
-		self.sizeMid = utils:coord(bgLayout.imgMid.size)
+		self.sizeMid = utils:coord(layout.imgMid.size)
 
-		self.top = self:addChild(uiImage.new(bgLayout.imgTop))
-		self.mid = self:addChild(uiImage.new(bgLayout.imgMid))
-		self.bottom = self:addChild(uiImage.new(bgLayout.imgBottom))
+		self.top = self:addChild(uiImage.new(layout.imgTop))
+		self.mid = self:addChild(uiImage.new(layout.imgMid))
+		self.bottom = self:addChild(uiImage.new(layout.imgBottom))
 
 		if isDebug then -- debug background
 			self.top:path('')
 			self.mid:path('')
 			self.bottom:path('')
-			
+
 			self.top:color(255,0,0)
 			self.mid:color(0,255,0)
 			self.bottom:color(0,0,255)
@@ -73,7 +73,7 @@ function uiBackground:update(contentHeight)
 	self.mid:repeat_xy(1, math.floor(contentHeight / self.sizeMid.y))
 
 	self.bottom:pos(self.bottom.posX, self.mid.posY + self.mid.height)
-	
+
 	-- visible size of the whole background area
 	self.size.width = math.max(math.max(self.top.absoluteWidth, self.bottom.absoluteWidth), self.mid.absoluteWidth)
 	self.size.height = self.top.absoluteHeight + self.mid.absoluteHeight + self.bottom.absoluteHeight

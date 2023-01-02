@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -74,8 +74,11 @@ function model:updatePlayers()
 			if member.mob and member.mob.id > 0 then
 				id = member.mob.id
 			end
+
 			local foundPlayer = self:getPlayer(member.name, id, 'member')
-			foundPlayer:update(member, target, subtarget)
+			if foundPlayer then
+				foundPlayer:update(member, target, subtarget)
+			end
 
 			self.parties[idx][i % 6] = foundPlayer
 		else

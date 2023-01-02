@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ function view:init(model)
 		utils:log('view:init missing parameter model!', 4)
 		return
 	end
-	
+
 	if Settings.hideAlliance then
 		lastPartyIndex = 0
 	else
@@ -68,9 +68,9 @@ function view:init(model)
 
 	for i = 0, lastPartyIndex do
 		partyLists[i] = uiPartyList.new(
-			model.parties[i], 
-			self:getSettingsByIndex(i), 
-			i == 0 and layout or layoutAlliance, -- lua style ternary operator
+			model.parties[i],
+			self:getSettingsByIndex(i),
+			i == 0 and layout.partyList or layoutAlliance.partyList, -- lua style ternary operator
 		    i == 0)
 	end
 
@@ -162,25 +162,33 @@ end
 
 function view:update(force)
 	if not isInitialized then return end
-	
+
 	for i = 0, lastPartyIndex do
 		partyLists[i]:update(force)
 	end
 end
 
-function view:show()
+function view:show(flagId)
 	if not isInitialized then return end
-	
+
 	for i = 0, lastPartyIndex do
-		partyLists[i]:show()
+		partyLists[i]:show(flagId)
 	end
 end
 
-function view:hide()
+function view:hide(flagId)
 	if not isInitialized then return end
 
 	for i = 0, lastPartyIndex do
-		partyLists[i]:hide()
+		partyLists[i]:hide(flagId)
+	end
+end
+
+function view:visible(isVisible, flagId)
+	if not isInitialized then return end
+
+	for i = 0, lastPartyIndex do
+		partyLists[i]:visible(isVisible, flagId)
 	end
 end
 

@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -38,10 +38,10 @@ local utils = require('utils')
 local uiContainer = classes.class(uiElement)
 
 -- constructor
--- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
+-- @param layout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
-function uiContainer:init(baseLayout)
-    self.super:init(baseLayout)
+function uiContainer:init(layout)
+    self.super:init(layout)
 
     self.children = T{}
 

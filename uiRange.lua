@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -35,14 +35,14 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiRange = classes.class(uiContainer)
 
-function uiRange:init(rangeLayout)
-	if self.super:init(rangeLayout) then
-		self.rangeLayout = rangeLayout
+function uiRange:init(layout)
+	if self.super:init(layout) then
+		self.layout = layout
 
-		self.imgNear = self:addChild(uiImage.new(rangeLayout.imgNear))
+		self.imgNear = self:addChild(uiImage.new(layout.imgNear))
 		self.imgNear:hide(const.visFeature)
 
-		self.imgFar = self:addChild(uiImage.new(rangeLayout.imgFar))
+		self.imgFar = self:addChild(uiImage.new(layout.imgFar))
 		self.imgFar:hide(const.visFeature)
 	end
 end
@@ -62,7 +62,7 @@ function uiRange:update(player)
 			visibilityFar = true
 		end
 	end
-	
+
 	self.imgNear:visible(visibility, const.visFeature)
 	self.imgFar:visible(visibilityFar, const.visFeature)
 end

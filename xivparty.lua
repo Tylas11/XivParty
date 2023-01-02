@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '1.7.0'
+_addon.version = '2.0.0'
 _addon.commands = {'xp', 'xivparty'}
 
 -- windower library imports
@@ -495,5 +495,14 @@ windower.register_event('addon command', function(...)
 		end
 	else
 		showHelp()
+	end
+end)
+
+-- @param key DirectInput keyboard (DIK) code as integer. see: https://community.bistudio.com/wiki/DIK_KeyCodes
+-- @param down true when the key is pressed, false when it is released
+-- @returns true to mark the keyboard event handled (will not be passed on to the game)
+windower.register_event('keyboard', function(key, down)
+	if Settings and Settings.hideKeyCode > 0 and key == Settings.hideKeyCode then
+		view:visible(not down, const.visKeyboard)
 	end
 end)

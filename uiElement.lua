@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -41,9 +41,9 @@ local uiElement = classes.class()
 local private = {}
 
 -- constructor
--- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
+-- @param layout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
-function uiElement:init(baseLayout)
+function uiElement:init(layout)
     private[self] = {}
     private[self].visibility = {}
 
@@ -51,22 +51,22 @@ function uiElement:init(baseLayout)
     self.isCreated = false
 
     self.isEnabled = true
-    if baseLayout and baseLayout.enabled ~= nil then
-        self.isEnabled = baseLayout.enabled
+    if layout and layout.enabled ~= nil then
+        self.isEnabled = layout.enabled
     end
 
     self.posX = 0
     self.posY = 0
-    if baseLayout and baseLayout.pos then
-        local pos = utils:coord(baseLayout.pos)
+    if layout and layout.pos then
+        local pos = utils:coord(layout.pos)
         self.posX = pos.x
         self.posY = pos.y
     end
 
     self.scaleX = 1
     self.scaleY = 1
-    if baseLayout and baseLayout.scale then
-        local scale = utils:coord(baseLayout.scale)
+    if layout and layout.scale then
+        local scale = utils:coord(layout.scale)
         self.scaleX = scale.x
         self.scaleY = scale.y
     end
@@ -76,13 +76,13 @@ function uiElement:init(baseLayout)
     self.absoluteScale = { x = 1, y = 1 }
 
     self.zOrder = 0
-    if baseLayout and baseLayout.zOrder then
-        self.zOrder = baseLayout.zOrder
+    if layout and layout.zOrder then
+        self.zOrder = layout.zOrder
     end
 
     self.snapToRaster = false
-    if baseLayout and baseLayout.snapToRaster ~= nil then
-        self.snapToRaster = baseLayout.snapToRaster
+    if layout and layout.snapToRaster ~= nil then
+        self.snapToRaster = layout.snapToRaster
     end
 
     return self.isEnabled

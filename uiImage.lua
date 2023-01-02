@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -61,18 +61,18 @@ function uiImage.create(path, sizeX, sizeY, scaleX, scaleY)
 	return uiImage.new(imageLayout)
 end
 
-function uiImage:init(imgLayout)
-    if self.super:init(imgLayout) then
+function uiImage:init(layout)
+    if self.super:init(layout) then
 		private[self] = {}
 
-		if imgLayout and imgLayout.path and imgLayout.path ~= '' then
-			private[self].path = imgLayout.path
+		if layout and layout.path and layout.path ~= '' then
+			private[self].path = layout.path
 		end
 
 		self.width = 0
 		self.height = 0
-		if imgLayout and imgLayout.size then
-			local size = utils:coord(imgLayout.size)
+		if layout and layout.size then
+			local size = utils:coord(layout.size)
 			self.width = size.x
 			self.height = size.y
 		end
@@ -82,8 +82,8 @@ function uiImage:init(imgLayout)
 		private[self].color.g = 255
 		private[self].color.b = 255
 		private[self].color.a = 255
-		if imgLayout and imgLayout.color then
-			local c = utils:colorFromHex(imgLayout.color)
+		if layout and layout.color then
+			local c = utils:colorFromHex(layout.color)
 			if c then
 				private[self].color = c
 			end

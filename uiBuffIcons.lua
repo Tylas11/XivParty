@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -36,17 +36,17 @@ local utils = require('utils')
 -- create the class, derive from uiContainer
 local uiBuffIcons = classes.class(uiContainer)
 
-function uiBuffIcons:init(buffLayout)
-	if self.super:init(buffLayout) then
-		self.buffLayout = buffLayout
+function uiBuffIcons:init(layout)
+	if self.super:init(layout) then
+		self.layout = layout
 
-		self.spacing = utils:coord(buffLayout.spacing)
-		self.size = utils:coord(buffLayout.size)
+		self.spacing = utils:coord(layout.spacing)
+		self.size = utils:coord(layout.size)
 
 		self.currentBuffs = {}
         self.buffImages = {}
 
-		if not self:validateLayout(self.buffLayout) then
+		if not self:validateLayout(self.layout) then
 			self.isEnabled = false
 			return
 		end
@@ -57,15 +57,15 @@ function uiBuffIcons:init(buffLayout)
 			local imgLayout = {}
 			imgLayout.enabled = true
 			imgLayout.path = ''
-			imgLayout.size = buffLayout.size
-			imgLayout.color = buffLayout.color
+			imgLayout.size = layout.size
+			imgLayout.color = layout.color
 
 			-- row and column start at index 1
 			local row = self:getRow(i)
 			if not row then break end -- cut off any icons that exceed row definitions from the layout
 
 			local column = self:getColumn(i, row)
-			local iconOffset = tonumber(buffLayout.offsetByRow[row]) * (self.size.x * self.scaleX + self.spacing.x)
+			local iconOffset = tonumber(layout.offsetByRow[row]) * (self.size.x * self.scaleX + self.spacing.x)
 
 			imgLayout.pos = L{
 				iconOffset + (column - 1) * (self.size.x * self.scaleX + self.spacing.x), 
@@ -78,15 +78,15 @@ function uiBuffIcons:init(buffLayout)
 	end
 end
 
-function uiBuffIcons:validateLayout(buffLayout)
+function uiBuffIcons:validateLayout(layout)
 	-- the config library loads lists with single entires as numbers, apply a fix here as the rest of the code expects a list
 	local singleEntry = false
-	if type(buffLayout.numIconsByRow) == 'number' then
-		buffLayout.numIconsByRow = L{ buffLayout.numIconsByRow }
+	if type(layout.numIconsByRow) == 'number' then
+		layout.numIconsByRow = L{ layout.numIconsByRow }
 		singleEntry = true
 	end
-	if type(buffLayout.offsetByRow) == 'number' then
-		buffLayout.offsetByRow = L{ buffLayout.offsetByRow }
+	if type(layout.offsetByRow) == 'number' then
+		layout.offsetByRow = L{ layout.offsetByRow }
 		singleEntry = true
 	end
 	if singleEntry then
@@ -94,7 +94,7 @@ function uiBuffIcons:validateLayout(buffLayout)
 	end
 
 	-- check that number of rows in both lists is equal
-	if buffLayout.numIconsByRow:length() ~= buffLayout.offsetByRow:length() then
+	if layout.numIconsByRow:length() ~= layout.offsetByRow:length() then
 		error('Layout invalid! Lists numIconsByRow and offsetByRow must have the same number of entries!')
 		return false
 	end
@@ -104,8 +104,8 @@ end
 
 -- gets the row index for the specified icon index, returns nil if the icon won't fit in the defined rows
 function uiBuffIcons:getRow(iconIndex)
-	for row = 1, self.buffLayout.numIconsByRow:length() do
-		local numIcons = tonumber(self.buffLayout.numIconsByRow[row]) -- numbers in L{} lists are loaded as strings by the config library
+	for row = 1, self.layout.numIconsByRow:length() do
+		local numIcons = tonumber(self.layout.numIconsByRow[row]) -- numbers in L{} lists are loaded as strings by the config library
 
 		if iconIndex <= numIcons then return row end
 		iconIndex = iconIndex - numIcons
@@ -127,7 +127,7 @@ function uiBuffIcons:getSumOfPreviousRows(row)
 	local sum = 0
 	if row > 1 then
 		for r = 1, row - 1 do
-			sum = sum + tonumber(self.buffLayout.numIconsByRow[r])
+			sum = sum + tonumber(self.layout.numIconsByRow[r])
 		end
 	end
 
@@ -137,8 +137,8 @@ end
  -- maximum number of icons we can display, either capped by row definitions or the game's limit of 32
 function uiBuffIcons:getMaxBuffCount()
 	local count = 0
-	for row = 1, self.buffLayout.numIconsByRow:length() do
-		local numIcons = tonumber(self.buffLayout.numIconsByRow[row])
+	for row = 1, self.layout.numIconsByRow:length() do
+		local numIcons = tonumber(self.layout.numIconsByRow[row])
 		count = count + numIcons
 	end
 
@@ -155,17 +155,17 @@ function uiBuffIcons:update(player)
 
 	if table.equals(buffs, self.currentBuffs) then return end
 	self.currentBuffs = table.copy(buffs)
-	
+
 	for i = 1, self.maxBuffCount do -- iterate through all images
 		local buff
 		local image = self.buffImages[i]
 
 		-- right aligned: find the index of the buff to place in the current image
-		if self.buffLayout.alignRight then
+		if self.layout.alignRight then
 			local row = self:getRow(i)
 			if not row then break end -- cut off any icons that exceed row definitions from the layout
 
-			local numIcons = self.buffLayout.numIconsByRow[row] -- maximum number of icons that fit in this row
+			local numIcons = self.layout.numIconsByRow[row] -- maximum number of icons that fit in this row
 			local sumPreviousRows = self:getSumOfPreviousRows(row)
 
 			local totalBuffCount = math.min(buffs:length(), self.maxBuffCount) -- total number of active buffs to display
@@ -182,9 +182,9 @@ function uiBuffIcons:update(player)
 		else -- left aligned: buff index = image index
 			buff = buffs[i]
 		end
-		
+
 		if buff then
-			image:path(self.buffLayout.path .. tostring(buff) .. '.png')
+			image:path(self.layout.path .. tostring(buff) .. '.png')
 			image:show(const.visFeature)
 		else
 			image:path('')

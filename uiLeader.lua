@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -35,15 +35,15 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiLeader = classes.class(uiContainer)
 
-function uiLeader:init(leaderLayout)
-	if self.super:init(leaderLayout) then
-		self.imgParty = self:addChild(uiImage.new(leaderLayout.imgParty))
+function uiLeader:init(layout)
+	if self.super:init(layout) then
+		self.imgParty = self:addChild(uiImage.new(layout.imgParty))
 		self.imgParty:hide(const.visFeature)
 
-		self.imgAlliance = self:addChild(uiImage.new(leaderLayout.imgAlliance))
+		self.imgAlliance = self:addChild(uiImage.new(layout.imgAlliance))
 		self.imgAlliance:hide(const.visFeature)
 
-        self.imgQuarterMaster = self:addChild(uiImage.new(leaderLayout.imgQuarterMaster))
+        self.imgQuarterMaster = self:addChild(uiImage.new(layout.imgQuarterMaster))
 		self.imgQuarterMaster:hide(const.visFeature)
 	end
 end

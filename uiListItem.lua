@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ local const = require('const')
 local uiListItem = classes.class(uiContainer)
 
 function uiListItem:init(layout)
-	if self.super:init(layout.listItem) then
+	if self.super:init(layout) then
 		self.layout = layout
 
 		self.cursor = self:addChild(uiImage.new(layout.cursor))
@@ -94,7 +94,7 @@ end
 
 function uiListItem:updateZone(player)
 	local zoneString = ''
-	
+
 	if player.zone and player.isOutsideZone then
 		if self.layout.text.zone.short then
 			zoneString = '('..res.zones[player.zone]['search']..')'
@@ -102,14 +102,14 @@ function uiListItem:updateZone(player)
 			zoneString = '('..res.zones[player.zone].name..')'
 		end
 	end
-	
+
 	self.zoneText:update(zoneString)
 end
 
 function uiListItem:updateJob(player)
 	local jobString = ''
 	local subJobString = ''
-	
+
 	if not player.isOutsideZone then
 		if player.job then
 			jobString = player.job
@@ -117,7 +117,7 @@ function uiListItem:updateJob(player)
 				jobString = jobString .. ' ' .. tostring(player.jobLvl)
 			end
 		end
-		
+
 		if player.subJob and player.subJob ~= 'MON' then
 			subJobString = player.subJob
 			if player.subJobLvl then
@@ -125,14 +125,14 @@ function uiListItem:updateJob(player)
 			end
 		end
 	end
-	
+
 	self.jobText:update(jobString)
 	self.subJobText:update(subJobString)
 end
 
 function uiListItem:updateCursor(player)
 	local opacity = 0
-	
+
 	if not player.isOutsideZone then
 		if player.isSelected then
 			opacity = 1
@@ -140,7 +140,7 @@ function uiListItem:updateCursor(player)
 			opacity = 0.5
 		end
 	end
-	
+
 	self.cursor:opacity(opacity)
 end
 

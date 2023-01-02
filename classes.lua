@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -81,7 +81,7 @@ function classes.class(baseclass)
 		-- Quick value lookup, usually anything that is not a function will be set on the root instance.
 		local val = rawget(rootInstance, k)
 		if val then return val end
-		
+
 		-- When calling via the 'super' reference, we start traversing from that superclass.
 		-- Otherwise always start at the root of the inheritance tree.
 		local current
@@ -121,10 +121,10 @@ function classes.class(baseclass)
 			class = classdef,
 			super = { __base = baseclass.alloc(rootInstance) }
 		}
-		
+
 		setmetatable(instance.super, {__index = function(t, k) return lookup(t, k, rootInstance, true) end, __newindex = rootInstance})
 		setmetatable(instance, {__index = function(t, k) return lookup(t, k, rootInstance, false) end, __newindex = rootInstance})
-		
+
 		return instance
 	end
 
@@ -144,10 +144,10 @@ function classes.class(baseclass)
 		-- Assignment/writes (__newindex) get directed to the root instance itself.
 		setmetatable(instance.super, { __index = function(t, k) return lookup(t, k, instance, true) end })
 		setmetatable(instance, {__index = function(t, k) return lookup(t, k, instance, false) end})
-		
+
 		-- Finally, init the object, it is up to the programmer to choose to call the super init method.
 		instance:init(...)
-		
+
 		return instance
 	end
 

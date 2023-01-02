@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -36,23 +36,23 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiJobIcon = classes.class(uiContainer)
 
-function uiJobIcon:init(jobIconLayout)
-	if self.super:init(jobIconLayout) then
-		self.jobIconLayout = jobIconLayout
+function uiJobIcon:init(layout)
+	if self.super:init(layout) then
+		self.layout = layout
 
-		self.jobHighlight = self:addChild(uiImage.new(jobIconLayout.imgHighlight))
+		self.jobHighlight = self:addChild(uiImage.new(layout.imgHighlight))
 		self.jobHighlight:hide(const.visFeature)
-		
-		self.jobBg = self:addChild(uiImage.new(jobIconLayout.imgBg))
+
+		self.jobBg = self:addChild(uiImage.new(layout.imgBg))
 		self.jobBg:hide(const.visFeature)
-		
-		self.jobGradient = self:addChild(uiImage.new(jobIconLayout.imgGradient))
+
+		self.jobGradient = self:addChild(uiImage.new(layout.imgGradient))
 		self.jobGradient:hide(const.visFeature)
-		
-		self.jobIcon = self:addChild(uiImage.new(jobIconLayout.imgIcon))
+
+		self.jobIcon = self:addChild(uiImage.new(layout.imgIcon))
 		self.jobIcon:hide(const.visFeature)
-		
-		self.jobFrame = self:addChild(uiImage.new(jobIconLayout.imgFrame))
+
+		self.jobFrame = self:addChild(uiImage.new(layout.imgFrame))
 		self.jobFrame:hide(const.visFeature)
 	end
 end
@@ -62,17 +62,17 @@ function uiJobIcon:update(player)
 
 	local visibility = false
 	local highlightVisibility = false
-	
+
 	if not player.isOutsideZone and player.job then
-		self.jobIcon:path(self.jobIconLayout.path .. player.job .. '.png')
-		self.jobBg:color(jobs:getRoleColor(player.job, self.jobIconLayout.colors))
+		self.jobIcon:path(self.layout.path .. player.job .. '.png')
+		self.jobBg:color(jobs:getRoleColor(player.job, self.layout.colors))
 		visibility = true
-		
+
 		if player.isSelected then
 			highlightVisibility = true
 		end
 	end
-	
+
 	self.jobHighlight:visible(highlightVisibility, const.visFeature)
 	self.jobBg:visible(visibility, const.visFeature)
 	self.jobGradient:visible(visibility, const.visFeature)

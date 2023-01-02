@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,36 +26,41 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local defaults = {}
+local defaults = {
+	layout = 'xiv', -- active UI layout, found in XivParty/layouts directory
 
-defaults.layout = 'xiv' -- active UI layout, found in XivParty/layouts directory
+	hideKeyCode = 207, -- DirectInput keyboard (DIK) code for holding down button to temporarily hide UI. set 0 to disable. default: "End" key
+	hideSolo = false, -- hides the party list when you are not in a party
+	hideAlliance = false, -- hides UI for alliance parties
+	hideCutscenes = true, -- hides UI during cutscenes or when talking to NPCs
 
-defaults.party = {}
-defaults.party.pos = L{ 40, 690 }
-defaults.party.scale = L{ 0, 0 } -- scale 0 will trigger screen resolution based autoscaling
-defaults.party.itemSpacing = 0 -- distance between party list items
-defaults.party.alignBottom = false -- expands the party list from bottom to top
-defaults.alliance1 = {}
-defaults.alliance1.pos = L{ 2220, 760 }
-defaults.alliance1.scale = L{ 0, 0 }
-defaults.alliance1.itemSpacing = 0
-defaults.alliance1.alignBottom = false
-defaults.alliance2 = {}
-defaults.alliance2.pos = L{ 2220, 860 }
-defaults.alliance2.scale = L{ 0, 0 }
-defaults.alliance2.itemSpacing = 0
-defaults.alliance2.alignBottom = false
+	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
+	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
 
-defaults.hideSolo = false -- hides the party list when you are not in a party
-defaults.hideAlliance = false -- hides UI for alliance parties
-defaults.hideCutscenes = true -- hides UI during cutscenes or when talking to NPCs
+	party = {
+		pos = L{ 40, 690 },
+		scale = L{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
+		itemSpacing = 0, -- distance between party list items
+		alignBottom = false -- expands the party list from bottom to top
+	},
+	alliance1 = {
+		pos = L{ 2220, 760 },
+		scale = L{ 0, 0 },
+		itemSpacing = 0,
+		alignBottom = false
+	},
+	alliance2 = {
+		pos = L{ 2220, 860 },
+		scale = L{ 0, 0 },
+		itemSpacing = 0,
+		alignBottom = false
+	},
 
-defaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
-defaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
-
-defaults.buffs = {}
-defaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-defaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
-defaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+	buffs = {
+		filters = '', -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
+		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
+		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+	}
+}
 
 return defaults

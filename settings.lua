@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -159,7 +159,7 @@ end
 function settings:saveFilters()
 	settings.buffs.filters = ''
 
-	for buffId, doFilter in pairs(settings.buffFilters) do 
+	for buffId, doFilter in pairs(settings.buffFilters) do
 		-- why add a semicolon even on the first element? because config.lua will mistake a single element as a number and not a string
 		settings.buffs.filters = settings.buffs.filters .. tostring(buffId) .. ';'
 	end

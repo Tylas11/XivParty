@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -40,13 +40,13 @@ local uiText = classes.class(uiElement)
 -- static storage for private variables, access using private[self] to keep separate values for each instance
 local private = {}
 
-function uiText:init(textLayout)
-    if self.super:init(textLayout) then
+function uiText:init(layout)
+    if self.super:init(layout) then
         private[self] = {}
 
         private[self].alignRight = false
-        if textLayout and textLayout.alignRight ~= nil then
-            private[self].alignRight = textLayout.alignRight
+        if layout and layout.alignRight ~= nil then
+            private[self].alignRight = layout.alignRight
         end
 
         private[self].color = {}
@@ -54,8 +54,8 @@ function uiText:init(textLayout)
 		private[self].color.g = 255
 		private[self].color.b = 255
 		private[self].color.a = 255
-		if textLayout and textLayout.color then
-			local c = utils:colorFromHex(textLayout.color)
+		if layout and layout.color then
+			local c = utils:colorFromHex(layout.color)
 			if c then
 				private[self].color = c
 			end
@@ -66,16 +66,16 @@ function uiText:init(textLayout)
 		private[self].stroke.g = 255
 		private[self].stroke.b = 255
 		private[self].stroke.a = 255
-		if textLayout and textLayout.stroke then
-			local s = utils:colorFromHex(textLayout.stroke)
+		if layout and layout.stroke then
+			local s = utils:colorFromHex(layout.stroke)
 			if s then
 				private[self].stroke = s
 			end
 		end
 
-        private[self].font = textLayout.font
-        private[self].fontSize = textLayout.size
-        private[self].strokeWidth = textLayout.strokeWidth
+        private[self].font = layout.font
+        private[self].fontSize = layout.size
+        private[self].strokeWidth = layout.strokeWidth
     end
 end
 
@@ -128,7 +128,7 @@ function uiText:applyLayout()
         -- right aligned text coordinates start at the right side of the screen
         x = x - windower.get_windower_settings().ui_x_res
     end
-    
+
     self.wrappedText:pos(x, y)
     self.wrappedText:size(private[self].fontSize * self.absoluteScale.y)
     self.wrappedText:stroke_width(private[self].strokeWidth * self.absoluteScale.x)

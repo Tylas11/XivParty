@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -37,23 +37,23 @@ local utils = require('utils')
 -- create the class, derive from uiContainer
 local uiStatusBar = classes.class(uiContainer)
 
-function uiStatusBar:init(statusBarLayout, barType)
-	if self.super:init(statusBarLayout) then
-		self.statusBarLayout = statusBarLayout
+function uiStatusBar:init(layout, barType)
+	if self.super:init(layout) then
+		self.layout = layout
 		self.barType = barType
 
-		self.bar = self:addChild(uiBar.new(statusBarLayout.bar))
-		self.text = self:addChild(uiText.new(statusBarLayout.text))
+		self.bar = self:addChild(uiBar.new(layout.bar))
+		self.text = self:addChild(uiText.new(layout.text))
 
 		if self.barType == const.barTypeHp then
-			self.hpYellowColor = utils:colorFromHex(statusBarLayout.hpYellowColor)
-			self.hpOrangeColor = utils:colorFromHex(statusBarLayout.hpOrangeColor)
-			self.hpRedColor = utils:colorFromHex(statusBarLayout.hpRedColor)
+			self.hpYellowColor = utils:colorFromHex(layout.hpYellowColor)
+			self.hpOrangeColor = utils:colorFromHex(layout.hpOrangeColor)
+			self.hpRedColor = utils:colorFromHex(layout.hpRedColor)
 		elseif self.barType == const.barTypeTp then
-			self.tpFullColor = utils:colorFromHex(statusBarLayout.tpFullColor)
+			self.tpFullColor = utils:colorFromHex(layout.tpFullColor)
 		end
 
-		self.textColor = utils:colorFromHex(statusBarLayout.text.color)
+		self.textColor = utils:colorFromHex(layout.text.color)
 	end
 end
 
@@ -78,7 +78,7 @@ function uiStatusBar:update(player)
 		distance = player.distance
 
 		self:show(const.visOutsideZone)
-	elseif self.statusBarLayout.hideOutsideZone then
+	elseif self.layout.hideOutsideZone then
 		self:hide(const.visOutsideZone)
 	end
 

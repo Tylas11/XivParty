@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -213,7 +213,7 @@ function jobs:getRoleColor(job, jobIconColors)
 			hexColor = roleColor
 		end
 	end
-	
+
 	return utils:colorFromHex(hexColor)
 end
 
@@ -223,7 +223,7 @@ function jobs:getTrustInfo(trustName, trustModel)
 			return t
 		end
 	end
-	
+
 	return nil
 end
 

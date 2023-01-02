@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,8 @@ local const = {
 	-- visibility flag IDs
 	visDefault = 1, -- the default flag to use when no flag is specified
 	visOutsideZone = 2, -- hide elements based on the player being outside the current zone
-	visFeature = 3 -- for general UI features like icons that show up, etc
+	visFeature = 3, -- for general UI features like icons that show up, etc
+	visKeyboard = 4 -- temporarily hide UI by holding down a key
 }
 
 return const

@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2022, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -36,17 +36,17 @@ local utils = require('utils')
 -- create the class, derive from uiContainer
 local uiBar = classes.class(uiContainer)
 
-function uiBar:init(barLayout)
-	if self.super:init(barLayout) then
-		self.barLayout = barLayout
+function uiBar:init(layout)
+	if self.super:init(layout) then
+		self.layout = layout
 
-		self.imgBg = self:addChild(uiImage.new(barLayout.imgBg))
-		self.imgBar = self:addChild(uiImage.new(barLayout.imgBar))
-		self.imgFg = self:addChild(uiImage.new(barLayout.imgFg))
+		self.imgBg = self:addChild(uiImage.new(layout.imgBg))
+		self.imgBar = self:addChild(uiImage.new(layout.imgBar))
+		self.imgFg = self:addChild(uiImage.new(layout.imgFg))
 
-		self.imgGlow = self:addChild(uiImage.new(barLayout.imgGlow))
-		self.imgGlowLeft = self:addChild(uiImage.new(barLayout.imgGlowSides))
-		self.imgGlowRight = self:addChild(uiImage.new(barLayout.imgGlowSides))
+		self.imgGlow = self:addChild(uiImage.new(layout.imgGlow))
+		self.imgGlowLeft = self:addChild(uiImage.new(layout.imgGlowSides))
+		self.imgGlowRight = self:addChild(uiImage.new(layout.imgGlowSides))
 
 		self.imgGlow:hide(const.visFeature)
 		self.imgGlowLeft:hide(const.visFeature)
@@ -56,9 +56,9 @@ function uiBar:init(barLayout)
 		self.value = 1
 		self.exactValue = 1
 
-		self.sizeBar = utils:coord(barLayout.imgBar.size)
-		self.sizeGlow = utils:coord(barLayout.imgGlow.size)
-		self.sizeGlowSides = utils:coord(barLayout.imgGlowSides.size)
+		self.sizeBar = utils:coord(layout.imgBar.size)
+		self.sizeGlow = utils:coord(layout.imgGlow.size)
+		self.sizeGlowSides = utils:coord(layout.imgGlowSides.size)
 
 		-- flip horizontally, this will move the image origin to the top-right corner
 		self.imgGlowRight:size(-self.sizeGlowSides.x, self.sizeGlowSides.y)
@@ -70,7 +70,7 @@ function uiBar:update(targetValue)
 	if not self.isEnabled then return end
 
 	if self.value ~= targetValue then
-		self.exactValue = self.exactValue + (targetValue - self.exactValue) * self.barLayout.animSpeed
+		self.exactValue = self.exactValue + (targetValue - self.exactValue) * self.layout.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
 

@@ -30,6 +30,7 @@
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
+local const = require('const')
 local utils = require('utils')
 
 -- create the class, derive from uiContainer
@@ -44,13 +45,23 @@ function uiBar:init(barLayout)
 		self.imgFg = self:addChild(uiImage.new(barLayout.imgFg))
 
 		self.imgGlow = self:addChild(uiImage.new(barLayout.imgGlow))
-		
+		self.imgGlowLeft = self:addChild(uiImage.new(barLayout.imgGlowSides))
+		self.imgGlowRight = self:addChild(uiImage.new(barLayout.imgGlowSides))
+
+		self.imgGlow:hide(const.visFeature)
+		self.imgGlowLeft:hide(const.visFeature)
+		self.imgGlowRight:hide(const.visFeature)
+
 		self.isDimmed = false
 		self.value = 1
 		self.exactValue = 1
-		
+
 		self.sizeBar = utils:coord(barLayout.imgBar.size)
 		self.sizeGlow = utils:coord(barLayout.imgGlow.size)
+		self.sizeGlowSides = utils:coord(barLayout.imgGlowSides.size)
+
+		-- flip horizontally, this will move the image origin to the top-right corner
+		self.imgGlowRight:size(-self.sizeGlowSides.x, self.sizeGlowSides.y)
 	end
 end
 
@@ -62,36 +73,46 @@ function uiBar:update(targetValue)
 		self.exactValue = self.exactValue + (targetValue - self.exactValue) * self.barLayout.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.value = utils:round(self.exactValue, 3)
-	    
+
 		local multiplier
-		if self.isDimmed then -- animate bar, glow hidden while dimmed
+		if self.isDimmed or not self.imgGlow.isEnabled then -- animate bar, glow hidden while dimmed or when glow disabled
 			multiplier = self.value
 		else -- instantly move the bar, the glow will be animated instead
 			multiplier = targetValue
 		end
 
-		self.imgBar:size((self.sizeBar.x - 2 * self.barLayout.barOverlap) * multiplier + self.barLayout.barOverlap, self.sizeBar.y)
+		self.imgBar:size(self.sizeBar.x * multiplier, self.sizeBar.y)
 	end
-	
+
 	self:updateGlow(targetValue)
 end
 
 function uiBar:updateGlow(targetValue)
 	if not self.isDimmed and math.abs(targetValue - self.value) > 0.01 then
-		local glowWidth = (self.sizeBar.x - 2 * self.barLayout.barOverlap) * math.abs(targetValue - self.value)
-		local glowPosX = self.imgBar.posX + (self.sizeBar.x - 2 * self.barLayout.barOverlap) * math.min(targetValue, self.value) + self.barLayout.barOverlap
+		local glowWidth = self.sizeBar.x * math.abs(targetValue - self.value)
+		local glowPosX = self.imgBar.posX + self.sizeBar.x * math.min(targetValue, self.value)
+		local glowLeftPosX = glowPosX - self.sizeGlowSides.x
+		local glowRightPosX = glowPosX + glowWidth + self.sizeGlowSides.x
 
-		self.imgGlow:opacity(1)
+		self.imgGlow:show(const.visFeature)
+		self.imgGlowLeft:show(const.visFeature)
+		self.imgGlowRight:show(const.visFeature)
+
 		self.imgGlow:size(glowWidth, self.sizeGlow.y)
 		self.imgGlow:pos(glowPosX, self.imgGlow.posY)
+
+		self.imgGlowLeft:pos(glowLeftPosX, self.imgGlowLeft.posY)
+		self.imgGlowRight:pos(glowRightPosX, self.imgGlowRight.posY)
 	else
-		self.imgGlow:opacity(0)
+		self.imgGlow:hide(const.visFeature)
+		self.imgGlowLeft:hide(const.visFeature)
+		self.imgGlowRight:hide(const.visFeature)
 	end
 end
 
 function uiBar:opacity(o)
 	if not self.isEnabled then return end
-	
+
 	self.isDimmed = o < 1
 	self.imgBar:opacity(o)
 end

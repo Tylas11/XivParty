@@ -44,7 +44,7 @@
                 <imgBar>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/XivAllyBar.png</path>
+                    <path>assets/XivAllyBarHP.png</path>
                     <pos>4,0</pos>
                     <size>56,64</size>
                 </imgBar>
@@ -65,14 +65,14 @@
                 <imgGlow>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/XivAllyBarGlow.png</path>
+                    <path>assets/XivAllyBarGlowHP.png</path>
                     <pos>4,0</pos>
                     <size>8,64</size>
                 </imgGlow>
                 <imgGlowSides>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/XivAllyBarGlowSides.png</path>
+                    <path>assets/XivAllyBarGlowSidesHP.png</path>
                     <pos>1,0</pos>
                     <size>3,64</size>
                 </imgGlowSides>
@@ -89,6 +89,54 @@
             </text>
             <zOrder>1</zOrder>
         </hp>
+        <mp>
+            <bar>
+                <animSpeed>0.1</animSpeed>
+                <enabled>true</enabled>
+                <imgBar>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyBarMP.png</path>
+                    <pos>4,0</pos>
+                    <size>56,64</size>
+                </imgBar>
+                <imgBg>
+                    <enabled>false</enabled>
+                </imgBg>
+                <imgFg>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyBarFG.png</path>
+                    <pos>0,0</pos>
+                    <size>64,64</size>
+                </imgFg>
+                <imgGlow>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyBarGlowMP.png</path>
+                    <pos>4,0</pos>
+                    <size>8,64</size>
+                </imgGlow>
+                <imgGlowSides>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyBarGlowSidesMP.png</path>
+                    <pos>1,0</pos>
+                    <size>3,64</size>
+                </imgGlowSides>
+                <pos>0,0</pos>
+            </bar>
+            <enabled>true</enabled>
+            <hpOrangeColor>#F8BA80FF</hpOrangeColor>
+            <hpRedColor>#FC8182FF</hpRedColor>
+            <hpYellowColor>#F3F37CFF</hpYellowColor>
+            <pos>43,-6</pos>
+            <snapToRaster>true</snapToRaster>
+            <text>
+                <enabled>false</enabled>
+            </text>
+            <zOrder>1</zOrder>
+        </mp>
         <jobIcon>
             <colors>
                 <dd>#663535FF</dd>
@@ -169,9 +217,6 @@
         <listItem>
             <enabled>true</enabled>
         </listItem>
-        <mp>
-            <enabled>false</enabled>
-        </mp>
         <partyList>
             <columnWidth>105</columnWidth>
             <columns>3</columns>
@@ -187,7 +232,15 @@
                 <enabled>false</enabled>
             </job>
             <name>
-                <enabled>false</enabled>
+                <color>#F0FFFFFF</color>
+                <enabled>true</enabled>
+                <font>Arial</font>
+                <pos>47,7</pos>
+                <size>8</size>
+                <snapToRaster>true</snapToRaster>
+                <stroke>#062D54C8</stroke>
+                <strokeWidth>2</strokeWidth>
+                <zOrder>4</zOrder>
             </name>
             <subJob>
                 <enabled>false</enabled>

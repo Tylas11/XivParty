@@ -490,6 +490,8 @@ windower.register_event('addon command', function(...)
 			view:debugSaveLayout()
 		elseif args[2] == 'refcount' then
 			log('Images: ' .. RefCountImage .. ', Texts: ' .. RefCountText)
+		elseif args[2] == 'set' and args[3] ~= nil then -- example: //xp debug set hpp 50 0 2
+			view:debugSetupSetValue(args[3], tonumber(args[4]), tonumber(args[5]), tonumber(args[6]))
 		end
 	else
 		showHelp()

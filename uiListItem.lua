@@ -73,11 +73,9 @@ end
 function uiListItem:update(player)
 	if not self.isEnabled or not player then return end
 
-	local isOutsideZone = player.zone and player.zone ~= windower.ffxi.get_info().zone -- TODO: this is needed quite often, maybe it should be a property of player
-
-	self.hpBar:update(player, isOutsideZone)
-	self.mpBar:update(player, isOutsideZone)
-	self.tpBar:update(player, isOutsideZone)
+	self.hpBar:update(player)
+	self.mpBar:update(player)
+	self.tpBar:update(player)
 
 	if player.name then
 		self.nameText:update(player.name)
@@ -85,19 +83,19 @@ function uiListItem:update(player)
 		self.nameText:update('???')
 	end
 
-	self.jobIcon:update(player, isOutsideZone)
-	self:updateZone(player, isOutsideZone)
-	self:updateJob(player, isOutsideZone)
+	self.jobIcon:update(player)
+	self:updateZone(player)
+	self:updateJob(player)
 	self.leader:update(player)
-	self.range:update(player, isOutsideZone)
-	self:updateCursor(player, isOutsideZone)
-	self.buffIcons:update(player, isOutsideZone)
+	self.range:update(player)
+	self:updateCursor(player)
+	self.buffIcons:update(player)
 end
 
-function uiListItem:updateZone(player, isOutsideZone)
+function uiListItem:updateZone(player)
 	local zoneString = ''
 	
-	if player.zone and isOutsideZone then
+	if player.zone and player.isOutsideZone then
 		if self.layout.text.zone.short then
 			zoneString = '('..res.zones[player.zone]['search']..')'
 		else
@@ -108,11 +106,11 @@ function uiListItem:updateZone(player, isOutsideZone)
 	self.zoneText:update(zoneString)
 end
 
-function uiListItem:updateJob(player, isOutsideZone)
+function uiListItem:updateJob(player)
 	local jobString = ''
 	local subJobString = ''
 	
-	if not isOutsideZone then
+	if not player.isOutsideZone then
 		if player.job then
 			jobString = player.job
 			if player.jobLvl then
@@ -132,10 +130,10 @@ function uiListItem:updateJob(player, isOutsideZone)
 	self.subJobText:update(subJobString)
 end
 
-function uiListItem:updateCursor(player, isOutsideZone)
+function uiListItem:updateCursor(player)
 	local opacity = 0
 	
-	if not isOutsideZone then
+	if not player.isOutsideZone then
 		if player.isSelected then
 			opacity = 1
 		elseif player.isSubTarget then

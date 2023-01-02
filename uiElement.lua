@@ -32,14 +32,21 @@ require('tables')
 -- imports
 local classes = require('classes')
 local utils = require('utils')
+local const = require('const')
 
 -- create the class
 local uiElement = classes.class()
+
+-- static storage for private variables, access using private[self] to keep separate values for each instance
+local private = {}
 
 -- constructor
 -- @param baseLayout optional: layout table defining this UI element. should contain an 'enabled' flag (bool) and a 'pos' (L{ x, y } from windower lists library)
 -- @return true if the UI element is enabled
 function uiElement:init(baseLayout)
+    private[self] = {}
+    private[self].visibility = {}
+
     self.parent = nil
     self.isCreated = false
 
@@ -55,7 +62,7 @@ function uiElement:init(baseLayout)
         self.posX = pos.x
         self.posY = pos.y
     end
-    
+
     self.scaleX = 1
     self.scaleY = 1
     if baseLayout and baseLayout.scale then
@@ -85,6 +92,8 @@ end
 function uiElement:dispose()
     self.isEnabled = false -- disposed elements are not meant to be reused, so deactivate them
     self.isCreated = false
+
+    private[self] = nil
 end
 
 -- override this function to create the windower primitives of this element
@@ -96,8 +105,17 @@ function uiElement:createPrimitives()
     self:applyLayout()
 end
 
--- calculates the element's absolute position and scale based on its parent
+-- updates and applies the layout
 function uiElement:layoutElement()
+    if not self.isEnabled then return end
+
+    self:updateLayout()
+    self:applyLayout()
+end
+
+-- calculates the element's absolute position and scale based on its parent
+-- override this to calculate more values like sizes, etc
+function uiElement:updateLayout()
     if not self.isEnabled then return end
 
     if self.parent then
@@ -116,13 +134,12 @@ function uiElement:layoutElement()
         self.absolutePos.x = math.floor(self.absolutePos.x)
         self.absolutePos.y = math.floor(self.absolutePos.y)
     end
-
-    self:applyLayout()
 end
 
 -- applies the absolute position and dimensions to windower primitives
 function uiElement:applyLayout()
     -- abstract function, must be overridden
+    error('Abstract method call: uiElement:applyLayout')
 end
 
 -- sets the position of this UI element. children will have their position set relative to their parent
@@ -154,13 +171,40 @@ function uiElement:scale(x, y)
 end
 
 -- sets windower primitives visible
-function uiElement:show()
-    -- abstract function, must be overridden
+-- @param flagId an integer identifying a boolean flag. only when all flags are true, the primitive will be come visible
+function uiElement:show(flagId)
+    self:visible(true, flagId)
 end
 
 -- sets windower primitives invisible
-function uiElement:hide()
+-- @param flag an integer identifying a boolean flag. only when all flags are true, the primitive will be come visible
+function uiElement:hide(flagId)
+    self:visible(false, flagId)
+end
+
+-- sets windower primitives' visibility
+-- @param isVisible true to set visible, false to set invisible
+-- @param flag an integer identifying a boolean flag. only when all flags are true, the primitive will be come visible
+function uiElement:visible(isVisible, flagId)
+    if not self.isEnabled then return end
+    if not isVisible then isVisible = false end
+    if not flagId then flagId = const.visDefault end
+
+    if private[self].visibility[flagId] ~= isVisible then
+        private[self].visibility[flagId] = isVisible
+        self:applyVisibility()
+    end
+end
+
+-- returns the overall visibility based on all visibility flags
+function uiElement:getVisibility()
+    return utils:all(private[self].visibility, function(v) return v end)
+end
+
+-- applies the visibility to windower primitives. use getVisibility() to get the evaluated visibility flags
+function uiElement:applyVisibility()
     -- abstract function, must be overridden
+    error('Abstract method call: uiElement:applyVisibility')
 end
 
 return uiElement

@@ -73,7 +73,7 @@ function uiBuffIcons:init(buffLayout)
 			}
 
 			self.buffImages[i] = self:addChild(uiImage.new(imgLayout))
-			self.buffImages[i]:opacity(0)
+			self.buffImages[i]:hide(const.visFeature)
         end
 	end
 end
@@ -145,11 +145,11 @@ function uiBuffIcons:getMaxBuffCount()
 	return math.min(const.maxBuffs, count)
 end
 
-function uiBuffIcons:update(player, isOutsideZone)
+function uiBuffIcons:update(player)
 	if not self.isEnabled then return end
 
 	local buffs = player.filteredBuffs
-	if not buffs or isOutsideZone then
+	if not buffs or player.isOutsideZone then
 		buffs = T{}
 	end
 
@@ -185,10 +185,10 @@ function uiBuffIcons:update(player, isOutsideZone)
 		
 		if buff then
 			image:path(self.buffLayout.path .. tostring(buff) .. '.png')
-			image:opacity(1)
+			image:show(const.visFeature)
 		else
 			image:path('')
-			image:opacity(0)
+			image:hide(const.visFeature)
 		end
 	end
 end

@@ -37,7 +37,12 @@ local const = {
     layoutAllianceSuffix = '_alliance',
 
 	maxBuffs = 32,
-	baseResY = 1440 -- default positions and scales are based on a 1440p screen
+	baseResY = 1440, -- default positions and scales are based on a 1440p screen
+
+	-- visibility flag IDs
+	visDefault = 1, -- the default flag to use when no flag is specified
+	visOutsideZone = 2, -- hide elements based on the player being outside the current zone
+	visFeature = 3 -- for general UI features like icons that show up, etc
 }
 
 return const

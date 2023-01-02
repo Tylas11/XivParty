@@ -80,6 +80,7 @@ function player:merge(other)
 	if other.isSubTarget ~= nil then self.isSubTarget = other.isSubTarget end
 	if other.distance then self.distance = other.distance end
 	if other.zone then self.zone = other.zone end
+	if other.isOutsideZone then self.isOutsideZone = other.isOutsideZone end
 
 	if other.isTrust ~= nil then self.isTrust = other.isTrust end
 
@@ -112,6 +113,7 @@ function player:update(member, target, subtarget)
 	self.isSubTarget = subtarget and member.mob and subtarget.id == member.mob.id
 
 	self.zone = member.zone
+	self.isOutsideZone = self.zone and self.zone ~= windower.ffxi.get_info().zone
 
 	if member.mob then
 		self.id = member.mob.id

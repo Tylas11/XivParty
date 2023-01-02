@@ -30,6 +30,7 @@
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
+local const = require('const')
 
 -- create the class, derive from uiContainer
 local uiLeader = classes.class(uiContainer)
@@ -37,36 +38,22 @@ local uiLeader = classes.class(uiContainer)
 function uiLeader:init(leaderLayout)
 	if self.super:init(leaderLayout) then
 		self.imgParty = self:addChild(uiImage.new(leaderLayout.imgParty))
-		self.imgParty:opacity(0)
+		self.imgParty:hide(const.visFeature)
 
 		self.imgAlliance = self:addChild(uiImage.new(leaderLayout.imgAlliance))
-		self.imgAlliance:opacity(0)
+		self.imgAlliance:hide(const.visFeature)
 
         self.imgQuarterMaster = self:addChild(uiImage.new(leaderLayout.imgQuarterMaster))
-		self.imgQuarterMaster:opacity(0)
+		self.imgQuarterMaster:hide(const.visFeature)
 	end
 end
 
 function uiLeader:update(player)
 	if not self.isEnabled then return end
 
-	if player.isLeader then
-		self.imgParty:opacity(1)
-	else
-		self.imgParty:opacity(0)
-	end
-	
-	if player.isAllianceLeader then
-		self.imgAlliance:opacity(1)
-	else
-		self.imgAlliance:opacity(0)
-	end
-	
-	if player.isQuarterMaster then
-		self.imgQuarterMaster:opacity(1)
-	else
-		self.imgQuarterMaster:opacity(0)
-	end
+	self.imgParty:visible(player.isLeader, const.visFeature)
+	self.imgAlliance:visible(player.isAllianceLeader, const.visFeature)
+	self.imgQuarterMaster:visible(player.isQuarterMaster, const.visFeature)
 end
 
 return uiLeader

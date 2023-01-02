@@ -113,8 +113,7 @@ function uiText:createPrimitives()
     self.wrappedText:stroke_color(private[self].stroke.r, private[self].stroke.g, private[self].stroke.b)
     self.wrappedText:stroke_alpha(private[self].stroke.a)
 
-    -- if visible is not yet set (nil), this will do nothing
-    self.wrappedText:visible(private[self].visible)
+    self.wrappedText:visible(self:getVisibility())
 
     self.super:createPrimitives() -- this will call applyLayout()
 end
@@ -187,27 +186,9 @@ function uiText:alpha(a)
     end
 end
 
-function uiText:show()
-    if not self.isEnabled then return end
-
-	if not private[self].visible then
-		private[self].visible = true
-
-		if self.isCreated then
-			self.wrappedText:show()
-		end
-	end
-end
-
-function uiText:hide()
-    if not self.isEnabled then return end
-
-	if private[self].visible then
-		private[self].visible = false
-
-		if self.isCreated then
-			self.wrappedText:hide()
-		end
+function uiText:applyVisibility()
+	if self.isCreated then
+		self.wrappedText:visible(self:getVisibility())
 	end
 end
 

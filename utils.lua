@@ -46,7 +46,7 @@ function utils:colorFromHex(hexString)
 		utils:log('Invalid hexadecimal color code. Expected format #RRGGBB or #RRGGBBAA', 4)
 		return nil
 	end
-	
+
 	local color = {}
 	color.r = tonumber(string.slice(hexString, 2, 3), 16)
 	color.g = tonumber(string.slice(hexString, 4, 5), 16)
@@ -56,22 +56,22 @@ function utils:colorFromHex(hexString)
 	else
 		color.a = 255
 	end
-	
+
 	return color
 end
 
 -- interprets an L{} list with two elements as X,Y coordinates
 function utils:coord(coordList)
 	local coord = {}
-	
+
 	if coordList then
 		coord.x = tonumber(coordList[1])
 		coord.y = tonumber(coordList[2])
 	end
-	
+
 	if not coord.x then coord.x = 0 end
 	if not coord.y then coord.y = 0 end
-	
+
 	return coord
 end
 
@@ -80,8 +80,33 @@ function utils:round(num, numDecimalPlaces)
 		local mult = 10^numDecimalPlaces
 		return math.floor(num * mult + 0.5) / mult
 	end
-	
+
 	return math.floor(num + 0.5)
+end
+
+-- returns true if the specified function returns true for ALL list values
+function utils:all(list, func)
+	local result = false
+	local first = true
+	for k, v in pairs(list) do
+		if first then
+			first = false
+			result = func(v)
+		else
+			result = result and func(v)
+		end
+    end
+	return result
+end
+
+-- returns true if the specified function returns true for ANY list value
+function utils:any(list, func)
+	local result = false
+	for k, v in pairs(list) do
+		result = result or func(v)
+		if result then return result end
+    end
+	return result
 end
 
 -- stable in-place sorting
@@ -103,7 +128,7 @@ end
 function utils:log(text, level)
 	if level == nil then
 		level = 2 -- default log level: info
-	end	
+	end
 
 	if self.level <= level and text then
 		windower.add_to_chat(8, text) -- message type "8" can be filtered in-game as "call for help"
@@ -114,7 +139,6 @@ function utils:toString(obj)
 	if obj then
 		return tostring(obj)
 	end
-	
 	return '???'
 end
 

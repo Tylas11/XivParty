@@ -121,17 +121,22 @@ function uiImage:createPrimitives()
 	self.wrappedImage:color(private[self].color.r, private[self].color.g, private[self].color.b)
 	self.wrappedImage:alpha(private[self].color.a * private[self].opacity)
 
-	-- if visible is not yet set (nil), this will do nothing
-	self.wrappedImage:visible(private[self].visible)
+	self.wrappedImage:visible(self:getVisibility())
 
 	self.super:createPrimitives() -- this will call applyLayout()
 end
 
-function uiImage:applyLayout()
+function uiImage:updateLayout()
 	if not self.isEnabled then return end
+
+	self.super:updateLayout()
 
 	self.absoluteWidth = self.width * self.absoluteScale.x
 	self.absoluteHeight = self.height * self.absoluteScale.y
+end
+
+function uiImage:applyLayout()
+	if not self.isEnabled then return end
 
 	if self.isCreated then
 		self.wrappedImage:pos(self.absolutePos.x, self.absolutePos.y)
@@ -161,7 +166,7 @@ function uiImage:size(w, h)
 		self.width = w;
 		self.height = h;
 
-		self:applyLayout()
+		self:layoutElement()
 	end
 end
 
@@ -245,27 +250,9 @@ function uiImage:opacity(o)
 	end
 end
 
-function uiImage:show()
-    if not self.isEnabled then return end
-
-	if not private[self].visible then
-		private[self].visible = true
-
-		if self.isCreated then
-			self.wrappedImage:show()
-		end
-	end
-end
-
-function uiImage:hide()
-    if not self.isEnabled then return end
-
-	if private[self].visible then
-		private[self].visible = false
-
-		if self.isCreated then
-			self.wrappedImage:hide()
-		end
+function uiImage:applyVisibility()
+	if self.isCreated then
+		self.wrappedImage:visible(self:getVisibility())
 	end
 end
 

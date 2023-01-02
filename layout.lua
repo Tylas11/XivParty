@@ -80,9 +80,11 @@ layout.hp = {}
 layout.hp.enabled = true
 layout.hp.pos = L{ 19, -7 }
 layout.hp.zOrder = 1
+layout.hp.hideOutsideZone = false
 layout.hp.hpYellowColor = '#F3F37CFF' -- HP < 75%
 layout.hp.hpOrangeColor = '#F8BA80FF' -- HP < 50%
 layout.hp.hpRedColor = '#FC8182FF' -- HP < 25%
+layout.hp.snapToRaster = true
 
 layout.hp.text = {}
 layout.hp.text.enabled = true
@@ -99,7 +101,6 @@ layout.hp.bar = {}
 layout.hp.bar.enabled = true
 layout.hp.bar.pos = L{ 0, 0 }
 layout.hp.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
-layout.hp.bar.barOverlap = 1 -- number of pixels (on each side) the imgBar is wider than the opening in the imgFg
 
 layout.hp.bar.imgBg = {}
 layout.hp.bar.imgBg.enabled = true
@@ -107,15 +108,13 @@ layout.hp.bar.imgBg.pos = L{ 0, 0 }
 layout.hp.bar.imgBg.path = 'assets/XivBarBG.png'
 layout.hp.bar.imgBg.size = L{ 128, 64 }
 layout.hp.bar.imgBg.color = '#FFFFFFFF'
-layout.hp.bar.imgBg.snapToRaster = true
 
 layout.hp.bar.imgBar = {}
 layout.hp.bar.imgBar.enabled = true
-layout.hp.bar.imgBar.pos = L{ 12, 0 } -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
+layout.hp.bar.imgBar.pos = L{ 13, 0 } -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
 layout.hp.bar.imgBar.path = 'assets/XivBar.png'
-layout.hp.bar.imgBar.size = L{ 104, 64 }
+layout.hp.bar.imgBar.size = L{ 102, 64 }
 layout.hp.bar.imgBar.color = '#FFFFFFFF'
-layout.hp.bar.imgBar.snapToRaster = true
 
 layout.hp.bar.imgFg = {}
 layout.hp.bar.imgFg.enabled = true
@@ -123,21 +122,28 @@ layout.hp.bar.imgFg.pos = L{ 0, 0 }
 layout.hp.bar.imgFg.path = 'assets/XivBarFG.png'
 layout.hp.bar.imgFg.size = L{ 128, 64 }
 layout.hp.bar.imgFg.color = '#FFFFFFFF'
-layout.hp.bar.imgFg.snapToRaster = true
 
 layout.hp.bar.imgGlow = {}
 layout.hp.bar.imgGlow.enabled = true
-layout.hp.bar.imgGlow.pos = L{ 12, 0 } -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+layout.hp.bar.imgGlow.pos = L{ 13, 0 } -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
 layout.hp.bar.imgGlow.path = 'assets/XivBarGlow.png'
 layout.hp.bar.imgGlow.size = L{ 6, 64 }
 layout.hp.bar.imgGlow.color = '#FFFFFFFF'
-layout.hp.bar.imgGlow.snapToRaster = true
+
+layout.hp.bar.imgGlowSides = {}
+layout.hp.bar.imgGlowSides.enabled = true
+layout.hp.bar.imgGlowSides.pos = L{ 11, 0 } -- x position set in code
+layout.hp.bar.imgGlowSides.path = 'assets/XivBarGlowSides.png'
+layout.hp.bar.imgGlowSides.size = L{ 2, 64 }
+layout.hp.bar.imgGlowSides.color = '#FFFFFFFF'
 
 -- MP bar
 layout.mp = {}
 layout.mp.enabled = true
 layout.mp.pos = L{ 150, -7 }
 layout.mp.zOrder = 2
+layout.mp.hideOutsideZone = false
+layout.mp.snapToRaster = true
 
 layout.mp.text = {}
 layout.mp.text.enabled = true
@@ -154,7 +160,6 @@ layout.mp.bar = {}
 layout.mp.bar.enabled = true
 layout.mp.bar.pos = L{ 0, 0 }
 layout.mp.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
-layout.mp.bar.barOverlap = 1 -- number of pixels (on each side) the imgBar is wider than the opening in the imgFg
 
 layout.mp.bar.imgBg = {}
 layout.mp.bar.imgBg.enabled = true
@@ -162,15 +167,13 @@ layout.mp.bar.imgBg.pos = L{ 0, 0 }
 layout.mp.bar.imgBg.path = 'assets/XivBarBG.png'
 layout.mp.bar.imgBg.size = L{ 128, 64 }
 layout.mp.bar.imgBg.color = '#FFFFFFFF'
-layout.mp.bar.imgBg.snapToRaster = true
 
 layout.mp.bar.imgBar = {}
 layout.mp.bar.imgBar.enabled = true
-layout.mp.bar.imgBar.pos = L{ 12, 0 } -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
+layout.mp.bar.imgBar.pos = L{ 13, 0 } -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
 layout.mp.bar.imgBar.path = 'assets/XivBar.png'
-layout.mp.bar.imgBar.size = L{ 104, 64 }
+layout.mp.bar.imgBar.size = L{ 102, 64 }
 layout.mp.bar.imgBar.color = '#FFFFFFFF'
-layout.mp.bar.imgBar.snapToRaster = true
 
 layout.mp.bar.imgFg = {}
 layout.mp.bar.imgFg.enabled = true
@@ -178,15 +181,20 @@ layout.mp.bar.imgFg.pos = L{ 0, 0 }
 layout.mp.bar.imgFg.path = 'assets/XivBarFG.png'
 layout.mp.bar.imgFg.size = L{ 128, 64 }
 layout.mp.bar.imgFg.color = '#FFFFFFFF'
-layout.mp.bar.imgFg.snapToRaster = true
 
 layout.mp.bar.imgGlow = {}
 layout.mp.bar.imgGlow.enabled = true
-layout.mp.bar.imgGlow.pos = L{ 12, 0 } -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+layout.mp.bar.imgGlow.pos = L{ 13, 0 } -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
 layout.mp.bar.imgGlow.path = 'assets/XivBarGlow.png'
 layout.mp.bar.imgGlow.size = L{ 6, 64 }
 layout.mp.bar.imgGlow.color = '#FFFFFFFF'
-layout.mp.bar.imgGlow.snapToRaster = true
+
+layout.mp.bar.imgGlowSides = {}
+layout.mp.bar.imgGlowSides.enabled = true
+layout.mp.bar.imgGlowSides.pos = L{ 11, 0 } -- x position set in code
+layout.mp.bar.imgGlowSides.path = 'assets/XivBarGlowSides.png'
+layout.mp.bar.imgGlowSides.size = L{ 2, 64 }
+layout.mp.bar.imgGlowSides.color = '#FFFFFFFF'
 
 -- TP bar
 layout.tp = {}
@@ -194,6 +202,8 @@ layout.tp.enabled = true
 layout.tp.pos = L{ 281, -7 }
 layout.tp.zOrder = 3
 layout.tp.tpFullColor = '#50B4FAFF' -- TP > 1000
+layout.tp.hideOutsideZone = false
+layout.tp.snapToRaster = true
 
 layout.tp.text = {}
 layout.tp.text.enabled = true
@@ -210,7 +220,6 @@ layout.tp.bar = {}
 layout.tp.bar.enabled = true
 layout.tp.bar.pos = L{ 0, 0 }
 layout.tp.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
-layout.tp.bar.barOverlap = 1 -- number of pixels (on each side) the imgBar is wider than the opening in the imgFg
 
 layout.tp.bar.imgBg = {}
 layout.tp.bar.imgBg.enabled = true
@@ -218,15 +227,13 @@ layout.tp.bar.imgBg.pos = L{ 0, 0 }
 layout.tp.bar.imgBg.path = 'assets/XivBarBG.png'
 layout.tp.bar.imgBg.size = L{ 128, 64 }
 layout.tp.bar.imgBg.color = '#FFFFFFFF'
-layout.tp.bar.imgBg.snapToRaster = true
 
 layout.tp.bar.imgBar = {}
 layout.tp.bar.imgBar.enabled = true
-layout.tp.bar.imgBar.pos = L{ 12, 0 } -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
+layout.tp.bar.imgBar.pos = L{ 13, 0 } -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
 layout.tp.bar.imgBar.path = 'assets/XivBar.png'
-layout.tp.bar.imgBar.size = L{ 104, 64 }
+layout.tp.bar.imgBar.size = L{ 102, 64 }
 layout.tp.bar.imgBar.color = '#FFFFFFFF'
-layout.tp.bar.imgBar.snapToRaster = true
 
 layout.tp.bar.imgFg = {}
 layout.tp.bar.imgFg.enabled = true
@@ -234,15 +241,20 @@ layout.tp.bar.imgFg.pos = L{ 0, 0 }
 layout.tp.bar.imgFg.path = 'assets/XivBarFG.png'
 layout.tp.bar.imgFg.size = L{ 128, 64 }
 layout.tp.bar.imgFg.color = '#FFFFFFFF'
-layout.tp.bar.imgFg.snapToRaster = true
 
 layout.tp.bar.imgGlow = {}
 layout.tp.bar.imgGlow.enabled = true
-layout.tp.bar.imgGlow.pos = L{ 12, 0 } -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+layout.tp.bar.imgGlow.pos = L{ 13, 0 } -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
 layout.tp.bar.imgGlow.path = 'assets/XivBarGlow.png'
 layout.tp.bar.imgGlow.size = L{ 6, 64 }
 layout.tp.bar.imgGlow.color = '#FFFFFFFF'
-layout.tp.bar.imgGlow.snapToRaster = true
+
+layout.tp.bar.imgGlowSides = {}
+layout.tp.bar.imgGlowSides.enabled = true
+layout.tp.bar.imgGlowSides.pos = L{ 11, 0 } -- x position set in code
+layout.tp.bar.imgGlowSides.path = 'assets/XivBarGlowSides.png'
+layout.tp.bar.imgGlowSides.size = L{ 2, 64 }
+layout.tp.bar.imgGlowSides.color = '#FFFFFFFF'
 
 -- job icon
 layout.jobIcon = {}
@@ -339,7 +351,7 @@ layout.range.imgNear.color = '#FFFFFFFF'
 layout.range.imgFar = {}
 layout.range.imgFar.enabled = true
 layout.range.imgFar.pos = L { 0, 0 }
-layout.range.imgFar.path = 'assets/RangeIndicator_far.png'
+layout.range.imgFar.path = 'assets/RangeIndicatorFar.png'
 layout.range.imgFar.size = L{ 10, 10 }
 layout.range.imgFar.color = '#FFFFFFFF'
 

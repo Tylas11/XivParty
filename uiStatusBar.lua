@@ -57,14 +57,14 @@ function uiStatusBar:init(statusBarLayout, barType)
 	end
 end
 
-function uiStatusBar:update(player, isOutsideZone)
+function uiStatusBar:update(player)
 	if not self.isEnabled then return end
 
 	local val = nil
 	local valPercent = nil
 	local distance = nil
 
-	if not isOutsideZone then
+	if not player.isOutsideZone then
 		if self.barType == const.barTypeHp then
 			val = player.hp
 			valPercent = player.hpp
@@ -76,19 +76,23 @@ function uiStatusBar:update(player, isOutsideZone)
 			valPercent = player.tpp
 		end
 		distance = player.distance
+
+		self:show(const.visOutsideZone)
+	elseif self.statusBarLayout.hideOutsideZone then
+		self:hide(const.visOutsideZone)
 	end
 
 	if not val then val = -1 end
 	if not valPercent then valPercent = 0 end
-	
+
 	self.bar:update(valPercent / 100)
-	
+
 	if val < 0 then
 		self.text:update('?')
 	else
 		self.text:update(tostring(val))
 	end
-	
+
 	local color = self.textColor
 	if self.barType == const.barTypeHp then
 		if val >= 0 then
@@ -103,18 +107,18 @@ function uiStatusBar:update(player, isOutsideZone)
 	elseif self.barType == const.barTypeTp then
 		if val >= 1000 then
 			color = self.tpFullColor
-		end	
+		end
 	end
-	
+
 	self.text:color(color)
-	
+
 	-- distance indication
-	if distance and distance:sqrt() > 50 then -- cannot target, over 50 distance, mob table not set
-		self.bar:opacity(0.25)
-	elseif distance and distance:sqrt() > 20.79 then -- out of heal range
+	if distance and distance:sqrt() < 20.79 then -- in cast range
+		self.bar:opacity(1)
+	elseif distance and distance:sqrt() < 50 then -- in targeting range
 		self.bar:opacity(0.5)
 	else
-		self.bar:opacity(1)
+		self.bar:opacity(0.25)
 	end
 end
 

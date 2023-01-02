@@ -133,12 +133,12 @@ function view:createSetupData(isMainParty)
 	for i = 0, 5 do
 		local j = res.jobs[math.random(1,22)].ens
 		local sj = res.jobs[math.random(1,22)].ens
-	
+
 		local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
 		setupPlayer:createSetupData(j, sj, isMainParty)
 		setupParty[i] = setupPlayer
 	end
-	
+
 	setupParty[0].isLeader = true
 	setupParty[0].isAllianceLeader = true
 	setupParty[0].isQuarterMaster = true
@@ -153,7 +153,9 @@ function view:createSetupData(isMainParty)
 	else
 		zone = zone - 1
 	end
-	setupParty[math.random(3,5)].zone = zone
+	local outsideZonePlayer = setupParty[math.random(3,5)]
+	outsideZonePlayer.zone = zone
+	outsideZonePlayer.isOutsideZone = true
 
 	return setupParty
 end
@@ -189,6 +191,22 @@ function view:debugSaveLayout()
 	layoutAlliance:save();
 
 	log('Layout saved.')
+end
+
+-- sets bar percentage values of selected setup party members
+function view:debugSetupSetValue(type, value, partyIndex, playerIndex)
+	if not isInitialized or not isSetupEnabled then return end
+	if value == nil then value = 0 end
+	if partyIndex == nil then partyIndex = 0 end
+	if playerIndex == nil then playerIndex = 0 end
+
+	if type == 'tpp' then
+		setupParties[partyIndex][playerIndex].tpp = value
+	elseif type == 'mpp' then
+		setupParties[partyIndex][playerIndex].mpp = value
+	else
+		setupParties[partyIndex][playerIndex].hpp = value
+	end
 end
 
 return view

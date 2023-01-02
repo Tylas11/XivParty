@@ -133,21 +133,26 @@ function uiContainer:layoutElement()
     end
 end
 
--- shows the UI element and all its children
-function uiContainer:show()
-    if not self.isEnabled then return end
-
-    for child in self.children:it() do
-        child:show()
-    end
+function uiContainer:applyLayout()
+    -- nothing to do
 end
 
--- hides the UI element and all its children
-function uiContainer:hide()
+-- shows all children
+function uiContainer:show(flagId)
+    self:visible(true, flagId)
+end
+
+-- hides all children
+function uiContainer:hide(flagId)
+    self:visible(false, flagId)
+end
+
+-- sets visibility of all children
+function uiContainer:visible(isVisible, flagId)
     if not self.isEnabled then return end
 
     for child in self.children:it() do
-        child:hide()
+        child:visible(isVisible, flagId)
     end
 end
 

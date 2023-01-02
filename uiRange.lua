@@ -30,6 +30,7 @@
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
+local const = require('const')
 
 -- create the class, derive from uiContainer
 local uiRange = classes.class(uiContainer)
@@ -39,31 +40,31 @@ function uiRange:init(rangeLayout)
 		self.rangeLayout = rangeLayout
 
 		self.imgNear = self:addChild(uiImage.new(rangeLayout.imgNear))
-		self.imgNear:opacity(0)
+		self.imgNear:hide(const.visFeature)
 
 		self.imgFar = self:addChild(uiImage.new(rangeLayout.imgFar))
-		self.imgFar:opacity(0)
+		self.imgFar:hide(const.visFeature)
 	end
 end
 
-function uiRange:update(player, isOutsideZone)
+function uiRange:update(player)
 	if not self.isEnabled then return end
 
-	local opacity = 0
-	local opacityFar = 0
+	local visibility = false
+	local visibilityFar = false
 
-	if player.distance and not isOutsideZone then
+	if player.distance and not player.isOutsideZone then
 		if Settings.rangeIndicator > 0 and player.distance:sqrt() <= Settings.rangeIndicator then
-			opacity = 1
-			opacityFar = 0
+			visibility = true
+			visibilityFar = false
 		elseif Settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= Settings.rangeIndicatorFar then
-			opacity = 0
-			opacityFar = 1
+			visibility = false
+			visibilityFar = true
 		end
 	end
 	
-	self.imgNear:opacity(opacity)
-	self.imgFar:opacity(opacityFar)
+	self.imgNear:visible(visibility, const.visFeature)
+	self.imgFar:visible(visibilityFar, const.visFeature)
 end
 
 return uiRange

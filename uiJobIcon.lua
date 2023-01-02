@@ -31,6 +31,7 @@ local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiImage = require('uiImage')
 local jobs = require('jobs')
+local const = require('const')
 
 -- create the class, derive from uiContainer
 local uiJobIcon = classes.class(uiContainer)
@@ -40,43 +41,43 @@ function uiJobIcon:init(jobIconLayout)
 		self.jobIconLayout = jobIconLayout
 
 		self.jobHighlight = self:addChild(uiImage.new(jobIconLayout.imgHighlight))
-		self.jobHighlight:opacity(0)
+		self.jobHighlight:hide(const.visFeature)
 		
 		self.jobBg = self:addChild(uiImage.new(jobIconLayout.imgBg))
-		self.jobBg:opacity(0)
+		self.jobBg:hide(const.visFeature)
 		
 		self.jobGradient = self:addChild(uiImage.new(jobIconLayout.imgGradient))
-		self.jobGradient:opacity(0)
+		self.jobGradient:hide(const.visFeature)
 		
 		self.jobIcon = self:addChild(uiImage.new(jobIconLayout.imgIcon))
-		self.jobIcon:opacity(0)
+		self.jobIcon:hide(const.visFeature)
 		
 		self.jobFrame = self:addChild(uiImage.new(jobIconLayout.imgFrame))
-		self.jobFrame:opacity(0)
+		self.jobFrame:hide(const.visFeature)
 	end
 end
 
-function uiJobIcon:update(player, isOutsideZone)
+function uiJobIcon:update(player)
 	if not self.isEnabled then return end
 
-	local opacity = 0
-	local highlightOpacity = 0
+	local visibility = false
+	local highlightVisibility = false
 	
-	if not isOutsideZone and player.job then
+	if not player.isOutsideZone and player.job then
 		self.jobIcon:path(self.jobIconLayout.path .. player.job .. '.png')
 		self.jobBg:color(jobs:getRoleColor(player.job, self.jobIconLayout.colors))
-		opacity = 1
+		visibility = true
 		
 		if player.isSelected then
-			highlightOpacity = 1
+			highlightVisibility = true
 		end
 	end
 	
-	self.jobHighlight:opacity(highlightOpacity)
-	self.jobBg:opacity(opacity)
-	self.jobGradient:opacity(opacity)
-	self.jobIcon:opacity(opacity)
-	self.jobFrame:opacity(opacity)
+	self.jobHighlight:visible(highlightVisibility, const.visFeature)
+	self.jobBg:visible(visibility, const.visFeature)
+	self.jobGradient:visible(visibility, const.visFeature)
+	self.jobIcon:visible(visibility, const.visFeature)
+	self.jobFrame:visible(visibility, const.visFeature)
 end
 
 return uiJobIcon

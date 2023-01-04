@@ -376,7 +376,8 @@ local layout = {
 				zOrder = 0,
 				path = 'assets/XivCursor.png',
 				size = L{ 390, 60 },
-				color = '#FFFFFFFF'
+				color = '#FFFFFFFF',
+				scale = L{ 1, 1 }
 			},
 			-- buff icons
 			buffIcons = {
@@ -389,7 +390,7 @@ local layout = {
 				spacing = L{ 0, 1 }, -- spacing between each icon
 				numIconsByRow = L{ 19, 13 }, -- number of icons to display in each row (max 32 in total)
 				offsetByRow = L{ 0, 6 }, -- offset each row by this many icons to the right
-				alignRight = false -- icons will extend from right to left (adjust pos, origin will change to the right side!)
+				alignRight = false -- icons will extend from right to left (adjust pos, x origin will change to the right side!)
 			},
 			-- text labels
 			text = {

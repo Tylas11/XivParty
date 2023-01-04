@@ -54,25 +54,24 @@ function uiBuffIcons:init(layout)
 		self.maxBuffCount = self:getMaxBuffCount()
 
 		for i = 1, self.maxBuffCount do
-			local imgLayout = {}
-			imgLayout.enabled = true
-			imgLayout.path = ''
-			imgLayout.size = layout.size
-			imgLayout.color = layout.color
-
 			-- row and column start at index 1
 			local row = self:getRow(i)
 			if not row then break end -- cut off any icons that exceed row definitions from the layout
 
 			local column = self:getColumn(i, row)
-			local iconOffset = tonumber(layout.offsetByRow[row]) * (self.size.x * self.scaleX + self.spacing.x)
+			local iconOffset = tonumber(layout.offsetByRow[row]) * (self.size.x + self.spacing.x)
 
-			imgLayout.pos = L{
-				iconOffset + (column - 1) * (self.size.x * self.scaleX + self.spacing.x), 
-				(row - 1) * self.size.y * self.scaleY + (row - 1) * self.spacing.y
-			}
+			local posX = iconOffset + (column - 1) * (self.size.x + self.spacing.x)
+			if self.layout.alignRight then
+				posX = posX - self.maxBuffCount * (self.size.x + self.spacing.x)
+			end
 
-			self.buffImages[i] = self:addChild(uiImage.new(imgLayout))
+			local posY = (row - 1) * self.size.y + (row - 1) * self.spacing.y
+			local size = utils:coord(layout.size)
+			local color = utils:colorFromHex(layout.color)
+
+			self.buffImages[i] = self:addChild(uiImage.create('', size.x, size.y, posX, posY))
+			self.buffImages[i]:color(color)
 			self.buffImages[i]:hide(const.visFeature)
         end
 	end

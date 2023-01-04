@@ -186,8 +186,6 @@ function uiPartyList:updateGrid(rowCount)
 		self.dragImage:pos(0, 0)
 	end
 
-	local count = self.listItems:length()
-
 	for i = 0, 5 do
 		local item = self.listItems[i]
 		if item then

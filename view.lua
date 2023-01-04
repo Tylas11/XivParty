@@ -64,6 +64,7 @@ function view:init(model)
 		lastPartyIndex = 2
 	end
 
+	self:checkLayout(Settings.layout)
 	self:loadLayout(Settings.layout)
 
 	for i = 0, lastPartyIndex do
@@ -90,9 +91,26 @@ function view:dispose()
 	isInitialized = false
 end
 
+local function getLayoutFileNames(layoutName)
+	local layoutFile = const.layoutDir .. layoutName .. const.xmlExtension
+	local layoutAllianceFile = const.layoutDir .. layoutName .. const.layoutAllianceSuffix .. const.xmlExtension
+
+	return layoutFile, layoutAllianceFile
+end
+
+function view:checkLayout(layoutName)
+	local layoutFile = getLayoutFileNames(layoutName)
+
+	if not windower.file_exists(windower.addon_path .. layoutFile) then
+		log('Layout \'' .. layoutName .. '\' not found. Reverting to default \'' .. const.defaultLayout .. '\'.')
+
+		Settings.layout = const.defaultLayout
+		Settings:save()
+	end
+end
+
 function view:loadLayout(layoutName)
-	local layoutFile = const.layoutDir .. layoutName .. '.xml'
-	local layoutAllianceFile = const.layoutDir .. layoutName .. const.layoutAllianceSuffix .. '.xml'
+	local layoutFile, layoutAllianceFile = getLayoutFileNames(layoutName)
 
 	layout = config.load(layoutFile, layoutDefaults)
 

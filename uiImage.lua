@@ -41,10 +41,14 @@ local uiImage = classes.class(uiElement)
 local private = {}
 
 -- alternative constructor
-function uiImage.create(path, sizeX, sizeY, scaleX, scaleY)
+function uiImage.create(path, sizeX, sizeY, posX, posY, scaleX, scaleY)
 	if not sizeX then
 		sizeX = 0
 		sizeY = 0
+	end
+	if not posX then
+		posX = 0
+		posY = 0
 	end
 	if not scaleX then
 		scaleX = 1
@@ -53,9 +57,9 @@ function uiImage.create(path, sizeX, sizeY, scaleX, scaleY)
 
 	local imageLayout = {}
 	imageLayout.enabled = true
-	imageLayout.pos = L{ 0, 0 }
 	imageLayout.path = path
 	imageLayout.size = L{ sizeX, sizeY }
+	imageLayout.pos = L{ posX, posY }
 	imageLayout.scale = L{ scaleX, scaleY }
 
 	return uiImage.new(imageLayout)
@@ -76,6 +80,9 @@ function uiImage:init(layout)
 			self.width = size.x
 			self.height = size.y
 		end
+
+		self.absoluteWidth = 0
+		self.absoluteHeight = 0
 
 		private[self].color = {}
 		private[self].color.r = 255

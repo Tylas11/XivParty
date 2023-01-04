@@ -41,10 +41,6 @@ function uiBackground:init(layout)
 	if self.super:init(layout) then
 		self.layout = layout
 
-		self.size = {}
-		self.size.width = 0
-		self.size.height = 0
-
 		self.sizeMid = utils:coord(layout.imgMid.size)
 
 		self.top = self:addChild(uiImage.new(layout.imgTop))
@@ -72,11 +68,7 @@ function uiBackground:update(contentHeight)
 	self.mid:size(self.sizeMid.x, contentHeight)
 	self.mid:repeat_xy(1, math.floor(contentHeight / self.sizeMid.y))
 
-	self.bottom:pos(self.bottom.posX, self.mid.posY + self.mid.height)
-
-	-- visible size of the whole background area
-	self.size.width = math.max(math.max(self.top.absoluteWidth, self.bottom.absoluteWidth), self.mid.absoluteWidth)
-	self.size.height = self.top.absoluteHeight + self.mid.absoluteHeight + self.bottom.absoluteHeight
+	self.bottom:pos(self.bottom.posX, self.mid.posY + contentHeight)
 end
 
 return uiBackground

@@ -33,7 +33,7 @@
 -- Scale affects all positions and sizes, snapToRaster only affects positions.
 -- Due to a windower limitation, z-orders only work between the same type of element (image, text). Texts will always be placed above images!
 
--- All elements support "enabled", "pos", "scale", "zOrder", "snapToRaster" and all texts support "alignRight". 
+-- All elements support "enabled", "pos", "scale", "zOrder", "snapToRaster" and all texts support "alignRight" and "maxChars". 
 -- However some of these properties have been omitted on some elements to keep the XMLs shorter.
 -- Add these properties to any element in this file if your custom layout requires them, otherwise they will not be loaded from the XML.
 
@@ -402,6 +402,7 @@ local layout = {
 					color = '#F0FFFFFF',
 					stroke = '#062D54C8',
 					strokeWidth = 2,
+					maxChars = 17, -- maximum number of characters to display, longer texts will be cut off by replacing the last allowed char with '...'
 					snapToRaster = true
 				},
 				zone = {

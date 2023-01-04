@@ -28,6 +28,7 @@
 
 -- windower library imports
 local texts = require('texts')
+require('strings')
 
 -- imports
 local classes = require('classes')
@@ -47,6 +48,11 @@ function uiText:init(layout)
         private[self].alignRight = false
         if layout and layout.alignRight ~= nil then
             private[self].alignRight = layout.alignRight
+        end
+
+        private[self].maxChars = 0
+        if layout and layout.maxChars ~= nil then
+            private[self].maxChars = layout.maxChars
         end
 
         private[self].color = {}
@@ -91,6 +97,16 @@ function uiText:dispose()
     self.super:dispose()
 end
 
+local function setTrimmedText(wrappedText, text, maxChars)
+    if text and maxChars > 0 then
+        if #text > maxChars then
+            text = text:slice(1, math.max(1, maxChars - 1)) .. '...'
+        end
+    end
+
+    wrappedText:text(text)
+end
+
 -- NOTE: z-ordering for texts works, but only relative to other texts. windower seems to always place texts above images!
 function uiText:createPrimitives()
     if not self.isEnabled or self.isCreated then return end
@@ -106,7 +122,7 @@ function uiText:createPrimitives()
     RefCountText = RefCountText + 1
     self.wrappedText:bg_visible(false)
     self.wrappedText:font(private[self].font, 'Arial') -- Arial is the fallback font
-    self.wrappedText:text(private[self].text)
+    setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
 
     self.wrappedText:color(private[self].color.r, private[self].color.g, private[self].color.b)
     self.wrappedText:alpha(private[self].color.a)
@@ -141,7 +157,7 @@ function uiText:update(text)
 		private[self].text = text
 
         if self.isCreated then
-		    self.wrappedText:text(private[self].text)
+            setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
         end
 	end
 end

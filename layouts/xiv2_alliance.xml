@@ -237,6 +237,7 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
+                        <maxChars>9</maxChars>
                         <zOrder>4</zOrder>
                     </name>
                     <subJob>

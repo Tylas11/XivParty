@@ -42,7 +42,7 @@
                     <path>assets/FfxiCursor.png</path>
                     <pos>-34,4</pos>
                     <size>37,24</size>
-                    <zOrder>3</zOrder>
+                    <zOrder>4</zOrder>
                 </cursor>
                 <hp>
                     <bar>
@@ -103,7 +103,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1.5</strokeWidth>
                     </text>
-                    <zOrder>0</zOrder>
+                    <zOrder>1</zOrder>
                 </hp>
                 <mp>
                     <bar>
@@ -161,7 +161,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1.5</strokeWidth>
                     </text>
-                    <zOrder>1</zOrder>
+                    <zOrder>2</zOrder>
                 </mp>
                 <jobIcon>
                     <colors>
@@ -211,7 +211,7 @@
                     <pos>-6,2</pos>
                     <scale>0.75,0.75</scale>
                     <snapToRaster>true</snapToRaster>
-                    <zOrder>2</zOrder>
+                    <zOrder>3</zOrder>
                 </jobIcon>
                 <leader>
                     <enabled>true</enabled>
@@ -255,7 +255,8 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
-                        <zOrder>4</zOrder>
+                        <maxChars>9</maxChars>
+                        <zOrder>0</zOrder>
                     </name>
                     <subJob>
                         <enabled>false</enabled>

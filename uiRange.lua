@@ -35,9 +35,10 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiRange = classes.class(uiContainer)
 
-function uiRange:init(layout)
+function uiRange:init(layout, player)
 	if self.super:init(layout) then
 		self.layout = layout
+		self.player = player
 
 		self.imgNear = self:addChild(uiImage.new(layout.imgNear))
 		self.imgNear:hide(const.visFeature)
@@ -47,17 +48,21 @@ function uiRange:init(layout)
 	end
 end
 
-function uiRange:update(player)
+function uiRange:setPlayer(player)
+	self.player = player
+end
+
+function uiRange:update()
 	if not self.isEnabled then return end
 
 	local visibility = false
 	local visibilityFar = false
 
-	if player.distance and not player.isOutsideZone then
-		if Settings.rangeIndicator > 0 and player.distance:sqrt() <= Settings.rangeIndicator then
+	if self.player.distance and not self.player.isOutsideZone then
+		if Settings.rangeIndicator > 0 and self.player.distance:sqrt() <= Settings.rangeIndicator then
 			visibility = true
 			visibilityFar = false
-		elseif Settings.rangeIndicatorFar > 0 and player.distance:sqrt() <= Settings.rangeIndicatorFar then
+		elseif Settings.rangeIndicatorFar > 0 and self.player.distance:sqrt() <= Settings.rangeIndicatorFar then
 			visibility = false
 			visibilityFar = true
 		end
@@ -65,6 +70,8 @@ function uiRange:update(player)
 
 	self.imgNear:visible(visibility, const.visFeature)
 	self.imgFar:visible(visibilityFar, const.visFeature)
+
+	self.super:update()
 end
 
 return uiRange

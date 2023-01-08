@@ -26,39 +26,53 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local settings = {}
-
 -- windower library imports
 local config = require('config')
 require('strings')
 
 -- imports
+local classes = require('classes')
 local defaults = require('defaults')
 local jobDefaults = require('jobdefaults')
 local const = require('const')
 
-local globalSettings = nil
-local jobSettings = nil
-local currentJob = ''
-local model = nil
-local isInitialized = false
+-- create the class
+local settings = classes.class()
 
-settings.jobEnabled = false -- also part of jobSettings and will be written to it
-settings.buffFilters = T{} -- dictionary, key: buff ID, value: bool indicating whether to filter
+function settings:init(model)
+	self.model = model
 
-function settings:init(md)
-	model = md
-	isInitialized = true
+	self.globalSettings = nil
+	self.jobSettings = nil
+	self.currentJob = ''
+
+	self.jobEnabled = false -- also part of jobSettings and will be written to it
+	self.buffFilters = T{} -- dictionary, key: buff ID, value: bool indicating whether to filter
+end
+
+-- copies settings from one table to another
+-- schema defines which keys shall be copied
+-- (optional) ignoreSchema defines which keys shall be skipped
+local function copySettings(from, to, schema, ignoreSchema)
+	for key, val in pairs(schema) do
+		if not ignoreSchema or ignoreSchema[key] == nil then
+			if type(from[key]) == 'table' then
+				to[key] = table.copy(from[key])
+			else
+				to[key] = from[key]
+			end
+		end
+	end
 end
 
 function settings:load(create, enable)
-	local wasJobEnabled = settings.jobEnabled
+	local wasJobEnabled = self.jobEnabled
 
-	globalSettings = config.load(defaults)
-	jobSettings = nil
-	settings.jobEnabled = false
+	self.globalSettings = config.load(defaults)
+	self.jobSettings = nil
+	self.jobEnabled = false
 
-	self:copy(globalSettings, settings, defaults)
+	copySettings(self.globalSettings, self, defaults)
 
 	local job = windower.ffxi.get_player().main_job
 	if job then
@@ -75,23 +89,23 @@ function settings:load(create, enable)
 			end
 
 			if js.jobEnabled then
-				jobSettings = js
-				settings.jobEnabled = true
-				currentJob = job
+				self.jobSettings = js
+				self.jobEnabled = true
+				self.currentJob = job
 
 				if create and not exists then
-					self:copy(settings, jobSettings, jobDefaults) -- apply current global settings to new job file
-					jobSettings:save()
+					copySettings(self, self.jobSettings, jobDefaults) -- apply current global settings to new job file
+					self.jobSettings:save()
 					log('Created job settings for ' .. job .. ' and copied global settings.')
 				else
-					self:copy(jobSettings, settings, jobDefaults) -- load job settings
+					copySettings(self.jobSettings, self, jobDefaults) -- load job settings
 					log('Loaded job settings for ' .. job .. '.')
 				end
 			end
 		end
 	end
 
-	if wasJobEnabled and not settings.jobEnabled then
+	if wasJobEnabled and not self.jobEnabled then
 		log('Global settings applied.')
 	end
 
@@ -101,68 +115,58 @@ end
 function settings:save()
 	self:saveFilters()
 
-	if jobSettings then
-		self:copy(settings, jobSettings, jobDefaults) -- copy only keys that are in job settings
-		jobSettings:save()
+	if self.jobSettings then
+		copySettings(self, self.jobSettings, jobDefaults) -- copy only keys that are in job settings
+		self.jobSettings:save()
 
-		self:copy(settings, globalSettings, defaults, jobDefaults) -- copy keys that are NOT in job settings
-		globalSettings:save()
+		copySettings(self, self.globalSettings, defaults, jobDefaults) -- copy keys that are NOT in job settings
+		self.globalSettings:save()
 	else
-		self:copy(settings, globalSettings, defaults) -- copy all keys
-		globalSettings:save()
+		copySettings(self, self.globalSettings, defaults) -- copy all keys
+		self.globalSettings:save()
 	end
 end
 
 function settings:update()
-	if not isInitialized then return end
+	local player = windower.ffxi.get_player()
+	if not player then return end
 
-	local job = windower.ffxi.get_player().main_job
-
-	if currentJob ~= job then
-		currentJob = job
+	if self.currentJob ~= player.main_job then
+		self.currentJob = player.main_job
 
 		self:load()
 	end
 end
 
--- copies settings from one table to another
--- schema defines which keys shall be copied
--- (optional) ignoreSchema defines which keys shall be skipped
-function settings:copy(from, to, schema, ignoreSchema)
-	for key, val in pairs(schema) do
-		if not ignoreSchema or ignoreSchema[key] == nil then
-			if type(from[key]) == 'table' then
-				to[key] = table.copy(from[key])
-			else
-				to[key] = from[key]
-			end
-		end
-	end
-end
-
 function settings:loadFilters()
-	settings.buffFilters:clear()
+	self.buffFilters:clear()
 
 	-- why use a custom CSV parser? because config.lua does not detect a list with a single element as a list >_>
-	if settings.buffs.filters ~= '' then
-		for part in T(settings.buffs.filters:split(';')):it() do
+	if self.buffs.filters ~= '' then
+		for part in T(self.buffs.filters:split(';')):it() do
 			local buffIdString = part:trim()
 			if buffIdString ~= '' then
-				settings.buffFilters[tonumber(buffIdString)] = true
+				self.buffFilters[tonumber(buffIdString)] = true
 			end
 		end
 	end
 
-	model:refreshFilteredBuffs()
+	self.model:refreshFilteredBuffs()
 end
 
 function settings:saveFilters()
-	settings.buffs.filters = ''
+	self.buffs.filters = ''
 
-	for buffId, doFilter in pairs(settings.buffFilters) do
+	for buffId, doFilter in pairs(self.buffFilters) do
 		-- why add a semicolon even on the first element? because config.lua will mistake a single element as a number and not a string
-		settings.buffs.filters = settings.buffs.filters .. tostring(buffId) .. ';'
+		self.buffs.filters = self.buffs.filters .. tostring(buffId) .. ';'
 	end
+end
+
+function settings:getPartySettings(partyIndex)
+	if partyIndex == 0 then return self.party end
+	if partyIndex == 1 then return self.alliance1 end
+	if partyIndex == 2 then return self.alliance2 end
 end
 
 return settings

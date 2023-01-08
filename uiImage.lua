@@ -33,6 +33,7 @@ local images = require('images')
 local classes = require('classes')
 local uiElement = require('uiElement')
 local utils = require('utils')
+local const = require('const')
 
 -- create the class, derive from uiElement
 local uiImage = classes.class(uiElement)
@@ -97,6 +98,7 @@ function uiImage:init(layout)
 		end
 
 		private[self].opacity = 1.0
+		private[self].initFrames = -1
     end
 end
 
@@ -112,6 +114,14 @@ function uiImage:dispose()
 	self.super:dispose()
 end
 
+local function setPath(image, path)
+	image.wrappedImage:path(windower.addon_path .. path)
+
+	-- this is a workaround for image primitives showing up before their texture is loaded
+	image:hide(const.visInit)
+	private[image].initFrames = 2 -- delay showing for 2 frames
+end
+
 function uiImage:createPrimitives()
 	if not self.isEnabled or self.isCreated then return end
 
@@ -120,15 +130,13 @@ function uiImage:createPrimitives()
 	self.wrappedImage:draggable(false)
 	self.wrappedImage:fit(false) -- scaling only works when 'fit' is false
 
-	if private[self].path then
-		self.wrappedImage:path(windower.addon_path .. private[self].path)
-	end
-
 	self.wrappedImage:repeat_xy(private[self].repeatX, private[self].repeatY)
 	self.wrappedImage:color(private[self].color.r, private[self].color.g, private[self].color.b)
 	self.wrappedImage:alpha(private[self].color.a * private[self].opacity)
 
-	self.wrappedImage:visible(self:getVisibility())
+	if private[self].path then
+		setPath(self, private[self].path)
+	end
 
 	self.super:createPrimitives() -- this will call applyLayout()
 end
@@ -142,12 +150,25 @@ function uiImage:updateLayout()
 	self.absoluteHeight = self.height * self.absoluteScale.y
 end
 
+function uiImage:update()
+	if not self.isEnabled then return end
+
+	-- this is a workaround for image primitives showing up before their texture is loaded
+	if private[self].initFrames >= 0 then
+		if private[self].initFrames == 0 then
+			self:show(const.visInit)
+		end
+		private[self].initFrames = private[self].initFrames - 1
+	end
+end
+
 function uiImage:applyLayout()
 	if not self.isEnabled then return end
 
 	if self.isCreated then
 		self.wrappedImage:pos(self.absolutePos.x, self.absolutePos.y)
 		self.wrappedImage:size(self.absoluteWidth, self.absoluteHeight)
+		self.wrappedImage:visible(self.absoluteVisibility)
 	end
 end
 
@@ -159,8 +180,8 @@ function uiImage:path(path)
 	if private[self].path ~= path then
 		private[self].path = path
 
-		if self.isCreated then 
-			self.wrappedImage:path(windower.addon_path .. path)
+		if self.isCreated then
+			setPath(self, private[self].path)
 		end
 	end
 end
@@ -254,12 +275,6 @@ function uiImage:opacity(o)
 		if self.isCreated then
 			self.wrappedImage:alpha(private[self].color.a * private[self].opacity)
 		end
-	end
-end
-
-function uiImage:applyVisibility()
-	if self.isCreated then
-		self.wrappedImage:visible(self:getVisibility())
 	end
 end
 

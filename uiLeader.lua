@@ -35,8 +35,10 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiLeader = classes.class(uiContainer)
 
-function uiLeader:init(layout)
+function uiLeader:init(layout, player)
 	if self.super:init(layout) then
+		self.player = player
+
 		self.imgParty = self:addChild(uiImage.new(layout.imgParty))
 		self.imgParty:hide(const.visFeature)
 
@@ -48,12 +50,18 @@ function uiLeader:init(layout)
 	end
 end
 
-function uiLeader:update(player)
+function uiLeader:setPlayer(player)
+	self.player = player
+end
+
+function uiLeader:update()
 	if not self.isEnabled then return end
 
-	self.imgParty:visible(player.isLeader, const.visFeature)
-	self.imgAlliance:visible(player.isAllianceLeader, const.visFeature)
-	self.imgQuarterMaster:visible(player.isQuarterMaster, const.visFeature)
+	self.imgParty:visible(self.player.isLeader, const.visFeature)
+	self.imgAlliance:visible(self.player.isAllianceLeader, const.visFeature)
+	self.imgQuarterMaster:visible(self.player.isQuarterMaster, const.visFeature)
+
+	self.super:update()
 end
 
 return uiLeader

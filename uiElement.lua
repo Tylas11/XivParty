@@ -46,6 +46,8 @@ local private = {}
 function uiElement:init(layout)
     private[self] = {}
     private[self].visibility = {}
+    private[self].visibility[const.visDefault] = true
+    self.absoluteVisibility = true
 
     self.parent = nil
     self.isCreated = false
@@ -123,11 +125,15 @@ function uiElement:updateLayout()
         self.absolutePos.y = self.parent.absolutePos.y + self.posY * self.parent.absoluteScale.y
         self.absoluteScale.x = self.parent.absoluteScale.x * self.scaleX
         self.absoluteScale.y = self.parent.absoluteScale.y * self.scaleY
+
+        self.absoluteVisibility = self.parent.absoluteVisibility and self:getVisibility()
     else
         self.absolutePos.x = self.posX
         self.absolutePos.y = self.posY
         self.absoluteScale.x = self.scaleX
         self.absoluteScale.y = self.scaleY
+
+        self.absoluteVisibility = self:getVisibility()
     end
 
     if self.snapToRaster then
@@ -137,9 +143,14 @@ function uiElement:updateLayout()
 end
 
 -- applies the absolute position and dimensions to windower primitives
+-- should be overridden in classes that create primitives
 function uiElement:applyLayout()
-    -- abstract function, must be overridden
-    error('Abstract method call: uiElement:applyLayout')
+    -- nothing to do
+end
+
+-- called every frame (prerender) for every element
+function uiElement:update()
+    -- nothing to do
 end
 
 -- sets the position of this UI element. children will have their position set relative to their parent
@@ -183,7 +194,7 @@ function uiElement:hide(flagId)
 end
 
 -- sets windower primitives' visibility
--- @param isVisible true to set visible, false to set invisible
+-- @param isVisible true to set visible, false to set invisible. defaults to false
 -- @param flag an integer identifying a boolean flag. only when all flags are true, the primitive will be come visible
 function uiElement:visible(isVisible, flagId)
     if not self.isEnabled then return end
@@ -192,19 +203,14 @@ function uiElement:visible(isVisible, flagId)
 
     if private[self].visibility[flagId] ~= isVisible then
         private[self].visibility[flagId] = isVisible
-        self:applyVisibility()
+
+        self:layoutElement()
     end
 end
 
 -- returns the overall visibility based on all visibility flags
 function uiElement:getVisibility()
-    return utils:all(private[self].visibility, function(v) return v end)
-end
-
--- applies the visibility to windower primitives. use getVisibility() to get the evaluated visibility flags
-function uiElement:applyVisibility()
-    -- abstract function, must be overridden
-    error('Abstract method call: uiElement:applyVisibility')
+    return utils:all(private[self].visibility)
 end
 
 return uiElement

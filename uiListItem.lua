@@ -44,18 +44,19 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiListItem = classes.class(uiContainer)
 
-function uiListItem:init(layout)
+function uiListItem:init(layout, player)
 	if self.super:init(layout) then
 		self.layout = layout
+		self.player = player
 
 		self.cursor = self:addChild(uiImage.new(layout.cursor))
 		self.cursor:opacity(0)
 
-		self.hpBar = self:addChild(uiStatusBar.new(layout.hp, const.barTypeHp))
-		self.mpBar = self:addChild(uiStatusBar.new(layout.mp, const.barTypeMp))
-		self.tpBar = self:addChild(uiStatusBar.new(layout.tp, const.barTypeTp))
+		self.hpBar = self:addChild(uiStatusBar.new(layout.hp, const.barTypeHp, player))
+		self.mpBar = self:addChild(uiStatusBar.new(layout.mp, const.barTypeMp, player))
+		self.tpBar = self:addChild(uiStatusBar.new(layout.tp, const.barTypeTp, player))
 
-		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon))
+		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon, player))
 
 		self.nameText = self:addChild(uiText.new(layout.text.name))
 		self.zoneText = self:addChild(uiText.new(layout.text.zone))
@@ -63,65 +64,75 @@ function uiListItem:init(layout)
 		self.jobText = self:addChild(uiText.new(layout.text.job))
 		self.subJobText = self:addChild(uiText.new(layout.text.subJob))
 
-		self.leader = self:addChild(uiLeader.new(layout.leader))
+		self.leader = self:addChild(uiLeader.new(layout.leader, player))
 
-		self.range = self:addChild(uiRange.new(layout.range))
-		self.buffIcons = self:addChild(uiBuffIcons.new(layout.buffIcons))
+		self.range = self:addChild(uiRange.new(layout.range, player))
+		self.buffIcons = self:addChild(uiBuffIcons.new(layout.buffIcons, player))
 	end
 end
 
-function uiListItem:update(player)
-	if not self.isEnabled or not player then return end
+function uiListItem:setPlayer(player)
+	if not self.isEnabled then return end
+	if self.player == player then return end
 
-	self.hpBar:update(player)
-	self.mpBar:update(player)
-	self.tpBar:update(player)
+	self.player = player
 
-	if player.name then
-		self.nameText:update(player.name)
+	self.hpBar:setPlayer(player)
+	self.mpBar:setPlayer(player)
+	self.tpBar:setPlayer(player)
+
+	self.jobIcon:setPlayer(player)
+	self.leader:setPlayer(player)
+	self.range:setPlayer(player)
+	self.buffIcons:setPlayer(player)
+end
+
+function uiListItem:update()
+	if not self.isEnabled or not self.player then return end
+
+	if self.player.name then
+		self.nameText:update(self.player.name)
 	else
 		self.nameText:update('???')
 	end
 
-	self.jobIcon:update(player)
-	self:updateZone(player)
-	self:updateJob(player)
-	self.leader:update(player)
-	self.range:update(player)
-	self:updateCursor(player)
-	self.buffIcons:update(player)
+	self:updateZone()
+	self:updateJob()
+	self:updateCursor()
+
+	self.super:update()
 end
 
-function uiListItem:updateZone(player)
+function uiListItem:updateZone()
 	local zoneString = ''
 
-	if player.zone and player.isOutsideZone then
+	if self.player.zone and self.player.isOutsideZone then
 		if self.layout.text.zone.short then
-			zoneString = '('..res.zones[player.zone]['search']..')'
+			zoneString = '('..res.zones[self.player.zone]['search']..')'
 		else
-			zoneString = '('..res.zones[player.zone].name..')'
+			zoneString = '('..res.zones[self.player.zone].name..')'
 		end
 	end
 
 	self.zoneText:update(zoneString)
 end
 
-function uiListItem:updateJob(player)
+function uiListItem:updateJob()
 	local jobString = ''
 	local subJobString = ''
 
-	if not player.isOutsideZone then
-		if player.job then
-			jobString = player.job
-			if player.jobLvl then
-				jobString = jobString .. ' ' .. tostring(player.jobLvl)
+	if not self.player.isOutsideZone then
+		if self.player.job then
+			jobString = self.player.job
+			if self.player.jobLvl then
+				jobString = jobString .. ' ' .. tostring(self.player.jobLvl)
 			end
 		end
 
-		if player.subJob and player.subJob ~= 'MON' then
-			subJobString = player.subJob
-			if player.subJobLvl then
-				subJobString = subJobString .. ' ' .. tostring(player.subJobLvl)
+		if self.player.subJob and self.player.subJob ~= 'MON' then
+			subJobString = self.player.subJob
+			if self.player.subJobLvl then
+				subJobString = subJobString .. ' ' .. tostring(self.player.subJobLvl)
 			end
 		end
 	end
@@ -130,13 +141,13 @@ function uiListItem:updateJob(player)
 	self.subJobText:update(subJobString)
 end
 
-function uiListItem:updateCursor(player)
+function uiListItem:updateCursor()
 	local opacity = 0
 
-	if not player.isOutsideZone then
-		if player.isSelected then
+	if not self.player.isOutsideZone then
+		if self.player.isSelected then
 			opacity = 1
-		elseif player.isSubTarget then
+		elseif self.player.isSubTarget then
 			opacity = 0.5
 		end
 	end

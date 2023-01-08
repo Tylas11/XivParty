@@ -37,10 +37,11 @@ local utils = require('utils')
 -- create the class, derive from uiContainer
 local uiStatusBar = classes.class(uiContainer)
 
-function uiStatusBar:init(layout, barType)
+function uiStatusBar:init(layout, barType, player)
 	if self.super:init(layout) then
 		self.layout = layout
 		self.barType = barType
+		self.player = player
 
 		self.bar = self:addChild(uiBar.new(layout.bar))
 		self.text = self:addChild(uiText.new(layout.text))
@@ -57,25 +58,29 @@ function uiStatusBar:init(layout, barType)
 	end
 end
 
-function uiStatusBar:update(player)
+function uiStatusBar:setPlayer(player)
+	self.player = player
+end
+
+function uiStatusBar:update()
 	if not self.isEnabled then return end
 
 	local val = nil
 	local valPercent = nil
 	local distance = nil
 
-	if not player.isOutsideZone then
+	if not self.player.isOutsideZone then
 		if self.barType == const.barTypeHp then
-			val = player.hp
-			valPercent = player.hpp
+			val = self.player.hp
+			valPercent = self.player.hpp
 		elseif self.barType == const.barTypeMp then
-			val = player.mp
-			valPercent = player.mpp
+			val = self.player.mp
+			valPercent = self.player.mpp
 		elseif self.barType == const.barTypeTp then
-			val = player.tp
-			valPercent = player.tpp
+			val = self.player.tp
+			valPercent = self.player.tpp
 		end
-		distance = player.distance
+		distance = self.player.distance
 
 		self:show(const.visOutsideZone)
 	elseif self.layout.hideOutsideZone then
@@ -85,7 +90,7 @@ function uiStatusBar:update(player)
 	if not val then val = -1 end
 	if not valPercent then valPercent = 0 end
 
-	self.bar:update(valPercent / 100)
+	self.bar:setValue(valPercent / 100)
 
 	if val < 0 then
 		self.text:update('?')
@@ -120,6 +125,8 @@ function uiStatusBar:update(player)
 	else
 		self.bar:opacity(0.25)
 	end
+
+	self.super:update()
 end
 
 return uiStatusBar

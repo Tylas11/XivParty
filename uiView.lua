@@ -31,66 +31,18 @@ local config = require('config')
 local res = require('resources')
 
 -- imports
+local classes = require('classes')
+local uiContainer = require('uiContainer')
 local uiPartyList = require('uiPartyList')
 local player = require('player')
 local layoutDefaults = require('layout')
 local const = require('const')
 local utils = require('utils')
 
-local view = {}
+-- create the class, derive from uiContainer
+local uiView = classes.class(uiContainer)
 
-local isInitialized = false
-local isSetupEnabled = false
-
-local partyLists = T{} -- UI elements for each party
-local setupParties = T{} -- setup data for each party (a list of lists of players)
-
-local layout
-local layoutAlliance
-
-local lastPartyIndex
-
-function view:init(model)
-	if isInitialized then return end
-
-	if not model then
-		utils:log('view:init missing parameter model!', 4)
-		return
-	end
-
-	if Settings.hideAlliance then
-		lastPartyIndex = 0
-	else
-		lastPartyIndex = 2
-	end
-
-	self:checkLayout(Settings.layout)
-	self:loadLayout(Settings.layout)
-
-	for i = 0, lastPartyIndex do
-		partyLists[i] = uiPartyList.new(
-			model.parties[i],
-			self:getSettingsByIndex(i),
-			i == 0 and layout.partyList or layoutAlliance.partyList, -- lua style ternary operator
-		    i == 0)
-	end
-
-	isInitialized = true
-end
-
-function view:dispose()
-	if not isInitialized then return end
-
-	for i = 0, lastPartyIndex do
-		partyLists[i]:dispose()
-	end
-	setupParties:clear()
-	partyLists:clear()
-
-	isSetupEnabled = false
-	isInitialized = false
-end
-
+-- private functions
 local function getLayoutFileNames(layoutName)
 	local layoutFile = const.layoutDir .. layoutName .. const.xmlExtension
 	local layoutAllianceFile = const.layoutDir .. layoutName .. const.layoutAllianceSuffix .. const.xmlExtension
@@ -98,7 +50,7 @@ local function getLayoutFileNames(layoutName)
 	return layoutFile, layoutAllianceFile
 end
 
-function view:checkLayout(layoutName)
+local function checkLayout(layoutName)
 	local layoutFile = getLayoutFileNames(layoutName)
 
 	if not windower.file_exists(windower.addon_path .. layoutFile) then
@@ -109,43 +61,70 @@ function view:checkLayout(layoutName)
 	end
 end
 
-function view:loadLayout(layoutName)
+local function loadLayout(layoutName)
 	local layoutFile, layoutAllianceFile = getLayoutFileNames(layoutName)
 
-	layout = config.load(layoutFile, layoutDefaults)
+	local layout = config.load(layoutFile, layoutDefaults)
+	local layoutAlliance
 
 	if windower.file_exists(windower.addon_path .. layoutAllianceFile) then
 		layoutAlliance = config.load(layoutAllianceFile, layoutDefaults)
 	else
 		layoutAlliance = layout
 	end
+
+	return layout, layoutAlliance
 end
 
-function view:getSettingsByIndex(index)
-	if index == 0 then return Settings.party end
-	if index == 1 then return Settings.alliance1 end
-	if index == 2 then return Settings.alliance2 end
+function uiView:init(model)
+	if not model then
+		utils:log('uiView:init missing parameter model!', 4)
+		return
+	end
 
-	utils:log('view:getSettingsByIndex: index ' .. tostring(index) .. 'not found!', 4)
-	return nil
-end
+	if self.super:init() then
+		self.partyLists = T{} -- UI elements for each party
+		self.setupParties = T{} -- setup data for each party (a list of lists of players)
+		self.isSetupEnabled = false
 
-function view:setupEnabled(enable)
-	if not isInitialized then return end
-	if enable == nil then return isSetupEnabled end
-
-	isSetupEnabled = enable
-
-	for i = 0, lastPartyIndex do
-		if enable and not setupParties[i] then
-			setupParties[i] = self:createSetupData(i == 0)
+		self.lastPartyIndex = 2
+		if Settings.hideAlliance then
+			self.lastPartyIndex = 0
 		end
-		partyLists[i]:setupEnabled(enable, setupParties[i])
+
+		checkLayout(Settings.layout)
+		self.layout, self.layoutAlliance = loadLayout(Settings.layout)
+
+		for i = 0, self.lastPartyIndex do
+			self.partyLists[i] = self:addChild(uiPartyList.new(
+				i == 0 and self.layout.partyList or self.layoutAlliance.partyList, -- lua style ternary operator
+				model.parties[i],
+				i))
+		end
+
+		-- initialize UI, as there is no parent element to call these for us
+		self:layoutElement()
+		self:createPrimitives()
+	end
+end
+
+function uiView:setupEnabled(enable)
+	if not self.isEnabled then return end
+
+	self.isSetupEnabled = enable
+
+	for i = 0, self.lastPartyIndex do
+		if enable and not self.setupParties[i] then
+			self.setupParties[i] = self:createSetupData(i == 0)
+		end
+		self.partyLists[i]:setupEnabled(enable, self.setupParties[i])
 	end
 end
 
 -- creates party and buffs for setup mode
-function view:createSetupData(isMainParty)
+function uiView:createSetupData(isMainParty)
+	if not self.isEnabled then return end
+
 	local setupParty = T{}
 
 	for i = 0, 5 do
@@ -178,61 +157,44 @@ function view:createSetupData(isMainParty)
 	return setupParty
 end
 
-function view:update(force)
-	if not isInitialized then return end
+function uiView:debugSaveLayout()
+	if not self.isEnabled then return end
 
-	for i = 0, lastPartyIndex do
-		partyLists[i]:update(force)
-	end
-end
-
-function view:show(flagId)
-	if not isInitialized then return end
-
-	for i = 0, lastPartyIndex do
-		partyLists[i]:show(flagId)
-	end
-end
-
-function view:hide(flagId)
-	if not isInitialized then return end
-
-	for i = 0, lastPartyIndex do
-		partyLists[i]:hide(flagId)
-	end
-end
-
-function view:visible(isVisible, flagId)
-	if not isInitialized then return end
-
-	for i = 0, lastPartyIndex do
-		partyLists[i]:visible(isVisible, flagId)
-	end
-end
-
-function view:debugSaveLayout()
-	if not isInitialized then return end
-
-	layout:save()
-	layoutAlliance:save();
+	self.layout:save()
+	self.layoutAlliance:save();
 
 	log('Layout saved.')
 end
 
 -- sets bar percentage values of selected setup party members
-function view:debugSetupSetValue(type, value, partyIndex, playerIndex)
-	if not isInitialized or not isSetupEnabled then return end
+function uiView:debugSetupSetValue(type, value, partyIndex, playerIndex)
+	if not self.isEnabled or not self.isSetupEnabled then return end
 	if value == nil then value = 0 end
 	if partyIndex == nil then partyIndex = 0 end
 	if playerIndex == nil then playerIndex = 0 end
 
 	if type == 'tpp' then
-		setupParties[partyIndex][playerIndex].tpp = value
+		self.setupParties[partyIndex][playerIndex].tpp = value
 	elseif type == 'mpp' then
-		setupParties[partyIndex][playerIndex].mpp = value
+		self.setupParties[partyIndex][playerIndex].mpp = value
 	else
-		setupParties[partyIndex][playerIndex].hpp = value
+		self.setupParties[partyIndex][playerIndex].hpp = value
 	end
 end
 
-return view
+function uiView:debugAddPlayer(party)
+	if not self.isEnabled or not self.isSetupEnabled then return end
+	if not party then party = 0 end
+
+	local setupParty = self.setupParties[party]
+	local i = #setupParty + 1
+
+	local j = res.jobs[math.random(1,22)].ens
+	local sj = res.jobs[math.random(1,22)].ens
+
+	local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
+	setupPlayer:createSetupData(j, sj, party == 0)
+	setupParty[i] = setupPlayer
+end
+
+return uiView

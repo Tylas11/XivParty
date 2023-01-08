@@ -36,9 +36,10 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiJobIcon = classes.class(uiContainer)
 
-function uiJobIcon:init(layout)
+function uiJobIcon:init(layout, player)
 	if self.super:init(layout) then
 		self.layout = layout
+		self.player = player
 
 		self.jobHighlight = self:addChild(uiImage.new(layout.imgHighlight))
 		self.jobHighlight:hide(const.visFeature)
@@ -57,18 +58,22 @@ function uiJobIcon:init(layout)
 	end
 end
 
-function uiJobIcon:update(player)
+function uiJobIcon:setPlayer(player)
+	self.player = player
+end
+
+function uiJobIcon:update()
 	if not self.isEnabled then return end
 
 	local visibility = false
 	local highlightVisibility = false
 
-	if not player.isOutsideZone and player.job then
-		self.jobIcon:path(self.layout.path .. player.job .. '.png')
-		self.jobBg:color(jobs:getRoleColor(player.job, self.layout.colors))
+	if not self.player.isOutsideZone and self.player.job then
+		self.jobIcon:path(self.layout.path .. self.player.job .. '.png')
+		self.jobBg:color(jobs:getRoleColor(self.player.job, self.layout.colors))
 		visibility = true
 
-		if player.isSelected then
+		if self.player.isSelected then
 			highlightVisibility = true
 		end
 	end
@@ -78,6 +83,8 @@ function uiJobIcon:update(player)
 	self.jobGradient:visible(visibility, const.visFeature)
 	self.jobIcon:visible(visibility, const.visFeature)
 	self.jobFrame:visible(visibility, const.visFeature)
+
+	self.super:update()
 end
 
 return uiJobIcon

@@ -37,15 +37,18 @@ local uiBackground = classes.class(uiContainer)
 
 local isDebug = false
 
-function uiBackground:init(layout)
+function uiBackground:init(layout, contentHeight)
 	if self.super:init(layout) then
 		self.layout = layout
 
-		self.sizeMid = utils:coord(layout.imgMid.size)
+		if not contentHeight then contentHeight = 0 end
+		self.contentHeight = contentHeight
 
 		self.top = self:addChild(uiImage.new(layout.imgTop))
 		self.mid = self:addChild(uiImage.new(layout.imgMid))
 		self.bottom = self:addChild(uiImage.new(layout.imgBottom))
+
+		self.sizeMid = utils:coord(layout.imgMid.size)
 
 		if isDebug then -- debug background
 			self.top:path('')
@@ -59,16 +62,21 @@ function uiBackground:init(layout)
 	end
 end
 
+function uiBackground:setContentHeight(contentHeight)
+	self.contentHeight = contentHeight
+end
+
 -- sets the height of the content area (excludes top and bottom tiles)
-function uiBackground:update(contentHeight)
+function uiBackground:update()
 	if not self.isEnabled then return end
 
-	contentHeight = contentHeight / self.scaleY -- negate vertical scaling, we want to set the height directly
+	local contentHeight = self.contentHeight / self.scaleY -- negate vertical scaling, we want to set the height directly
 
 	self.mid:size(self.sizeMid.x, contentHeight)
 	self.mid:repeat_xy(1, math.floor(contentHeight / self.sizeMid.y))
-
 	self.bottom:pos(self.bottom.posX, self.mid.posY + contentHeight)
+
+	self.super:update()
 end
 
 return uiBackground

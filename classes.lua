@@ -80,7 +80,7 @@ function classes.class(baseclass)
 	local function lookup(t, k, rootInstance, fromSuper)
 		-- Quick value lookup, usually anything that is not a function will be set on the root instance.
 		local val = rawget(rootInstance, k)
-		if val then return val end
+		if val ~= nil then return val end
 
 		-- When calling via the 'super' reference, we start traversing from that superclass.
 		-- Otherwise always start at the root of the inheritance tree.
@@ -92,7 +92,7 @@ function classes.class(baseclass)
 		end
 		repeat
 			val = rawget(current.class, k)
-			if val then
+			if val ~= nil then
 				if type(val) == 'function' and val ~= classes.Object.instanceOf then
 					-- Instead of returning the found function (which would be run with the original instance as self),
 					-- we pack it in another function which calls it with the 'current' level of the inheritance tree.
@@ -110,7 +110,7 @@ function classes.class(baseclass)
 			else
 				current = nil
 			end
-		until val or not current
+		until val or current == nil
 	end
 
 	--- Recursively allocates the inheritance tree of the instance.

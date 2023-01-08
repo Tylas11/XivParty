@@ -42,14 +42,15 @@ require('tables')
 -- imports
 local const = require('const')
 local utils = require('utils')
-local view = require('view')
+local uiView = require('uiView')
 local model = require('model').new()
-Settings = require('settings')
+local settings = require('settings')
 
-local isLoaded = false
 local isInitialized = false
-local zoning = false
-local hidden = false
+local isZoning = false
+
+local view = nil
+Settings = nil
 
 math.randomseed(os.time())
 
@@ -58,35 +59,37 @@ math.randomseed(os.time())
 RefCountImage = 0
 RefCountText = 0
 
--- initialization / dispose / events
+-- initialization / events
 
 windower.register_event('load', function()
+	-- settings must only be loaded when logged in, as they are separate for every character
 	if windower.ffxi.get_info().logged_in then
-		Settings:init(model)
+		Settings = settings.new(model)
 		Settings:load()
-		isLoaded = true
+		view = uiView.new(model) -- depends on settings, always create view after loading settings
+		isInitialized = true
 	end
 end)
 
 windower.register_event('login', function()
-	if not isLoaded then
-		Settings:init(model)
+	if not isInitialized then
+		Settings = settings.new(model)
 		Settings:load()
-		isLoaded = true
+		view = uiView.new(model)
+		isInitialized = true
 	end
 end)
 
 windower.register_event('logout', function()
-	isLoaded = false
+	view:dispose()
+	view = nil
+	Settings = nil
+	isInitialized = false
 end)
 
 windower.register_event('status change', function(status)
-	if Settings.hideCutscenes and not hidden and status == 4 then -- hide UI during cutscenes
-		hidden = true
-		view:hide()
-	elseif hidden and status ~= 4 then
-		hidden = false
-		view:show()
+	if isInitialized then
+		view:visible(not Settings.hideCutscenes or status ~= 4, const.visCutscene) -- hide UI during cutscenes
 	end
 end)
 
@@ -94,105 +97,67 @@ local function isSolo()
 	return windower.ffxi.get_party().party1_leader == nil
 end
 
-local function init()
-	if Settings.hideSolo and isSolo() then return end
-	if isInitialized then return end
-
-	utils:log('Initializing...')
-	view:init(model)
-	view:show()
-
-	isInitialized = true
-end
-
-local function dispose()
-	if not isInitialized then return end
-
-	utils:log('Disposing...')
-	view:dispose()
-
-	isInitialized = false
-end
-
-local function zoningFinished()
-	zoning = false
-	init()
-end
-
 -- per frame updating
 
 windower.register_event('prerender', function()
-	if zoning then return end
+	if isZoning or not isInitialized then return end
 
 	Settings:update()
-
-	if Settings.hideSolo then
-		if not isSolo() and not isInitialized then
-			init()
-		elseif isSolo() and isInitialized then
-			dispose()
-		end
-	elseif windower.ffxi.get_info().logged_in and not isInitialized then
-		init()
-	end
-
-	if not isInitialized then return end
-
 	model:updatePlayers()
+
+	view:visible(view.isSetupEnabled or not Settings.hideSolo or not isSolo(), const.visSolo)
 	view:update()
 end)
 
 -- packets
 
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
-	if not zoning then
-		if id == 0xC8 then -- alliance update
-			local packet = packets.parse('incoming', original)
-			if packet then
-				for i = 1, 18 do
-					local playerId = packet['ID ' .. tostring(i)]
-					local flags = packet['Flags ' .. tostring(i)]
-					if flags and playerId and playerId > 0 then
-						local foundPlayer = model:getPlayer(nil, playerId, 'alliance')
-						foundPlayer:updateLeaderFromFlags(flags)
-					end
-				end
-			end
-		end
-
-		if id == 0xDF then -- char update
-			local packet = packets.parse('incoming', original)
-			if packet then
-				local playerId = packet['ID']
-				if playerId and playerId > 0 then
-					utils:log('PACKET: Char update for player ID: '..playerId, 0)
-
-					local foundPlayer = model:getPlayer(nil, playerId, 'char')
-					foundPlayer:updateJobFromPacket(packet)
-				else
-					utils:log('Char update: ID not found.', 1)
-				end
-			end
-		end
-
-		if id == 0xDD then -- party member update
-			local packet = packets.parse('incoming', original)
-			if packet then
-				local name = packet['Name']
-				local playerId = packet['ID']
-				if name and playerId and playerId > 0 then
-					utils:log('PACKET: Party member update for '..name, 0)
-
-					local foundPlayer = model:getPlayer(name, playerId, 'party')
-					foundPlayer:updateJobFromPacket(packet)
-				else
-					utils:log('Party update: name and/or ID not found.', 1)
+	if id == 0xC8 then -- alliance update
+		local packet = packets.parse('incoming', original)
+		if packet then
+			for i = 1, 18 do
+				local playerId = packet['ID ' .. tostring(i)]
+				local flags = packet['Flags ' .. tostring(i)]
+				if flags and playerId and playerId > 0 then
+					local foundPlayer = model:getPlayer(nil, playerId, 'alliance')
+					foundPlayer:updateLeaderFromFlags(flags)
 				end
 			end
 		end
 	end
 
-	if not zoning and id == 0x076 then -- party buffs (Credit: Kenshi, PartyBuffs)
+	if id == 0xDF then -- char update
+		local packet = packets.parse('incoming', original)
+		if packet then
+			local playerId = packet['ID']
+			if playerId and playerId > 0 then
+				utils:log('PACKET: Char update for player ID: '..playerId, 0)
+
+				local foundPlayer = model:getPlayer(nil, playerId, 'char')
+				foundPlayer:updateJobFromPacket(packet)
+			else
+				utils:log('Char update: ID not found.', 1)
+			end
+		end
+	end
+
+	if id == 0xDD then -- party member update
+		local packet = packets.parse('incoming', original)
+		if packet then
+			local name = packet['Name']
+			local playerId = packet['ID']
+			if name and playerId and playerId > 0 then
+				utils:log('PACKET: Party member update for '..name, 0)
+
+				local foundPlayer = model:getPlayer(name, playerId, 'party')
+				foundPlayer:updateJobFromPacket(packet)
+			else
+				utils:log('Party update: name and/or ID not found.', 1)
+			end
+		end
+	end
+
+	if id == 0x076 then -- party buffs (Credit: Kenshi, PartyBuffs)
 		for k = 0, 4 do
 			local playerId = original:unpack('I', k*48+5)
 
@@ -217,12 +182,18 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 
 	if id == 0xB then -- zoning, also happens on log out
 		utils:log('Zoning...')
-		zoning = true
+		isZoning = true
 		model:clear() -- clear model only when zoning, this allows reloading the UI (for layout changes, etc) without losing party data
-		dispose()
-	elseif id == 0xA and zoning then
+		if isInitialized then
+			view:hide(const.visZoning)
+			view:update() -- manual update to clear the UI after clearing the model
+		end
+	elseif id == 0xA and isZoning then -- also happens on login
 		utils:log('Zoning done.')
-		coroutine.schedule(zoningFinished, 3) -- delay a bit so init does not see pre-zone party lists
+		isZoning = false
+		if isInitialized then
+			view:show(const.visZoning)
+		end
 	end
 end)
 
@@ -331,22 +302,20 @@ windower.register_event('addon command', function(...)
 	end
 
 	if command == 'setup' then
-		if not isInitialized then
-			error('Party list not initialized. Join a party or disable hiding while solo.')
-		else
-			local ret = handleCommandOnOff(view:setupEnabled(), args[2], 'Setup mode')
-			view:setupEnabled(ret)
-		end
+		local ret = handleCommandOnOff(view.isSetupEnabled, args[2], 'Setup mode')
+		view:setupEnabled(ret)
 	elseif command == 'hidesolo' then
 		local ret = handleCommandOnOff(Settings.hideSolo, args[2], 'Party list hiding while solo')
 		Settings.hideSolo = ret
 		Settings:save()
 	elseif command == 'hidealliance' then
 		local ret = handleCommandOnOff(Settings.hideAlliance, args[2], 'Alliance list hiding')
-		dispose()
 		Settings.hideAlliance = ret
 		Settings:save()
-		init()
+
+		-- re-create the view, as hideAlliance is only evaluated once in uiView:init
+		view:dispose()
+		view = uiView.new(model)
 	elseif command == 'hidecutscenes' then
 		local ret = handleCommandOnOff(Settings.hideCutscenes, args[2], 'Party list hiding during cutscenes')
 		Settings.hideCutscenes = ret
@@ -358,7 +327,6 @@ windower.register_event('addon command', function(...)
 		Settings.alliance1.alignBottom = ret
 		Settings.alliance2.alignBottom = ret
 		Settings:save()
-		view:update(true) -- force a redraw
 	elseif command == 'customorder' then
 		local ret = handleCommandOnOff(Settings.buffs.customOrder, args[2], 'Custom buff order')
 		Settings.buffs.customOrder = ret
@@ -460,10 +428,12 @@ windower.register_event('addon command', function(...)
 			if windower.file_exists(windower.addon_path .. filename) then
 				log('Loading layout \'' .. args[2] .. '\'.')
 
-				dispose()
 				Settings.layout = args[2]
 				Settings:save()
-				init()
+
+				-- re-create the view, layouts are only loaded in uiView:init
+				view:dispose()
+				view = uiView.new(model)
 			else
 				error('The layout file \'' .. filename .. '\' does not exist!')
 			end
@@ -492,6 +462,8 @@ windower.register_event('addon command', function(...)
 			log('Images: ' .. RefCountImage .. ', Texts: ' .. RefCountText)
 		elseif args[2] == 'set' and args[3] ~= nil then -- example: //xp debug set hpp 50 0 2
 			view:debugSetupSetValue(args[3], tonumber(args[4]), tonumber(args[5]), tonumber(args[6]))
+		elseif args[2] == 'addplayer' then
+			view:debugAddPlayer(tonumber(args[3]))
 		end
 	else
 		showHelp()

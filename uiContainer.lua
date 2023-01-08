@@ -106,9 +106,9 @@ function uiContainer:clearChildren()
     self.children:clear()
 end
 
--- creates the windower primitives of all child UI elements in their z-order
--- design convention: add all children that require z-ordering before calling this. adding children afterwards will 
--- always place primitives on top of existing ones regardless of configured z-order
+-- creates the windower primitives of all child UI elements in their z-order.
+-- design convention: add all children that require z-ordering before calling this. 
+-- adding children afterwards will always place primitives on top of existing ones regardless of configured z-order.
 function uiContainer:createPrimitives()
     if not self.isEnabled then return end
 
@@ -133,26 +133,13 @@ function uiContainer:layoutElement()
     end
 end
 
-function uiContainer:applyLayout()
-    -- nothing to do
-end
-
--- shows all children
-function uiContainer:show(flagId)
-    self:visible(true, flagId)
-end
-
--- hides all children
-function uiContainer:hide(flagId)
-    self:visible(false, flagId)
-end
-
--- sets visibility of all children
-function uiContainer:visible(isVisible, flagId)
+function uiContainer:update()
     if not self.isEnabled then return end
 
+    self.super:update()
+
     for child in self.children:it() do
-        child:visible(isVisible, flagId)
+        child:update()
     end
 end
 

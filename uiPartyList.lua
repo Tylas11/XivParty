@@ -38,29 +38,26 @@ local utils = require('utils')
 -- create the class
 local uiPartyList = classes.class(uiContainer)
 
-function uiPartyList:init(party, partySettings, layout, isMainParty)
+function uiPartyList:init(layout, party, partyIndex)
     if not party then
 		utils:log('uiPartyList:init missing parameter party!', 4)
-		return
-	end
-
-    if not partySettings then
-		utils:log('uiPartyList:init missing parameter partySettings!', 4)
 		return
 	end
 
 	-- TODO: validate layout, rows * columns must always equal 6! (is this technically necessary?)
 
 	if self.super:init(layout) then
-		self.party = party -- list of party members from model.party (or one of the alliances)
-		self.partySettings = partySettings
 		self.layout = layout
+		self.party = party -- list of party members from model.party (or one of the alliances)
+		self.partyIndex = partyIndex
 
 		self.listItems = T{} -- ordered list by party list position, index range 0..5
 		self.setupParty = nil -- list of party members used in setup mode
 		self.isSetupEnabled = false
 		self.isCtrlDown = false
-		self.hidden = false
+
+		local isMainParty = partyIndex == 0
+		local partySettings = Settings:getPartySettings(self.partyIndex)
 
 		local scale = utils:coord(partySettings.scale)
 		local pos = utils:coord(partySettings.pos)
@@ -104,14 +101,12 @@ function uiPartyList:init(party, partySettings, layout, isMainParty)
 		self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
 			return self:handleWindowerMouse(type, x, y, delta, blocked)
 		end)
-
-		-- initialize UI, as there is no parent element to call these for us
-		self.layoutElement()
-		self:createPrimitives()
 	end
 end
 
 function uiPartyList:dispose()
+	if not self.isEnabled then return end
+
     windower.unregister_event(self.keyboardHandlerId)
     windower.unregister_event(self.mouseHandlerId)
 
@@ -122,6 +117,8 @@ function uiPartyList:dispose()
 end
 
 function uiPartyList:setupEnabled(enable, setupParty)
+	if not self.isEnabled then return end
+
 	if enable ~= nil then
 		if enable ~= self.isSetupEnabled then
 			self.isSetupEnabled = enable
@@ -132,9 +129,10 @@ function uiPartyList:setupEnabled(enable, setupParty)
 	return self.isSetupEnabled
 end
 
-function uiPartyList:update(force)
-	local count = self.listItems:length()
+function uiPartyList:update()
+	if not self.isEnabled then return end
 
+	-- update list items
 	for i = 0, 5 do
 		local player
 		if self.isSetupEnabled then
@@ -147,15 +145,11 @@ function uiPartyList:update(force)
 
 		if player then
 			if not item then
-				item = self:addChild(uiListItem.new(self.layout.listItem))
-
+				item = self:addChild(uiListItem.new(self.layout.listItem, player))
 				self.listItems[i] = item
-				if not self.hidden then
-					item:show()
-				end
+			else
+				item:setPlayer(player)
 			end
-
-			item:update(player)
 		elseif item then
 			item:dispose()
 			self:removeChild(item)
@@ -163,22 +157,19 @@ function uiPartyList:update(force)
 		end
 	end
 
-	if count ~= self.listItems:length() or force then
-		local rowCount = math.floor((self.listItems:length() - 1) / self.layout.columns) + 1
-		local contentHeight = rowCount * self.layout.rowHeight + (rowCount - 1) * self.partySettings.itemSpacing
+	local partySettings = Settings:getPartySettings(self.partyIndex)
 
-		self.background:update(contentHeight)
-		self:updateBackgroundVisibility()
+	-- update the background
+	local count = self.listItems:length()
+	local rowCount = math.floor((count - 1) / self.layout.columns) + 1
+	local contentHeight = rowCount * self.layout.rowHeight + (rowCount - 1) * partySettings.itemSpacing
 
-		self.dragImage:size(self.layout.columns * self.layout.columnWidth, rowCount * self.layout.rowHeight)
+	self.background:setContentHeight(contentHeight)
+	self.background:visible(count > 0, const.visFeature)
+	self.dragImage:size(self.layout.columns * self.layout.columnWidth, rowCount * self.layout.rowHeight)
 
-		self:updateGrid(rowCount)
-	end
-end
-
-function uiPartyList:updateGrid(rowCount)
-	-- TODO: refactor this so we dont need to mess with these image positions
-	if self.partySettings.alignBottom then
+	-- update the grid
+	if partySettings.alignBottom then -- TODO: refactor this so we dont need to mess with these image positions
 		self.background:pos(self.bgPos.x, self.bgPos.y - rowCount * self.layout.rowHeight)
 		self.dragImage:pos(0, -rowCount * self.layout.rowHeight)
 	else
@@ -192,45 +183,17 @@ function uiPartyList:updateGrid(rowCount)
 			local row = math.floor(i / self.layout.columns)
     		local column = i % self.layout.columns
 
-			local x = column * (self.layout.columnWidth + self.partySettings.itemSpacing)
-			local y = row * (self.layout.rowHeight + self.partySettings.itemSpacing)
-			if self.partySettings.alignBottom then
+			local x = column * (self.layout.columnWidth + partySettings.itemSpacing)
+			local y = row * (self.layout.rowHeight + partySettings.itemSpacing)
+			if partySettings.alignBottom then
 				y = y - rowCount * self.layout.rowHeight
 			end
 
 			item:pos(x, y)
 		end
 	end
-end
 
-function uiPartyList:updateBackgroundVisibility()
-	if not self.hidden and self.listItems:length() > 0 then
-		self.background:show()
-	else
-		self.background:hide()
-	end
-end
-
-function uiPartyList:show()
-	self.hidden = false
-
-	self:updateBackgroundVisibility()
-	self.dragImage:show()
-
-	for item in self.listItems:it() do
-		item:show()
-	end
-end
-
-function uiPartyList:hide()
-	self.hidden = true
-
-	self:updateBackgroundVisibility()
-	self.dragImage:hide()
-
-	for item in self.listItems:it() do
-		item:hide()
-	end
+	self.super:update()
 end
 
 function uiPartyList:handleWindowerKeyboard(key, down)
@@ -255,7 +218,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
                     posY = math.floor(posY / 10) * 10
                 end
 
-                if self.partySettings.alignBottom then
+                if Settings:getPartySettings(self.partyIndex).alignBottom then
                     self:pos(posX, posY + self.dragImage.height) -- TODO: re-test this
                 else
                     self:pos(posX, posY)
@@ -273,7 +236,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
         -- mouse left release
         elseif type == 2 then
             if self.dragged then
-                self.partySettings.pos = L{ self.posX, self.posY }
+                Settings:getPartySettings(self.partyIndex).pos = L{ self.posX, self.posY }
 
                 log('Position: ' .. self.posX .. ', ' .. self.posY)
                 Settings:save()
@@ -289,7 +252,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
 				local sy = math.max(0.25, self.scaleY + delta / 100)
 				self:scale(sx, sy)
 
-				self.partySettings.scale = L{ sx, sy }
+				Settings:getPartySettings(self.partyIndex).scale = L{ sx, sy }
 
 				log('Scale: ' .. sx .. ', ' .. sy)
                 Settings:save()

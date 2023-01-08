@@ -44,7 +44,11 @@ local const = {
 	visDefault = 1, -- the default flag to use when no flag is specified
 	visOutsideZone = 2, -- hide elements based on the player being outside the current zone
 	visFeature = 3, -- for general UI features like icons that show up, etc
-	visKeyboard = 4 -- temporarily hide UI by holding down a key
+	visKeyboard = 4, -- temporarily hide UI by holding down a key
+	visInit = 5, -- for delayed showing of newly loaded images
+	visCutscene = 6, -- hide UI during cutscenes
+	visSolo = 7, -- hide UI while solo
+	visZoning = 8 -- hide UI while zoning
 }
 
 return const

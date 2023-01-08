@@ -176,7 +176,7 @@ function player:updateBuffs(buffs)
 	for i = 1, const.maxBuffs do
 		local buff = buffs[i]
 
-		if (Settings.buffs.filterMode == 'blacklist' and Settings.buffFilters[buff]) or 
+		if (Settings.buffs.filterMode == 'blacklist' and Settings.buffFilters[buff]) or
 		   (Settings.buffs.filterMode == 'whitelist' and not Settings.buffFilters[buff]) then
 			buff = nil
 		end

@@ -86,6 +86,8 @@ end
 
 -- returns true if the specified function returns true for ALL list values
 function utils:all(list, func)
+	if not func then func = function(x) return x end end
+
 	local result = false
 	local first = true
 	for k, v in pairs(list) do
@@ -101,6 +103,8 @@ end
 
 -- returns true if the specified function returns true for ANY list value
 function utils:any(list, func)
+	if not func then func = function(x) return x end end
+
 	local result = false
 	for k, v in pairs(list) do
 		result = result or func(v)

@@ -36,9 +36,16 @@ local utils = require('utils')
 -- create the class, derive from uiContainer
 local uiBar = classes.class(uiContainer)
 
-function uiBar:init(layout)
+function uiBar:init(layout, value)
 	if self.super:init(layout) then
 		self.layout = layout
+
+		if not value then value = 0 end
+		self.value = value -- the value the bar should display, due to animation this and the other values can differ for a while
+		self.exactValue = value -- the current value of the bar animation, for precise calculations
+		self.currentValue = nil -- the current value of the bar animation. subject to rounding, based on exactValue
+
+		self.isDimmed = false
 
 		self.imgBg = self:addChild(uiImage.new(layout.imgBg))
 		self.imgBar = self:addChild(uiImage.new(layout.imgBar))
@@ -52,10 +59,6 @@ function uiBar:init(layout)
 		self.imgGlowLeft:hide(const.visFeature)
 		self.imgGlowRight:hide(const.visFeature)
 
-		self.isDimmed = false
-		self.value = 1
-		self.exactValue = 1
-
 		self.sizeBar = utils:coord(layout.imgBar.size)
 		self.sizeGlow = utils:coord(layout.imgGlow.size)
 		self.sizeGlowSides = utils:coord(layout.imgGlowSides.size)
@@ -65,32 +68,37 @@ function uiBar:init(layout)
 	end
 end
 
+function uiBar:setValue(value)
+	self.value = value
+end
+
 -- must be called every frame for a smooth animation
-function uiBar:update(targetValue)
+function uiBar:update()
 	if not self.isEnabled then return end
 
-	if self.value ~= targetValue then
-		self.exactValue = self.exactValue + (targetValue - self.exactValue) * self.layout.animSpeed
+	if self.currentValue ~= self.value then
+		self.exactValue = self.exactValue + (self.value - self.exactValue) * self.layout.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
-		self.value = utils:round(self.exactValue, 3)
+		self.currentValue = utils:round(self.exactValue, 3)
 
 		local multiplier
 		if self.isDimmed or not self.imgGlow.isEnabled then -- animate bar, glow hidden while dimmed or when glow disabled
-			multiplier = self.value
+			multiplier = self.currentValue
 		else -- instantly move the bar, the glow will be animated instead
-			multiplier = targetValue
+			multiplier = self.value
 		end
 
 		self.imgBar:size(self.sizeBar.x * multiplier, self.sizeBar.y)
 	end
+	self:updateGlow()
 
-	self:updateGlow(targetValue)
+	self.super:update()
 end
 
-function uiBar:updateGlow(targetValue)
-	if not self.isDimmed and math.abs(targetValue - self.value) > 0.01 then
-		local glowWidth = self.sizeBar.x * math.abs(targetValue - self.value)
-		local glowPosX = self.imgBar.posX + self.sizeBar.x * math.min(targetValue, self.value)
+function uiBar:updateGlow()
+	if not self.isDimmed and math.abs(self.value - self.currentValue) > 0.01 then
+		local glowWidth = self.sizeBar.x * math.abs(self.value - self.currentValue)
+		local glowPosX = self.imgBar.posX + self.sizeBar.x * math.min(self.value, self.currentValue)
 		local glowLeftPosX = glowPosX - self.sizeGlowSides.x
 		local glowRightPosX = glowPosX + glowWidth + self.sizeGlowSides.x
 

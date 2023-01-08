@@ -129,8 +129,6 @@ function uiText:createPrimitives()
     self.wrappedText:stroke_color(private[self].stroke.r, private[self].stroke.g, private[self].stroke.b)
     self.wrappedText:stroke_alpha(private[self].stroke.a)
 
-    self.wrappedText:visible(self:getVisibility())
-
     self.super:createPrimitives() -- this will call applyLayout()
 end
 
@@ -148,6 +146,7 @@ function uiText:applyLayout()
     self.wrappedText:pos(x, y)
     self.wrappedText:size(private[self].fontSize * self.absoluteScale.y)
     self.wrappedText:stroke_width(private[self].strokeWidth * self.absoluteScale.x)
+    self.wrappedText:visible(self.absoluteVisibility)
 end
 
 function uiText:update(text)
@@ -200,12 +199,6 @@ function uiText:alpha(a)
 	        self.wrappedText:alpha(a)
         end
     end
-end
-
-function uiText:applyVisibility()
-	if self.isCreated then
-		self.wrappedText:visible(self:getVisibility())
-	end
 end
 
 return uiText

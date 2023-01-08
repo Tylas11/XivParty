@@ -36,9 +36,10 @@ local utils = require('utils')
 -- create the class, derive from uiContainer
 local uiBuffIcons = classes.class(uiContainer)
 
-function uiBuffIcons:init(layout)
+function uiBuffIcons:init(layout, player)
 	if self.super:init(layout) then
 		self.layout = layout
+		self.player = player
 
 		self.spacing = utils:coord(layout.spacing)
 		self.size = utils:coord(layout.size)
@@ -75,6 +76,10 @@ function uiBuffIcons:init(layout)
 			self.buffImages[i]:hide(const.visFeature)
         end
 	end
+end
+
+function uiBuffIcons:setPlayer(player)
+	self.player = player
 end
 
 function uiBuffIcons:validateLayout(layout)
@@ -144,52 +149,55 @@ function uiBuffIcons:getMaxBuffCount()
 	return math.min(const.maxBuffs, count)
 end
 
-function uiBuffIcons:update(player)
+function uiBuffIcons:update()
 	if not self.isEnabled then return end
 
-	local buffs = player.filteredBuffs
-	if not buffs or player.isOutsideZone then
+	local buffs = self.player.filteredBuffs
+	if not buffs or self.player.isOutsideZone then
 		buffs = T{}
 	end
 
-	if table.equals(buffs, self.currentBuffs) then return end
-	self.currentBuffs = table.copy(buffs)
+	if not table.equals(buffs, self.currentBuffs) then
+		self.currentBuffs = table.copy(buffs)
 
-	for i = 1, self.maxBuffCount do -- iterate through all images
-		local buff
-		local image = self.buffImages[i]
+		for i = 1, self.maxBuffCount do -- iterate through all images
+			local buff
+			local image = self.buffImages[i]
 
-		-- right aligned: find the index of the buff to place in the current image
-		if self.layout.alignRight then
-			local row = self:getRow(i)
-			if not row then break end -- cut off any icons that exceed row definitions from the layout
+			-- right aligned: find the index of the buff to place in the current image
+			if self.layout.alignRight then
+				local row = self:getRow(i)
+				if not row then break end -- cut off any icons that exceed row definitions from the layout
 
-			local numIcons = self.layout.numIconsByRow[row] -- maximum number of icons that fit in this row
-			local sumPreviousRows = self:getSumOfPreviousRows(row)
+				local numIcons = self.layout.numIconsByRow[row] -- maximum number of icons that fit in this row
+				local sumPreviousRows = self:getSumOfPreviousRows(row)
 
-			local totalBuffCount = math.min(buffs:length(), self.maxBuffCount) -- total number of active buffs to display
-			local buffCountInRow = math.min(totalBuffCount - sumPreviousRows, numIcons) -- number of active buffs to display in current row
+				local totalBuffCount = math.min(buffs:length(), self.maxBuffCount) -- total number of active buffs to display
+				local buffCountInRow = math.min(totalBuffCount - sumPreviousRows, numIcons) -- number of active buffs to display in current row
 
-			local indexOffset = buffCountInRow - numIcons -- offset between image index and buff index
-			local index = i + indexOffset
+				local indexOffset = buffCountInRow - numIcons -- offset between image index and buff index
+				local index = i + indexOffset
 
-			if index - sumPreviousRows > 0 then -- make sure that the indexOffset doesn't push us to the previous rows
-				buff = buffs[index]
-			else
-				buff = nil -- clear the image
+				if index - sumPreviousRows > 0 then -- make sure that the indexOffset doesn't push us to the previous rows
+					buff = buffs[index]
+				else
+					buff = nil -- clear the image
+				end
+			else -- left aligned: buff index = image index
+				buff = buffs[i]
 			end
-		else -- left aligned: buff index = image index
-			buff = buffs[i]
-		end
 
-		if buff then
-			image:path(self.layout.path .. tostring(buff) .. '.png')
-			image:show(const.visFeature)
-		else
-			image:path('')
-			image:hide(const.visFeature)
+			if buff then
+				image:path(self.layout.path .. tostring(buff) .. '.png')
+				image:show(const.visFeature)
+			else
+				image:path('')
+				image:hide(const.visFeature)
+			end
 		end
 	end
+
+	self.super:update()
 end
 
 return uiBuffIcons

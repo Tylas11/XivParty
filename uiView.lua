@@ -28,16 +28,13 @@
 
 -- windower library imports
 local config = require('config')
-local res = require('resources')
 
 -- imports
 local classes = require('classes')
 local uiContainer = require('uiContainer')
 local uiPartyList = require('uiPartyList')
-local player = require('player')
 local layoutDefaults = require('layout')
 local const = require('const')
-local utils = require('utils')
 
 -- create the class, derive from uiContainer
 local uiView = classes.class(uiContainer)
@@ -76,85 +73,61 @@ local function loadLayout(layoutName)
 	return layout, layoutAlliance
 end
 
-function uiView:init(model)
-	if not model then
-		utils:log('uiView:init missing parameter model!', 4)
-		return
-	end
+function uiView:init(model, isUiLocked)
+	if isUiLocked == nil then isUiLocked = true end
 
 	if self.super:init() then
+		self.model = model
+		self.isUiLocked = isUiLocked
+
 		self.partyLists = T{} -- UI elements for each party
-		self.setupParties = T{} -- setup data for each party (a list of lists of players)
-		self.isSetupEnabled = false
 
-		self.lastPartyIndex = 2
-		if Settings.hideAlliance then
-			self.lastPartyIndex = 0
-		end
-
-		checkLayout(Settings.layout)
-		self.layout, self.layoutAlliance = loadLayout(Settings.layout)
-
-		for i = 0, self.lastPartyIndex do
-			self.partyLists[i] = self:addChild(uiPartyList.new(
-				i == 0 and self.layout.partyList or self.layoutAlliance.partyList, -- lua style ternary operator
-				model.parties[i],
-				i))
-		end
-
-		-- initialize UI, as there is no parent element to call these for us
-		self:layoutElement()
-		self:createPrimitives()
+		self:reload()
 	end
 end
 
-function uiView:setupEnabled(enable)
-	if not self.isEnabled then return end
+function uiView:reload()
+	self:clearChildren(true) -- destroy previously loaded UI
 
-	self.isSetupEnabled = enable
+	self.lastPartyIndex = 2
+	if Settings.hideAlliance then
+		self.lastPartyIndex = 0
+	end
+
+	checkLayout(Settings.layout)
+	self.layout, self.layoutAlliance = loadLayout(Settings.layout)
 
 	for i = 0, self.lastPartyIndex do
-		if enable and not self.setupParties[i] then
-			self.setupParties[i] = self:createSetupData(i == 0)
-		end
-		self.partyLists[i]:setupEnabled(enable, self.setupParties[i])
+		self.partyLists[i] = self:addChild(uiPartyList.new(
+			i == 0 and self.layout.partyList or self.layoutAlliance.partyList, -- lua style ternary operator
+			i,
+			self.model,
+			self.isUiLocked))
+	end
+
+	-- initialize UI, as there is no parent element to call these for us
+	self:layoutElement()
+	self:createPrimitives()
+end
+
+function uiView:setModel(model)
+	if not self.isEnabled then return end
+
+	self.model = model
+
+	for i = 0, self.lastPartyIndex do
+		self.partyLists[i]:setModel(model)
 	end
 end
 
--- creates party and buffs for setup mode
-function uiView:createSetupData(isMainParty)
+function uiView:setUiLocked(isUiLocked)
 	if not self.isEnabled then return end
 
-	local setupParty = T{}
+	self.isUiLocked = isUiLocked
 
-	for i = 0, 5 do
-		local j = res.jobs[math.random(1,22)].ens
-		local sj = res.jobs[math.random(1,22)].ens
-
-		local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
-		setupPlayer:createSetupData(j, sj, isMainParty)
-		setupParty[i] = setupPlayer
+	for i = 0, self.lastPartyIndex do
+		self.partyLists[i]:setUiLocked(isUiLocked)
 	end
-
-	setupParty[0].isLeader = true
-	setupParty[0].isAllianceLeader = true
-	setupParty[0].isQuarterMaster = true
-
-	-- NOTE: can't be both selected and out of zone, so range only 0-2
-	setupParty[math.random(0,2)].isSelected = true
-
-	-- set a zone that is not the current zone for one player, to show off the zone name display
-	local zone = windower.ffxi.get_info().zone
-	if zone == 0 then
-		zone = zone + 1
-	else
-		zone = zone - 1
-	end
-	local outsideZonePlayer = setupParty[math.random(3,5)]
-	outsideZonePlayer.zone = zone
-	outsideZonePlayer.isOutsideZone = true
-
-	return setupParty
 end
 
 function uiView:debugSaveLayout()
@@ -164,37 +137,6 @@ function uiView:debugSaveLayout()
 	self.layoutAlliance:save();
 
 	log('Layout saved.')
-end
-
--- sets bar percentage values of selected setup party members
-function uiView:debugSetupSetValue(type, value, partyIndex, playerIndex)
-	if not self.isEnabled or not self.isSetupEnabled then return end
-	if value == nil then value = 0 end
-	if partyIndex == nil then partyIndex = 0 end
-	if playerIndex == nil then playerIndex = 0 end
-
-	if type == 'tpp' then
-		self.setupParties[partyIndex][playerIndex].tpp = value
-	elseif type == 'mpp' then
-		self.setupParties[partyIndex][playerIndex].mpp = value
-	else
-		self.setupParties[partyIndex][playerIndex].hpp = value
-	end
-end
-
-function uiView:debugAddPlayer(party)
-	if not self.isEnabled or not self.isSetupEnabled then return end
-	if not party then party = 0 end
-
-	local setupParty = self.setupParties[party]
-	local i = #setupParty + 1
-
-	local j = res.jobs[math.random(1,22)].ens
-	local sj = res.jobs[math.random(1,22)].ens
-
-	local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
-	setupPlayer:createSetupData(j, sj, party == 0)
-	setupParty[i] = setupPlayer
 end
 
 return uiView

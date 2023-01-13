@@ -26,6 +26,9 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
+local res = require('resources')
+
 -- imports
 local classes = require('classes')
 local player = require('player')
@@ -165,6 +168,70 @@ function model:refreshFilteredBuffs()
 	for p in self.parties[0]:it() do -- alliance members do not have buff information, only iterate the main party list as a minor optimization
 		p:refreshFilteredBuffs()
 	end
+end
+
+-- creates dummy parties for setup mode
+function model:createSetupData()
+	for partyIndex = 0, 2 do
+		for i = 0, 5 do
+			local j = res.jobs[math.random(1,22)].ens
+			local sj = res.jobs[math.random(1,22)].ens
+
+			local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
+			setupPlayer:createSetupData(j, sj, partyIndex == 0)
+			self.parties[partyIndex][i] = setupPlayer
+		end
+
+		self.parties[partyIndex][0].isLeader = true
+		self.parties[partyIndex][0].isAllianceLeader = true
+		self.parties[partyIndex][0].isQuarterMaster = true
+
+		-- NOTE: can't be both selected and out of zone, so range only 0-2
+		self.parties[partyIndex][math.random(0,2)].isSelected = true
+
+		-- set a zone that is not the current zone for one player, to show off the zone name display
+		local zone = windower.ffxi.get_info().zone
+		if zone == 0 then
+			zone = zone + 1
+		else
+			zone = zone - 1
+		end
+		local outsideZonePlayer = self.parties[partyIndex][math.random(3,5)]
+		outsideZonePlayer.zone = zone
+		outsideZonePlayer.isOutsideZone = true
+	end
+end
+
+-- sets bar percentage values of selected setup party members
+function model:debugSetBarValue(type, value, partyIndex, playerIndex)
+	if value == nil then value = 0 end
+	if partyIndex == nil then partyIndex = 0 end
+	if playerIndex == nil then playerIndex = 0 end
+
+	if type == 'tpp' then
+		self.parties[partyIndex][playerIndex].tpp = value
+	elseif type == 'mpp' then
+		self.parties[partyIndex][playerIndex].mpp = value
+	else
+		self.parties[partyIndex][playerIndex].hpp = value
+	end
+end
+
+-- adds a new setup player to the specified party
+function model:debugAddSetupPlayer(partyIndex)
+	if not partyIndex then partyIndex = 0 end
+
+	local setupParty = self.parties[partyIndex]
+	local i = #setupParty + 1
+
+	if i > 5 then error('Cannot add setup player, party full!') return end
+
+	local j = res.jobs[math.random(1,22)].ens
+	local sj = res.jobs[math.random(1,22)].ens
+
+	local setupPlayer = player.new('Player' .. tostring(i + 1), (i + 1), nil) -- model only needed for party leader lookup for trusts, can skip here
+	setupPlayer:createSetupData(j, sj, partyIndex == 0)
+	setupParty[i] = setupPlayer
 end
 
 return model

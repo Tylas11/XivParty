@@ -53,10 +53,7 @@ end
 function uiContainer:dispose()
     if not self.isEnabled then return end
 
-    for child in self.children:it() do
-        child:dispose()
-    end
-    self:clearChildren()
+    self:clearChildren(true)
 
     self.super:dispose()
 end
@@ -95,12 +92,18 @@ function uiContainer:removeChild(child)
 end
 
 -- removes all child UI elements
-function uiContainer:clearChildren()
+-- @param dispose when true, children are also disposed
+function uiContainer:clearChildren(dispose)
     if not self.isEnabled then return end
 
     for child in self.children:it() do
         child.parent = nil
-        child:layoutElement()
+
+        if dispose then
+            child:dispose()
+        else
+            child:layoutElement()
+        end
     end
 
     self.children:clear()

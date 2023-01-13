@@ -46,11 +46,15 @@ local uiView = require('uiView')
 local model = require('model').new()
 local settings = require('settings')
 
+-- local and global variables
 local isInitialized = false
 local isZoning = false
 
 local view = nil
 Settings = nil
+
+local setupModel = nil
+local isSetupEnabled = false
 
 math.randomseed(os.time())
 
@@ -105,7 +109,7 @@ windower.register_event('prerender', function()
 	Settings:update()
 	model:updatePlayers()
 
-	view:visible(view.isSetupEnabled or not Settings.hideSolo or not isSolo(), const.visSolo)
+	view:visible(isSetupEnabled or not Settings.hideSolo or not isSolo(), const.visSolo)
 	view:update()
 end)
 
@@ -186,14 +190,15 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 		model:clear() -- clear model only when zoning, this allows reloading the UI (for layout changes, etc) without losing party data
 		if isInitialized then
 			view:hide(const.visZoning)
-			view:update() -- manual update to clear the UI after clearing the model
 		end
 	elseif id == 0xA and isZoning then -- also happens on login
 		utils:log('Zoning done.')
 		isZoning = false
-		if isInitialized then
-			view:show(const.visZoning)
-		end
+		coroutine.schedule(function()
+			if isInitialized then
+				view:show(const.visZoning)
+			end
+		end, 3) -- delay showing UI for 3 sec to hide pre-zoning party lists
 	end
 end)
 
@@ -294,6 +299,18 @@ local function getRange(arg)
 	return range
 end
 
+local function setSetupEnabled(enabled)
+	isSetupEnabled = enabled
+
+	if not setupModel then
+		setupModel = model.new()
+		setupModel:createSetupData()
+	end
+
+	view:setModel(isSetupEnabled and setupModel or model) -- lua style ternary operator
+	view:setUiLocked(not isSetupEnabled)
+end
+
 windower.register_event('addon command', function(...)
 	local args = T{...}
 	local command
@@ -302,8 +319,8 @@ windower.register_event('addon command', function(...)
 	end
 
 	if command == 'setup' then
-		local ret = handleCommandOnOff(view.isSetupEnabled, args[2], 'Setup mode')
-		view:setupEnabled(ret)
+		local ret = handleCommandOnOff(isSetupEnabled, args[2], 'Setup mode')
+		setSetupEnabled(ret)
 	elseif command == 'hidesolo' then
 		local ret = handleCommandOnOff(Settings.hideSolo, args[2], 'Party list hiding while solo')
 		Settings.hideSolo = ret
@@ -312,10 +329,7 @@ windower.register_event('addon command', function(...)
 		local ret = handleCommandOnOff(Settings.hideAlliance, args[2], 'Alliance list hiding')
 		Settings.hideAlliance = ret
 		Settings:save()
-
-		-- re-create the view, as hideAlliance is only evaluated once in uiView:init
-		view:dispose()
-		view = uiView.new(model)
+		view:reload()
 	elseif command == 'hidecutscenes' then
 		local ret = handleCommandOnOff(Settings.hideCutscenes, args[2], 'Party list hiding during cutscenes')
 		Settings.hideCutscenes = ret
@@ -331,6 +345,8 @@ windower.register_event('addon command', function(...)
 		local ret = handleCommandOnOff(Settings.buffs.customOrder, args[2], 'Custom buff order')
 		Settings.buffs.customOrder = ret
 		Settings:save()
+		if setupModel then setupModel:refreshFilteredBuffs() end
+		model:refreshFilteredBuffs() -- TODO: test if this ever worked without this line for party member buffs
 	elseif command == 'range' then
 		if args[2] then
 			local range1 = getRange(args[2])
@@ -364,6 +380,7 @@ windower.register_event('addon command', function(...)
 			if checkBuff(buffId) then
 				Settings.buffFilters[buffId] = true
 				Settings:save()
+				if setupModel then setupModel:refreshFilteredBuffs() end
 				model:refreshFilteredBuffs()
 				log('Added buff filter for ' .. getBuffText(buffId))
 			end
@@ -372,12 +389,14 @@ windower.register_event('addon command', function(...)
 			if checkBuff(buffId) then
 				Settings.buffFilters[buffId] = nil
 				Settings:save()
+				if setupModel then setupModel:refreshFilteredBuffs() end
 				model:refreshFilteredBuffs()
 				log('Removed buff filter for ' .. getBuffText(buffId))
 			end
 		elseif subCommand == 'clear' then
 			Settings.buffFilters = T{}
 			Settings:save()
+			if setupModel then setupModel:refreshFilteredBuffs() end
 			model:refreshFilteredBuffs()
 			log('All buff filters cleared.')
 		elseif subCommand == 'list' then
@@ -391,6 +410,7 @@ windower.register_event('addon command', function(...)
 			local ret = handleCommand(Settings.buffs.filterMode, args[3], 'Filter mode', 'blacklist', 'blacklist', 'whitelist', 'whitelist')
 			Settings.buffs.filterMode = ret
 			Settings:save()
+			if setupModel then setupModel:refreshFilteredBuffs() end
 			model:refreshFilteredBuffs()
 		else
 			showHelp()
@@ -431,9 +451,7 @@ windower.register_event('addon command', function(...)
 				Settings.layout = args[2]
 				Settings:save()
 
-				-- re-create the view, layouts are only loaded in uiView:init
-				view:dispose()
-				view = uiView.new(model)
+				view:reload()
 			else
 				error('The layout file \'' .. filename .. '\' does not exist!')
 			end
@@ -456,14 +474,15 @@ windower.register_event('addon command', function(...)
 			log('Global settings applied. The job specific settings for ' .. job .. ' will remain saved for later use.')
 		end
 	elseif command == 'debug' then
-		if args[2] == 'savelayout' then
+		local subCommand = string.lower(args[2])
+		if subCommand == 'savelayout' then
 			view:debugSaveLayout()
-		elseif args[2] == 'refcount' then
+		elseif subCommand == 'refcount' then
 			log('Images: ' .. RefCountImage .. ', Texts: ' .. RefCountText)
-		elseif args[2] == 'set' and args[3] ~= nil then -- example: //xp debug set hpp 50 0 2
-			view:debugSetupSetValue(args[3], tonumber(args[4]), tonumber(args[5]), tonumber(args[6]))
-		elseif args[2] == 'addplayer' then
-			view:debugAddPlayer(tonumber(args[3]))
+		elseif subCommand == 'setbar' and args[3] ~= nil and setupModel then -- example: //xp debug setbar hpp 50 0 2
+			setupModel:debugSetBarValue(args[3], tonumber(args[4]), tonumber(args[5]), tonumber(args[6]))
+		elseif subCommand == 'addplayer' and setupModel then
+			setupModel:debugAddSetupPlayer(tonumber(args[3]))
 		end
 	else
 		showHelp()

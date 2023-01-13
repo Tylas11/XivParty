@@ -38,23 +38,16 @@ local utils = require('utils')
 -- create the class
 local uiPartyList = classes.class(uiContainer)
 
-function uiPartyList:init(layout, party, partyIndex)
-    if not party then
-		utils:log('uiPartyList:init missing parameter party!', 4)
-		return
-	end
-
+function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 	-- TODO: validate layout, rows * columns must always equal 6! (is this technically necessary?)
 
 	if self.super:init(layout) then
 		self.layout = layout
-		self.party = party -- list of party members from model.party (or one of the alliances)
 		self.partyIndex = partyIndex
+		self.model = model
+		self.isUiLocked = isUiLocked -- blocks mouse drag and scale
 
 		self.listItems = T{} -- ordered list by party list position, index range 0..5
-		self.setupParty = nil -- list of party members used in setup mode
-		self.isSetupEnabled = false
-		self.isCtrlDown = false
 
 		local isMainParty = partyIndex == 0
 		local partySettings = Settings:getPartySettings(self.partyIndex)
@@ -93,6 +86,8 @@ function uiPartyList:init(layout, party, partyIndex)
 		self.dragImage:show()
 		self.dragged = nil
 
+		self.isCtrlDown = false
+
 		-- register windower event handlers
 		self.keyboardHandlerId = windower.register_event('keyboard', function(key, down)
 			self:handleWindowerKeyboard(key, down)
@@ -110,23 +105,17 @@ function uiPartyList:dispose()
     windower.unregister_event(self.keyboardHandlerId)
     windower.unregister_event(self.mouseHandlerId)
 
-	self.isSetupEnabled = false
 	self.listItems:clear()
 
 	self.super:dispose()
 end
 
-function uiPartyList:setupEnabled(enable, setupParty)
-	if not self.isEnabled then return end
+function uiPartyList:setModel(model)
+	self.model = model
+end
 
-	if enable ~= nil then
-		if enable ~= self.isSetupEnabled then
-			self.isSetupEnabled = enable
-            self.setupParty = setupParty
-		end
-	end
-
-	return self.isSetupEnabled
+function uiPartyList:setUiLocked(isUiLocked)
+	self.isUiLocked = isUiLocked
 end
 
 function uiPartyList:update()
@@ -134,13 +123,7 @@ function uiPartyList:update()
 
 	-- update list items
 	for i = 0, 5 do
-		local player
-		if self.isSetupEnabled then
-			player = self.setupParty[i]
-		else
-			player = self.party[i]
-		end
-
+		local player = self.model.parties[self.partyIndex][i]
 		local item = self.listItems[i]
 
 		if player then
@@ -206,7 +189,7 @@ end
 function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
     if blocked then return end
 
-    if self.isSetupEnabled then
+    if not self.isUiLocked then
         -- mouse drag
         if type == 0 then
             if self.dragged then

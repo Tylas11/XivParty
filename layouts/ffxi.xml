@@ -43,7 +43,7 @@
                     <pos>293,0</pos>
                     <size>20,20</size>
                     <spacing>0,1</spacing>
-                    <zOrder>11</zOrder>
+                    <zOrder>12</zOrder>
                 </buffIcons>
                 <cursor>
                     <color>#FFFFFFFF</color>
@@ -51,8 +51,16 @@
                     <path>assets/FfxiCursor.png</path>
                     <pos>-38,4</pos>
                     <size>37,24</size>
-                    <zOrder>4</zOrder>
+                    <zOrder>5</zOrder>
                 </cursor>
+                <hover>
+                    <color>#FFFFFFAA</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivHover.png</path>
+                    <pos>20,-8</pos>
+                    <size>390,60</size>
+                    <zOrder>0</zOrder>
+                </hover>
                 <hp>
                     <bar>
                         <animSpeed>0.1</animSpeed>
@@ -111,7 +119,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
                     </text>
-                    <zOrder>0</zOrder>
+                    <zOrder>1</zOrder>
                 </hp>
                 <jobIcon>
                     <colors>
@@ -161,7 +169,7 @@
                     <pos>-11,-2</pos>
                     <scale>1,1</scale>
                     <snapToRaster>true</snapToRaster>
-                    <zOrder>3</zOrder>
+                    <zOrder>4</zOrder>
                 </jobIcon>
                 <leader>
                     <enabled>true</enabled>
@@ -188,7 +196,7 @@
                     </imgQuarterMaster>
                     <pos>88,5</pos>
                     <scale>1,1</scale>
-                    <zOrder>9</zOrder>
+                    <zOrder>10</zOrder>
                 </leader>
                 <mp>
                     <bar>
@@ -245,7 +253,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
                     </text>
-                    <zOrder>1</zOrder>
+                    <zOrder>2</zOrder>
                 </mp>
                 <range>
                     <enabled>true</enabled>
@@ -264,7 +272,7 @@
                         <size>10,10</size>
                     </imgNear>
                     <pos>30,30</pos>
-                    <zOrder>10</zOrder>
+                    <zOrder>11</zOrder>
                 </range>
                 <text>
                     <job>
@@ -276,7 +284,7 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1</strokeWidth>
-                        <zOrder>7</zOrder>
+                        <zOrder>8</zOrder>
                     </job>
                     <name>
                         <color>#F0FFFFFF</color>
@@ -288,7 +296,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
                         <maxChars>17</maxChars>
-                        <zOrder>5</zOrder>
+                        <zOrder>6</zOrder>
                     </name>
                     <subJob>
                         <color>#F0FFFFFF</color>
@@ -299,7 +307,7 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1</strokeWidth>
-                        <zOrder>8</zOrder>
+                        <zOrder>9</zOrder>
                     </subJob>
                     <zone>
                         <alignRight>false</alignRight>
@@ -312,7 +320,7 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
-                        <zOrder>6</zOrder>
+                        <zOrder>7</zOrder>
                     </zone>
                 </text>
                 <tp>
@@ -371,7 +379,7 @@
                         <strokeWidth>2</strokeWidth>
                     </text>
                     <tpFullColor>#50B4FAFF</tpFullColor>
-                    <zOrder>2</zOrder>
+                    <zOrder>3</zOrder>
                 </tp>
             </listItem>
         </partyList>

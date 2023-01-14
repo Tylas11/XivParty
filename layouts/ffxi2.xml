@@ -2,7 +2,7 @@
 <settings>
     <global>
         <partyList>
-            <columnWidth>180</columnWidth>
+            <columnWidth>168</columnWidth>
             <columns>1</columns>
             <rowHeight>32</rowHeight>
             <rows>6</rows>
@@ -43,7 +43,7 @@
                     <pos>-25,5</pos>
                     <size>20,20</size>
                     <spacing>0,1</spacing>
-                    <zOrder>11</zOrder>
+                    <zOrder>9</zOrder>
                 </buffIcons>
                 <cursor>
                     <color>#FFFFFFFF</color>
@@ -52,8 +52,16 @@
                     <pos>-24,7</pos>
                     <size>37,24</size>
                     <scale>0.75,0.75</scale>
-                    <zOrder>4</zOrder>
+                    <zOrder>6</zOrder>
                 </cursor>
+                <hover>
+                    <color>#FFFFFFAA</color>
+                    <enabled>true</enabled>
+                    <path>assets/FfxiAllyHover.png</path>
+                    <pos>18,-6</pos>
+                    <size>156,44</size>
+                    <zOrder>0</zOrder>
+                </hover>
                 <hp>
                     <bar>
                         <animSpeed>0.1</animSpeed>
@@ -113,7 +121,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1.5</strokeWidth>
                     </text>
-                    <zOrder>1</zOrder>
+                    <zOrder>2</zOrder>
                 </hp>
                 <mp>
                     <bar>
@@ -171,7 +179,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1.5</strokeWidth>
                     </text>
-                    <zOrder>2</zOrder>
+                    <zOrder>3</zOrder>
                 </mp>
                 <tp>
                     <bar>
@@ -193,7 +201,7 @@
                         <strokeWidth>1.5</strokeWidth>
                     </text>
                     <tpFullColor>#50B4FAFF</tpFullColor>
-                    <zOrder>2</zOrder>
+                    <zOrder>4</zOrder>
                 </tp>
                 <jobIcon>
                     <colors>
@@ -243,7 +251,7 @@
                     <pos>-6,2</pos>
                     <scale>0.75,0.75</scale>
                     <snapToRaster>true</snapToRaster>
-                    <zOrder>3</zOrder>
+                    <zOrder>5</zOrder>
                 </jobIcon>
                 <leader>
                     <enabled>true</enabled>
@@ -269,7 +277,7 @@
                         <size>7,5</size>
                     </imgQuarterMaster>
                     <pos>26,21</pos>
-                    <zOrder>6</zOrder>
+                    <zOrder>8</zOrder>
                 </leader>
                 <range>
                     <enabled>false</enabled>
@@ -288,7 +296,7 @@
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
                         <maxChars>9</maxChars>
-                        <zOrder>0</zOrder>
+                        <zOrder>1</zOrder>
                     </name>
                     <subJob>
                         <enabled>false</enabled>
@@ -304,7 +312,7 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
-                        <zOrder>5</zOrder>
+                        <zOrder>7</zOrder>
                     </zone>
                 </text>
             </listItem>

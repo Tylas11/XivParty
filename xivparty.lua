@@ -334,6 +334,10 @@ windower.register_event('addon command', function(...)
 		local ret = handleCommandOnOff(Settings.hideCutscenes, args[2], 'Party list hiding during cutscenes')
 		Settings.hideCutscenes = ret
 		Settings:save()
+	elseif command == 'mousetargeting' then
+		local ret = handleCommandOnOff(Settings.mouseTargeting, args[2], 'Targeting party members using the mouse')
+		Settings.mouseTargeting = ret
+		Settings:save()
 	elseif command == 'alignbottom' then
 		local ret = handleCommandOnOff(Settings.party.alignBottom, args[2], 'Bottom alignment')
 		-- TODO: maybe we want to set these separately?

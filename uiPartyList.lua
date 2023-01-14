@@ -115,7 +115,12 @@ function uiPartyList:setModel(model)
 end
 
 function uiPartyList:setUiLocked(isUiLocked)
+	if not self.isEnabled then return end
+
 	self.isUiLocked = isUiLocked
+	for item in self.listItems:it() do
+		item:setUiLocked(isUiLocked)
+	end
 end
 
 function uiPartyList:update()
@@ -128,7 +133,7 @@ function uiPartyList:update()
 
 		if player then
 			if not item then
-				item = self:addChild(uiListItem.new(self.layout.listItem, player))
+				item = self:addChild(uiListItem.new(self.layout.listItem, player, self.isUiLocked, self.layout.columnWidth, self.layout.rowHeight))
 				self.listItems[i] = item
 			else
 				item:setPlayer(player)

@@ -66,31 +66,33 @@ function player:merge(other)
 	utils:log('Merging player ' .. utils:toString(other.name) .. '(' .. utils:toString(other.id) .. ')' ..
 			  ' into ' .. utils:toString(self.name) .. '(' .. utils:toString(self.id) .. ')', 2)
 
-	if other.name then self.name = other.name end
-	if other.id and other.id > 0 then self.id = other.id end
+	if other.name ~= nil then self.name = other.name end
+	if other.id ~= nil and other.id > 0 then self.id = other.id end
 
-	if other.hp then self.hp = other.hp end
-	if other.mp then self.mp = other.mp end
-	if other.tp then self.tp = other.tp end
-	if other.hpp then self.hpp = other.hpp end
-	if other.mpp then self.mpp = other.mpp end
-	if other.tpp then self.tpp = other.tpp end
+	if other.hp ~= nil then self.hp = other.hp end
+	if other.mp ~= nil then self.mp = other.mp end
+	if other.tp ~= nil then self.tp = other.tp end
+	if other.hpp ~= nil then self.hpp = other.hpp end
+	if other.mpp ~= nil then self.mpp = other.mpp end
+	if other.tpp ~= nil then self.tpp = other.tpp end
 
 	if other.isSelected ~= nil then self.isSelected = other.isSelected end
 	if other.isSubTarget ~= nil then self.isSubTarget = other.isSubTarget end
-	if other.distance then self.distance = other.distance end
-	if other.zone then self.zone = other.zone end
-	if other.isOutsideZone then self.isOutsideZone = other.isOutsideZone end
+	if other.distance ~= nil then self.distance = other.distance end
+	if other.zone ~= nil then self.zone = other.zone end
+	if other.isOutsideZone ~= nil then self.isOutsideZone = other.isOutsideZone end
+	if other.isInCastingRange ~= nil then self.isInCastingRange = other.isInCastingRange end
+	if other.isInTargetingRange ~= nil then self.isInTargetingRange = other.isInTargetingRange end
 
 	if other.isTrust ~= nil then self.isTrust = other.isTrust end
 
-	if other.job then self.job = other.job end
-	if other.jobLvl then self.jobLvl = other.jobLvl end
-	if other.subJob then self.subJob = other.subJob end
-	if other.subJobLvl then self.subJobLvl = other.subJobLvl end
+	if other.job ~= nil then self.job = other.job end
+	if other.jobLvl ~= nil then self.jobLvl = other.jobLvl end
+	if other.subJob ~= nil then self.subJob = other.subJob end
+	if other.subJobLvl ~= nil then self.subJobLvl = other.subJobLvl end
 
-	if other.buffs then self.buffs = other.buffs end
-	if other.filteredBuffs then self.filteredBuffs = other.filteredBuffs end
+	if other.buffs ~= nil then self.buffs = other.buffs end
+	if other.filteredBuffs ~= nil then self.filteredBuffs = other.filteredBuffs end
 
 	if other.isLeader ~= nil then self.isLeader = other.isLeader end
 	if other.isAllianceLeader ~= nil then self.isAllianceLeader = other.isAllianceLeader end
@@ -140,6 +142,9 @@ function player:update(member, target, subtarget)
 	else
 		self.distance = 99999 -- no mob means player too far to target
 	end
+
+	self.isInCastingRange = self.distance and self.distance:sqrt() < 20.79
+	self.isInTargetingRange = self.distance and self.distance:sqrt() < 50
 
 	local mainPlayer = windower.ffxi.get_player()
 	if member.name == mainPlayer.name then -- set buffs and job info for main player
@@ -236,6 +241,8 @@ function player:createSetupData(job, subJob, isMainParty)
 	self.isSelected = false
 	self.isSubTarget = false
 	self.distance = math.random(0, 400)
+	self.isInCastingRange = self.distance:sqrt() < 20.79
+	self.isInTargetingRange = self.distance:sqrt() < 50
 	self.isTrust = false
 
 	self.job = job

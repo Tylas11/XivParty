@@ -29,7 +29,7 @@
                     <pos>0,0</pos>
                     <size>327,5</size>
                 </imgTop>
-                <pos>0,0</pos>
+                <pos>-6,-6</pos>
             </background>
             <listItem>
                 <enabled>true</enabled>
@@ -40,10 +40,18 @@
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
                     <path>assets/XivAllyCursor.png</path>
-                    <pos>0,0</pos>
+                    <pos>-6,-6</pos>
                     <size>116,53</size>
-                    <zOrder>0</zOrder>
+                    <zOrder>1</zOrder>
                 </cursor>
+                <hover>
+                    <color>#FFFFFFAA</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyHover.png</path>
+                    <pos>-11,-8</pos>
+                    <size>125,55</size>
+                    <zOrder>0</zOrder>
+                </hover>
                 <hp>
                     <bar>
                         <animSpeed>0.1</animSpeed>
@@ -89,12 +97,12 @@
                     <hpOrangeColor>#F8BA80FF</hpOrangeColor>
                     <hpRedColor>#FC8182FF</hpRedColor>
                     <hpYellowColor>#F3F37CFF</hpYellowColor>
-                    <pos>43,-6</pos>
+                    <pos>37,-12</pos>
                     <snapToRaster>true</snapToRaster>
                     <text>
                         <enabled>false</enabled>
                     </text>
-                    <zOrder>1</zOrder>
+                    <zOrder>2</zOrder>
                 </hp>
                 <mp>
                     <bar>
@@ -137,12 +145,12 @@
                     <hpOrangeColor>#F8BA80FF</hpOrangeColor>
                     <hpRedColor>#FC8182FF</hpRedColor>
                     <hpYellowColor>#F3F37CFF</hpYellowColor>
-                    <pos>43,-6</pos>
+                    <pos>37,-12</pos>
                     <snapToRaster>true</snapToRaster>
                     <text>
                         <enabled>false</enabled>
                     </text>
-                    <zOrder>1</zOrder>
+                    <zOrder>3</zOrder>
                 </mp>
                 <jobIcon>
                     <colors>
@@ -189,10 +197,10 @@
                         <size>36,36</size>
                     </imgIcon>
                     <path>assets/jobIcons/</path>
-                    <pos>10,10</pos>
+                    <pos>4,4</pos>
                     <scale>0.9,0.9</scale>
                     <snapToRaster>true</snapToRaster>
-                    <zOrder>2</zOrder>
+                    <zOrder>4</zOrder>
                 </jobIcon>
                 <leader>
                     <enabled>true</enabled>
@@ -217,9 +225,9 @@
                         <pos>0,24</pos>
                         <size>24,24</size>
                     </imgQuarterMaster>
-                    <pos>0,6</pos>
+                    <pos>-6,0</pos>
                     <scale>0.8,0.8</scale>
-                    <zOrder>3</zOrder>
+                    <zOrder>5</zOrder>
                 </leader>
                 <range>
                     <enabled>false</enabled>
@@ -232,13 +240,13 @@
                         <color>#F0FFFFFF</color>
                         <enabled>true</enabled>
                         <font>Arial</font>
-                        <pos>47,7</pos>
+                        <pos>41,1</pos>
                         <size>8</size>
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>2</strokeWidth>
                         <maxChars>9</maxChars>
-                        <zOrder>4</zOrder>
+                        <zOrder>6</zOrder>
                     </name>
                     <subJob>
                         <enabled>false</enabled>

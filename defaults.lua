@@ -33,6 +33,7 @@ local defaults = {
 	hideSolo = false, -- hides the party list when you are not in a party
 	hideAlliance = false, -- hides UI for alliance parties
 	hideCutscenes = true, -- hides UI during cutscenes or when talking to NPCs
+	mouseTargeting = true, -- enables targeting party members using the mouse
 
 	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
 	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off

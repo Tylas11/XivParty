@@ -44,10 +44,14 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiListItem = classes.class(uiContainer)
 
-function uiListItem:init(layout, player)
+function uiListItem:init(layout, player, isUiLocked, itemWidth, itemHeight)
 	if self.super:init(layout) then
 		self.layout = layout
 		self.player = player
+		self.isUiLocked = isUiLocked
+
+		self.hover = self:addChild(uiImage.new(layout.hover))
+		self.hover:hide(const.visFeature)
 
 		self.cursor = self:addChild(uiImage.new(layout.cursor))
 		self.cursor:opacity(0)
@@ -68,7 +72,26 @@ function uiListItem:init(layout, player)
 
 		self.range = self:addChild(uiRange.new(layout.range, player))
 		self.buffIcons = self:addChild(uiBuffIcons.new(layout.buffIcons, player))
+
+		self.mouseArea = self:addChild(uiImage.create())
+		self.mouseArea:size(math.max(0, itemWidth - 1), math.max(0, itemHeight - 1)) -- reduce size by 1 to prevent hovering over two neighboring items at the same time
+		self.mouseArea:alpha(0)
+
+		self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
+			return self:handleWindowerMouse(type, x, y, delta, blocked)
+		end)
 	end
+end
+
+function uiListItem:dispose()
+	if not self.isEnabled then return end
+
+	if self.mouseHandlerId then
+		windower.unregister_event(self.mouseHandlerId)
+		self.mouseHandlerId = nil
+	end
+
+	self.super:dispose()
 end
 
 function uiListItem:setPlayer(player)
@@ -85,6 +108,16 @@ function uiListItem:setPlayer(player)
 	self.leader:setPlayer(player)
 	self.range:setPlayer(player)
 	self.buffIcons:setPlayer(player)
+end
+
+function uiListItem:setUiLocked(isUiLocked)
+	if not self.isEnabled then return end
+
+	self.isUiLocked = isUiLocked
+
+	if not isUiLocked then
+		self.hover:hide(const.visFeature)
+	end
 end
 
 function uiListItem:update()
@@ -153,6 +186,33 @@ function uiListItem:updateCursor()
 	end
 
 	self.cursor:opacity(opacity)
+end
+
+-- handle mouse interaction
+function uiListItem:handleWindowerMouse(type, x, y, delta, blocked)
+    if blocked then return end
+
+    if self.isUiLocked and Settings.mouseTargeting then
+		if self.mouseArea:hover(x, y) and not self.player.isOutsideZone and self.player.isInTargetingRange then
+			-- mouse move
+			if type == 0 then
+				self.hover:show(const.visFeature)
+			-- mouse left click
+			elseif type == 1 then
+				return true
+			-- mouse left release
+			elseif type == 2 then
+				windower.send_command('input /ta ' .. self.player.name)
+				return true
+			end
+		else
+			self.hover:hide(const.visFeature)
+		end
+    else
+		self.hover:hide(const.visFeature)
+	end
+
+    return false
 end
 
 return uiListItem

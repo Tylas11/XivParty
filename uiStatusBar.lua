@@ -67,7 +67,6 @@ function uiStatusBar:update()
 
 	local val = nil
 	local valPercent = nil
-	local distance = nil
 
 	if not self.player.isOutsideZone then
 		if self.barType == const.barTypeHp then
@@ -80,7 +79,6 @@ function uiStatusBar:update()
 			val = self.player.tp
 			valPercent = self.player.tpp
 		end
-		distance = self.player.distance
 
 		self:show(const.visOutsideZone)
 	elseif self.layout.hideOutsideZone then
@@ -118,9 +116,9 @@ function uiStatusBar:update()
 	self.text:color(color)
 
 	-- distance indication
-	if distance and distance:sqrt() < 20.79 then -- in cast range
+	if self.player.isInCastingRange then
 		self.bar:opacity(1)
-	elseif distance and distance:sqrt() < 50 then -- in targeting range
+	elseif self.player.isInTargetingRange then
 		self.bar:opacity(0.5)
 	else
 		self.bar:opacity(0.25)

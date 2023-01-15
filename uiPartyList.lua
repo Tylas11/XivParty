@@ -41,7 +41,7 @@ local uiPartyList = classes.class(uiContainer)
 function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 	-- TODO: validate layout, rows * columns must always equal 6! (is this technically necessary?)
 
-	if self.super:init(layout) then
+	if self.super:init() then
 		self.layout = layout
 		self.partyIndex = partyIndex
 		self.model = model
@@ -81,9 +81,9 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		self.background = self:addChild(uiBackground.new(layout.background))
 		self.bgPos = utils:coord(layout.background.pos)
 
-		self.dragImage = self:addChild(uiImage.create())
-		self.dragImage:alpha(0)
-		self.dragImage:show()
+		self.imgMouse = self:addChild(uiImage.create())
+		self.imgMouse:alpha(0)
+		self.imgMouse:show()
 		self.dragged = nil
 
 		self.isCtrlDown = false
@@ -154,15 +154,15 @@ function uiPartyList:update()
 
 	self.background:setContentHeight(contentHeight)
 	self.background:visible(count > 0, const.visFeature)
-	self.dragImage:size(self.layout.columns * self.layout.columnWidth, rowCount * self.layout.rowHeight)
+	self.imgMouse:size(self.layout.columns * self.layout.columnWidth, rowCount * self.layout.rowHeight)
 
 	-- update the grid
 	if partySettings.alignBottom then -- TODO: refactor this so we dont need to mess with these image positions
 		self.background:pos(self.bgPos.x, self.bgPos.y - rowCount * self.layout.rowHeight)
-		self.dragImage:pos(0, -rowCount * self.layout.rowHeight)
+		self.imgMouse:pos(0, -rowCount * self.layout.rowHeight)
 	else
 		self.background:pos(self.bgPos.x, self.bgPos.y)
-		self.dragImage:pos(0, 0)
+		self.imgMouse:pos(0, 0)
 	end
 
 	for i = 0, 5 do
@@ -190,7 +190,7 @@ function uiPartyList:handleWindowerKeyboard(key, down)
     end
 end
 
--- handle drag and drop
+-- handle mouse interaction
 function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
     if blocked then return end
 
@@ -207,7 +207,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
                 end
 
                 if Settings:getPartySettings(self.partyIndex).alignBottom then
-                    self:pos(posX, posY + self.dragImage.height) -- TODO: re-test this
+                    self:pos(posX, posY + self.imgMouse.height) -- TODO: re-test this
                 else
                     self:pos(posX, posY)
                 end
@@ -216,8 +216,8 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
 
         -- mouse left click
         elseif type == 1 then
-            if self.dragImage:hover(x, y) then
-				self.dragged = { x = x - self.dragImage.absolutePos.x, y = y - self.dragImage.absolutePos.y }
+            if self.imgMouse:hover(x, y) then
+				self.dragged = { x = x - self.imgMouse.absolutePos.x, y = y - self.imgMouse.absolutePos.y }
                 return true
             end
 
@@ -235,7 +235,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
 
         -- mouse scroll
         elseif type == 10 then
-            if self.dragImage:hover(x, y) then
+            if self.imgMouse:hover(x, y) then
 				local sx = math.max(0.25, self.scaleX + delta / 100)
 				local sy = math.max(0.25, self.scaleY + delta / 100)
 				self:scale(sx, sy)

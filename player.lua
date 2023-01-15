@@ -135,8 +135,6 @@ function player:update(member, target, subtarget)
 						self.subJobLvl = math.max(1, math.floor(partyLeader.jobLvl / 2))
 					end
 				end
-			else
-				utils:log('Failed to get trust info for ' .. self.name, 3) -- TODO: this message spams if it triggers, probably best to disable it
 			end
 		end
 	else

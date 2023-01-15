@@ -33,25 +33,6 @@
             </background>
             <listItem>
                 <enabled>true</enabled>
-                <buffIcons>
-                    <enabled>false</enabled>
-                </buffIcons>
-                <cursor>
-                    <color>#FFFFFFFF</color>
-                    <enabled>true</enabled>
-                    <path>assets/XivAllyCursor.png</path>
-                    <pos>-6,-6</pos>
-                    <size>116,53</size>
-                    <zOrder>1</zOrder>
-                </cursor>
-                <hover>
-                    <color>#FFFFFFAA</color>
-                    <enabled>true</enabled>
-                    <path>assets/XivAllyHover.png</path>
-                    <pos>-11,-8</pos>
-                    <size>125,55</size>
-                    <zOrder>0</zOrder>
-                </hover>
                 <hp>
                     <bar>
                         <animSpeed>0.1</animSpeed>
@@ -94,14 +75,12 @@
                         <pos>0,0</pos>
                     </bar>
                     <enabled>true</enabled>
+                    <hideOutsideZone>true</hideOutsideZone>
                     <hpOrangeColor>#F8BA80FF</hpOrangeColor>
                     <hpRedColor>#FC8182FF</hpRedColor>
                     <hpYellowColor>#F3F37CFF</hpYellowColor>
                     <pos>37,-12</pos>
                     <snapToRaster>true</snapToRaster>
-                    <text>
-                        <enabled>false</enabled>
-                    </text>
                     <zOrder>2</zOrder>
                 </hp>
                 <mp>
@@ -115,9 +94,6 @@
                             <pos>4,0</pos>
                             <size>56,64</size>
                         </imgBar>
-                        <imgBg>
-                            <enabled>false</enabled>
-                        </imgBg>
                         <imgFg>
                             <color>#FFFFFFFF</color>
                             <enabled>true</enabled>
@@ -142,14 +118,12 @@
                         <pos>0,0</pos>
                     </bar>
                     <enabled>true</enabled>
+                    <hideOutsideZone>true</hideOutsideZone>
                     <hpOrangeColor>#F8BA80FF</hpOrangeColor>
                     <hpRedColor>#FC8182FF</hpRedColor>
                     <hpYellowColor>#F3F37CFF</hpYellowColor>
                     <pos>37,-12</pos>
                     <snapToRaster>true</snapToRaster>
-                    <text>
-                        <enabled>false</enabled>
-                    </text>
                     <zOrder>3</zOrder>
                 </mp>
                 <jobIcon>
@@ -229,35 +203,47 @@
                     <scale>0.8,0.8</scale>
                     <zOrder>5</zOrder>
                 </leader>
-                <range>
-                    <enabled>false</enabled>
-                </range>
-                <text>
-                    <job>
-                        <enabled>false</enabled>
-                    </job>
-                    <name>
-                        <color>#F0FFFFFF</color>
-                        <enabled>true</enabled>
-                        <font>Arial</font>
-                        <pos>41,1</pos>
-                        <size>8</size>
-                        <snapToRaster>true</snapToRaster>
-                        <stroke>#062D54C8</stroke>
-                        <strokeWidth>2</strokeWidth>
-                        <maxChars>9</maxChars>
-                        <zOrder>6</zOrder>
-                    </name>
-                    <subJob>
-                        <enabled>false</enabled>
-                    </subJob>
-                    <zone>
-                        <enabled>false</enabled>
-                    </zone>
-                </text>
-                <tp>
-                    <enabled>false</enabled>
-                </tp>
+                <hover>
+                    <color>#FFFFFFAA</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyHover.png</path>
+                    <pos>-11,-8</pos>
+                    <size>125,55</size>
+                    <zOrder>0</zOrder>
+                </hover>
+                <cursor>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyCursor.png</path>
+                    <pos>-6,-6</pos>
+                    <size>116,53</size>
+                    <zOrder>1</zOrder>
+                </cursor>
+                <txtName>
+                    <color>#F0FFFFFF</color>
+                    <enabled>true</enabled>
+                    <font>Arial</font>
+                    <pos>41,1</pos>
+                    <size>8</size>
+                    <snapToRaster>true</snapToRaster>
+                    <stroke>#062D54C8</stroke>
+                    <strokeWidth>2</strokeWidth>
+                    <maxChars>9</maxChars>
+                    <zOrder>6</zOrder>
+                </txtName>
+                <txtZone>
+                    <alignRight>true</alignRight>
+                    <color>#F0FFFFFF</color>
+                    <enabled>true</enabled>
+                    <font>Arial</font>
+                    <pos>102,18</pos>
+                    <short>true</short>
+                    <size>9</size>
+                    <snapToRaster>true</snapToRaster>
+                    <stroke>#062D54C8</stroke>
+                    <strokeWidth>2</strokeWidth>
+                    <zOrder>7</zOrder>
+                </txtZone>
             </listItem>
         </partyList>
     </global>

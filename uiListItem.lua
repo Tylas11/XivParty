@@ -62,20 +62,20 @@ function uiListItem:init(layout, player, isUiLocked, itemWidth, itemHeight)
 
 		self.jobIcon = self:addChild(uiJobIcon.new(layout.jobIcon, player))
 
-		self.nameText = self:addChild(uiText.new(layout.text.name))
-		self.zoneText = self:addChild(uiText.new(layout.text.zone))
+		self.txtName = self:addChild(uiText.new(layout.txtName))
+		self.txtZone = self:addChild(uiText.new(layout.txtZone))
 
-		self.jobText = self:addChild(uiText.new(layout.text.job))
-		self.subJobText = self:addChild(uiText.new(layout.text.subJob))
+		self.txtJob = self:addChild(uiText.new(layout.txtJob))
+		self.txtSubJob = self:addChild(uiText.new(layout.txtSubJob))
 
 		self.leader = self:addChild(uiLeader.new(layout.leader, player))
 
 		self.range = self:addChild(uiRange.new(layout.range, player))
 		self.buffIcons = self:addChild(uiBuffIcons.new(layout.buffIcons, player))
 
-		self.mouseArea = self:addChild(uiImage.create())
-		self.mouseArea:size(math.max(0, itemWidth - 1), math.max(0, itemHeight - 1)) -- reduce size by 1 to prevent hovering over two neighboring items at the same time
-		self.mouseArea:alpha(0)
+		self.imgMouse = self:addChild(uiImage.create())
+		self.imgMouse:size(math.max(0, itemWidth - 1), math.max(0, itemHeight - 1)) -- reduce size by 1 to prevent hovering over two neighboring items at the same time
+		self.imgMouse:alpha(0)
 
 		self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
 			return self:handleWindowerMouse(type, x, y, delta, blocked)
@@ -124,9 +124,9 @@ function uiListItem:update()
 	if not self.isEnabled or not self.player then return end
 
 	if self.player.name then
-		self.nameText:update(self.player.name)
+		self.txtName:update(self.player.name)
 	else
-		self.nameText:update('???')
+		self.txtName:update('???')
 	end
 
 	self:updateZone()
@@ -140,14 +140,14 @@ function uiListItem:updateZone()
 	local zoneString = ''
 
 	if self.player.zone and self.player.isOutsideZone then
-		if self.layout.text.zone.short then
+		if self.layout.txtZone.short then
 			zoneString = '('..res.zones[self.player.zone]['search']..')'
 		else
 			zoneString = '('..res.zones[self.player.zone].name..')'
 		end
 	end
 
-	self.zoneText:update(zoneString)
+	self.txtZone:update(zoneString)
 end
 
 function uiListItem:updateJob()
@@ -170,8 +170,8 @@ function uiListItem:updateJob()
 		end
 	end
 
-	self.jobText:update(jobString)
-	self.subJobText:update(subJobString)
+	self.txtJob:update(jobString)
+	self.txtSubJob:update(subJobString)
 end
 
 function uiListItem:updateCursor()
@@ -193,7 +193,7 @@ function uiListItem:handleWindowerMouse(type, x, y, delta, blocked)
     if blocked then return end
 
     if self.isUiLocked and Settings.mouseTargeting then
-		if self.mouseArea:hover(x, y) and not self.player.isOutsideZone and self.player.isInTargetingRange then
+		if self.imgMouse:hover(x, y) and not self.player.isOutsideZone and self.player.isInTargetingRange then
 			-- mouse move
 			if type == 0 then
 				self.hover:show(const.visFeature)

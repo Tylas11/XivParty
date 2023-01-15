@@ -33,9 +33,55 @@
 -- Scale affects all positions and sizes, snapToRaster only affects positions.
 -- Due to a windower limitation, z-orders only work between the same type of element (image, text). Texts will always be placed above images!
 
--- All elements support "enabled", "pos", "scale", "zOrder", "snapToRaster" and all texts support "alignRight" and "maxChars". 
--- However some of these properties have been omitted on some elements to keep the XMLs shorter.
--- Add these properties to any element in this file if your custom layout requires them, otherwise they will not be loaded from the XML.
+require('tables')
+
+local function element(values)
+	local ret = {
+		enabled = false,
+		pos = L{ 0, 0 },
+		scale = L{ 1, 1 },
+		zOrder = 0,
+		snapToRaster = false
+	}
+
+	if values ~= nil then
+		table.update(ret, values)
+	end
+
+	return ret
+end
+
+local function image(values)
+	local ret = table.update(element(), {
+		path = '',
+		size = L{ 0, 0 },
+		color = '#FFFFFFFF'
+	})
+
+	if values ~= nil then
+		table.update(ret, values)
+	end
+
+	return ret
+end
+
+local function text(values)
+	local ret = table.update(element(), {
+		font = 'Arial',
+		size = 12,
+		color = '#FFFFFFFF',
+		stroke = '#000000FF',
+		strokeWidth = 1,
+		alignRight = false,
+		maxChars = 0
+	})
+
+	if values ~= nil then
+		table.update(ret, values)
+	end
+
+	return ret
+end
 
 local layout = {
 	partyList = {
@@ -45,49 +91,43 @@ local layout = {
 		columnWidth = 410,
 
 		-- Background
-		background = {
-			enabled = true,
+		background = element({
 			pos = L{ 0, -21 },
-			imgTop = {
-				enabled = true,
+			imgTop = image({
 				pos = L{ 0, 0 },
 				path = 'assets/XivBgTop.png',
 				size = L{ 377, 21 },
 				color = '#FFFFFFDD'
-			},
-			imgMid = {
-				enabled = true,
+			}),
+			imgMid = image({
 				pos = L{ 0, 21 },
 				path = 'assets/XivBgMid.png', -- this texture is repeated vertically when the list resizes
 				size = L{ 377, 12 }, -- Y size will be overwritten in code, value here still required as a base
 				color = '#FFFFFFDD'
-			},
-			imgBottom = {
-				enabled = true,
+			}),
+			imgBottom = image({
 				pos = L{ 0, 0 }, -- Y pos will be overwritten in code, value here irrelevant
 				path = 'assets/XivBgBottom.png',
 				size = L{ 377, 21 },
 				color = '#FFFFFFDD'
-			}
-		},
+			})
+		}),
 
 		-- List item - a container for all UI elements of a party member, position is set in code
-		listItem = {
-			enabled = true,
+		listItem = element({
+			pos = L{ 0, 0 }, -- overwritten in code
 
 			-- HP bar
-			hp = {
-				enabled = true,
+			hp = element({
 				pos = L{ 19, -7 },
-				zOrder = 2,
 				hideOutsideZone = false,
 				hpYellowColor = '#F3F37CFF', -- HP < 75%
 				hpOrangeColor = '#F8BA80FF', -- HP < 50%
 				hpRedColor = '#FC8182FF', -- HP < 25%
 				snapToRaster = true,
+				zOrder = 2,
 
-				text = {
-					enabled = true,
+				txtValue = text({
 					pos = L{ 120, 35 },
 					font = 'Grammara',
 					size = 11,
@@ -96,60 +136,47 @@ local layout = {
 					strokeWidth = 2,
 					alignRight = true,
 					snapToRaster = true
-				},
+				}),
 
-				bar = {
-					enabled = true,
+				bar = element({
 					pos = L{ 0, 0 },
 					animSpeed = 0.1, -- speed of the bar animation in percent per frame (higher is faster)
 
-					imgBg = {
-						enabled = true,
+					imgBg = image({
 						pos = L{ 0, 0 },
 						path = 'assets/XivBarBG.png',
-						size = L{ 128, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgBar = {
-						enabled = true,
+						size = L{ 128, 64 }
+					}),
+					imgBar = image({
 						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
 						path = 'assets/XivBar.png',
-						size = L{ 102, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgFg = {
-						enabled = true,
+						size = L{ 102, 64 }
+					}),
+					imgFg = image({
 						pos = L{ 0, 0 },
 						path = 'assets/XivBarFG.png',
-						size = L{ 128, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgGlow = {
-						enabled = true,
+						size = L{ 128, 64 }
+					}),
+					imgGlow = image({
 						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
 						path = 'assets/XivBarGlow.png',
-						size = L{ 6, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgGlowSides = {
-						enabled = true,
+						size = L{ 6, 64 }
+					}),
+					imgGlowSides = image({
 						pos = L{ 11, 0 }, -- x position set in code
 						path = 'assets/XivBarGlowSides.png',
-						size = L{ 2, 64 },
-						color = '#FFFFFFFF'
-					}
-				}
-			},
+						size = L{ 2, 64 }
+					})
+				})
+			}),
 			-- MP bar
-			mp = {
-				enabled = true,
+			mp = element({
 				pos = L{ 150, -7 },
-				zOrder = 3,
 				hideOutsideZone = false,
 				snapToRaster = true,
+				zOrder = 3,
 
-				text = {
-					enabled = true,
+				txtValue = text({
 					pos = L{ 120, 35 },
 					font = 'Grammara',
 					size = 11,
@@ -158,61 +185,48 @@ local layout = {
 					strokeWidth = 2,
 					alignRight = true,
 					snapToRaster = true
-				},
+				}),
 
-				bar = {
-					enabled = true,
+				bar = element({
 					pos = L{ 0, 0 },
 					animSpeed = 0.1, -- speed of the bar animation in percent per frame (higher is faster)
 
-					imgBg = {
-						enabled = true,
+					imgBg = image({
 						pos = L{ 0, 0 },
 						path = 'assets/XivBarBG.png',
-						size = L{ 128, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgBar = {
-						enabled = true,
+						size = L{ 128, 64 }
+					}),
+					imgBar = image({
 						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
 						path = 'assets/XivBar.png',
-						size = L{ 102, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgFg = {
-						enabled = true,
+						size = L{ 102, 64 }
+					}),
+					imgFg = image({
 						pos = L{ 0, 0 },
 						path = 'assets/XivBarFG.png',
-						size = L{ 128, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgGlow = {
-						enabled = true,
+						size = L{ 128, 64 }
+					}),
+					imgGlow = image({
 						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
 						path = 'assets/XivBarGlow.png',
-						size = L{ 6, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgGlowSides = {
-						enabled = true,
+						size = L{ 6, 64 }
+					}),
+					imgGlowSides = image({
 						pos = L{ 11, 0 }, -- x position set in code
 						path = 'assets/XivBarGlowSides.png',
-						size = L{ 2, 64 },
-						color = '#FFFFFFFF'
-					}
-				}
-			},
+						size = L{ 2, 64 }
+					})
+				})
+			}),
 			-- TP bar
-			tp = {
-				enabled = true,
+			tp = element({
 				pos = L{ 281, -7 },
-				zOrder = 4,
 				tpFullColor = '#50B4FAFF', -- TP > 1000
 				hideOutsideZone = false,
 				snapToRaster = true,
+				zOrder = 4,
 
-				text = {
-					enabled = true,
+				txtValue = text({
 					pos = L{ 120, 35 },
 					font = 'Grammara',
 					size = 11,
@@ -221,58 +235,45 @@ local layout = {
 					strokeWidth = 2,
 					alignRight = true,
 					snapToRaster = true
-				},
+				}),
 
-				bar = {
-					enabled = true,
+				bar = element({
 					pos = L{ 0, 0 },
 					animSpeed = 0.1, -- speed of the bar animation in percent per frame (higher is faster)
 
-					imgBg = {
-						enabled = true,
+					imgBg = image({
 						pos = L{ 0, 0 },
 						path = 'assets/XivBarBG.png',
-						size = L{ 128, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgBar = {
-						enabled = true,
+						size = L{ 128, 64 }
+					}),
+					imgBar = image({
 						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
 						path = 'assets/XivBar.png',
-						size = L{ 102, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgFg = {
-						enabled = true,
+						size = L{ 102, 64 }
+					}),
+					imgFg = image({
 						pos = L{ 0, 0 },
 						path = 'assets/XivBarFG.png',
-						size = L{ 128, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgGlow = {
-						enabled = true,
+						size = L{ 128, 64 }
+					}),
+					imgGlow = image({
 						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
 						path = 'assets/XivBarGlow.png',
-						size = L{ 6, 64 },
-						color = '#FFFFFFFF'
-					},
-					imgGlowSides = {
-						enabled = true,
+						size = L{ 6, 64 }
+					}),
+					imgGlowSides = image({
 						pos = L{ 11, 0 }, -- x position set in code
 						path = 'assets/XivBarGlowSides.png',
-						size = L{ 2, 64 },
-						color = '#FFFFFFFF'
-					}
-				}
-			},
+						size = L{ 2, 64 }
+					})
+				})
+			}),
 			-- job icon
-			jobIcon = {
-				enabled = true,
+			jobIcon = element({
 				pos = L{ -11, -2 },
-				zOrder = 5,
-				scale = L{ 1, 1 },
 				path = 'assets/jobIcons/', -- where all job icons are located, named <3 letter job>.png
 				snapToRaster = true,
+				zOrder = 5,
 
 				-- background colors for job roles
 				colors = {
@@ -283,176 +284,142 @@ local layout = {
 					special = '#FF9700FF'
 				},
 
-				imgFrame = {
-					enabled = true,
+				imgFrame = image({
 					pos = L{ 0, 0 },
 					path = 'assets/jobIcons/frame.png',
-					size = L{ 36, 36 },
-					color = '#FFFFFFFF'
-				},
-				imgIcon = {
-					enabled = true,
+					size = L{ 36, 36 }
+				}),
+				imgIcon = image({
 					pos = L{ 0, 0 },
 					path = '', -- must remain empty, set in code
-					size = L{ 36, 36 },
-					color = '#FFFFFFFF'
-				},
-				imgGradient = {
-					enabled = true,
+					size = L{ 36, 36 }
+				}),
+				imgGradient = image({
 					pos = L{ 0, 0 },
 					path = 'assets/jobIcons/gradient.png',
-					size = L{ 36, 36 },
-					color = '#FFFFFFFF'
-				},
-				imgBg = {
-					enabled = true,
+					size = L{ 36, 36 }
+				}),
+				imgBg = image({
 					pos = L{ 0, 0 },
 					path = 'assets/jobIcons/bg.png',
 					size = L{ 36, 36 },
 					color = '#FFFFFFFF' -- will be overwritten with role colors
-				},
-				imgHighlight = {
-					enabled = true,
+				}),
+				imgHighlight = image({
 					pos = L{ -13, -13 },
 					path = 'assets/jobIcons/highlight.png',
-					size = L{ 62, 62 },
-					color = '#FFFFFFFF'
-				}
-			},
+					size = L{ 62, 62 }
+				})
+			}),
 			-- leader icons
-			leader = {
-				enabled = true,
+			leader = element({
 				pos = L{ -23, -6 },
 				zOrder = 10,
-				scale = L{ 1, 1 },
 
-				imgParty = {
-					enabled = true,
+				imgParty = image({
 					pos = L{ 0, 0 },
 					path = 'assets/XivLeader.png',
-					size = L{ 22, 22 },
-					color = '#FFFFFFFF'
-				},
-				imgAlliance = {
-					enabled = true,
+					size = L{ 22, 22 }
+				}),
+				imgAlliance = image({
 					pos = L{ 0, 11 },
 					path = 'assets/XivAllianceLeader.png',
-					size = L{ 22, 22 },
-					color = '#FFFFFFFF'
-				},
-				imgQuarterMaster = {
-					enabled = true,
+					size = L{ 22, 22 }
+				}),
+				imgQuarterMaster = image({
 					pos = L{ 0, 22 },
 					path = 'assets/XivQuarterMaster.png',
-					size = L{ 22, 22 },
-					color = '#FFFFFFFF'
-				}
-			},
+					size = L{ 22, 22 }
+				})
+			}),
 			-- range indicator
-			range = {
-				enabled = true,
+			range = element({
 				pos = L{ 30, 30 },
 				zOrder = 11,
 
-				imgNear = {
-					enabled = true,
+				imgNear = image({
 					pos = L { 0, 0 },
 					path = 'assets/RangeIndicator.png',
-					size = L{ 10, 10 },
-					color = '#FFFFFFFF'
-				},
-				imgFar = {
-					enabled = true,
+					size = L{ 10, 10 }
+				}),
+				imgFar = image({
 					pos = L { 0, 0 },
 					path = 'assets/RangeIndicatorFar.png',
-					size = L{ 10, 10 },
-					color = '#FFFFFFFF'
-				}
-			},
+					size = L{ 10, 10 }
+				})
+			}),
 			-- mouse hover image
-			hover = {
-				enabled = true,
+			hover = image({
 				pos = L{ 20, -8 },
-				zOrder = 0,
 				path = 'assets/XivHover.png',
 				size = L{ 390, 60 },
 				color = '#FFFFFFAA',
-				scale = L{ 1, 1 }
-			},
+				zOrder = 0
+			}),
 			-- cursor image
-			cursor = {
-				enabled = true,
+			cursor = image({
 				pos = L{ 20, -8 },
-				zOrder = 1,
 				path = 'assets/XivCursor.png',
 				size = L{ 390, 60 },
-				color = '#FFFFFFFF',
-				scale = L{ 1, 1 }
-			},
+				zOrder = 1
+			}),
 			-- buff icons
-			buffIcons = {
-				enabled = true,
+			buffIcons = element({
 				pos = L{ 293, 0 },
-				zOrder = 12,
 				path = 'assets/buffIcons/', -- directory where buff icons can be found. must follow naming pattern: <buffId>.png
 				size = L{ 20, 20 }, -- size of all buff icon images
 				color = '#FFFFFFFF', -- color of all buff icon images
 				spacing = L{ 0, 1 }, -- spacing between each icon
 				numIconsByRow = L{ 19, 13 }, -- number of icons to display in each row (max 32 in total)
 				offsetByRow = L{ 0, 6 }, -- offset each row by this many icons to the right
-				alignRight = false -- icons will extend from right to left (adjust pos, x origin will change to the right side!)
-			},
+				alignRight = false, -- icons will extend from right to left (adjust pos, x origin will change to the right side!)
+				zOrder = 12
+			}),
 			-- text labels
-			text = {
-				name = {
-					enabled = true,
-					pos = L{ 95, 1 },
-					zOrder = 6,
-					font = 'Arial',
-					size = 15,
-					color = '#F0FFFFFF',
-					stroke = '#062D54C8',
-					strokeWidth = 2,
-					maxChars = 17, -- maximum number of characters to display, longer texts will be cut off by replacing the last allowed char with '...'
-					snapToRaster = true
-				},
-				zone = {
-					enabled = true,
-					pos = L{ 292, 1 },
-					zOrder = 7,
-					font = 'Arial',
-					size = 13,
-					color = '#F0FFFFFF',
-					stroke = '#062D54C8',
-					strokeWidth = 2,
-					short = false, -- display short zone name
-					alignRight = false, -- right align the text to the right end of the TP bar (use short zone names or text might overlap with player name)
-					snapToRaster = true
-				},
-				job = {
-					enabled = true,
-					pos = L{ 30, 0 },
-					zOrder = 8,
-					font = 'Arial',
-					size = 8,
-					color = '#F0FFFFFF',
-					stroke = '#062D54C8',
-					strokeWidth = 1,
-					snapToRaster = true
-				},
-				subJob = {
-					enabled = true,
-					pos = L{ 39, 9 },
-					zOrder = 9,
-					font = 'Arial',
-					size = 8,
-					color = '#F0FFFFFF',
-					stroke = '#062D54C8',
-					strokeWidth = 1,
-					snapToRaster = true
-				}
-			}
-		}
+			txtName = text({
+				pos = L{ 95, 1 },
+				font = 'Arial',
+				size = 15,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 2,
+				maxChars = 17, -- maximum number of characters to display, longer texts will be cut off by replacing the last allowed char with '...'
+				snapToRaster = true,
+				zOrder = 6
+			}),
+			txtZone = text({
+				pos = L{ 292, 1 },
+				font = 'Arial',
+				size = 13,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 2,
+				short = false, -- display short zone name
+				alignRight = false, -- right align the text to the right end of the TP bar (use short zone names or text might overlap with player name)
+				snapToRaster = true,
+				zOrder = 7
+			}),
+			txtJob = text({
+				pos = L{ 30, 0 },
+				font = 'Arial',
+				size = 8,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 1,
+				snapToRaster = true,
+				zOrder = 8
+			}),
+			txtSubJob = text({
+				pos = L{ 39, 9 },
+				font = 'Arial',
+				size = 8,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 1,
+				snapToRaster = true,
+				zOrder = 9
+			})
+		})
 	}
 }
 

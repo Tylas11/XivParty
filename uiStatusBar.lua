@@ -44,7 +44,7 @@ function uiStatusBar:init(layout, barType, player)
 		self.player = player
 
 		self.bar = self:addChild(uiBar.new(layout.bar))
-		self.text = self:addChild(uiText.new(layout.text))
+		self.txtValue = self:addChild(uiText.new(layout.txtValue))
 
 		if self.barType == const.barTypeHp then
 			self.hpYellowColor = utils:colorFromHex(layout.hpYellowColor)
@@ -54,7 +54,7 @@ function uiStatusBar:init(layout, barType, player)
 			self.tpFullColor = utils:colorFromHex(layout.tpFullColor)
 		end
 
-		self.textColor = utils:colorFromHex(layout.text.color)
+		self.textColor = utils:colorFromHex(layout.txtValue.color)
 	end
 end
 
@@ -91,9 +91,9 @@ function uiStatusBar:update()
 	self.bar:setValue(valPercent / 100)
 
 	if val < 0 then
-		self.text:update('?')
+		self.txtValue:update('?')
 	else
-		self.text:update(tostring(val))
+		self.txtValue:update(tostring(val))
 	end
 
 	local color = self.textColor
@@ -113,7 +113,7 @@ function uiStatusBar:update()
 		end
 	end
 
-	self.text:color(color)
+	self.txtValue:color(color)
 
 	-- distance indication
 	if self.player.isInCastingRange then

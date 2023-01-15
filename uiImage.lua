@@ -99,6 +99,7 @@ function uiImage:init(layout)
 
 		private[self].opacity = 1.0
 		private[self].initFrames = -1
+		private[self].initShown = false
     end
 end
 
@@ -118,8 +119,11 @@ local function setPath(image, path)
 	image.wrappedImage:path(windower.addon_path .. path)
 
 	-- this is a workaround for image primitives showing up before their texture is loaded
-	image:hide(const.visInit)
-	private[image].initFrames = 2 -- delay showing for 2 frames
+	-- only needed on the first texture load, not on later changes
+	if not private[image].initShown then
+		image:hide(const.visInit)
+		private[image].initFrames = 2 -- delay showing for 2 frames
+	end
 end
 
 function uiImage:createPrimitives()
@@ -157,6 +161,7 @@ function uiImage:update()
 	if private[self].initFrames >= 0 then
 		if private[self].initFrames == 0 then
 			self:show(const.visInit)
+			private[self].initShown = true
 		end
 		private[self].initFrames = private[self].initFrames - 1
 	end

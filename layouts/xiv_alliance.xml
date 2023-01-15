@@ -33,25 +33,6 @@
             </background>
             <listItem>
                 <enabled>true</enabled>
-                <buffIcons>
-                    <enabled>false</enabled>
-                </buffIcons>
-                <cursor>
-                    <color>#FFFFFFFF</color>
-                    <enabled>true</enabled>
-                    <path>assets/XivAllyCursor.png</path>
-                    <pos>-6,-6</pos>
-                    <size>116,53</size>
-                    <zOrder>1</zOrder>
-                </cursor>
-                <hover>
-                    <color>#FFFFFFAA</color>
-                    <enabled>true</enabled>
-                    <path>assets/XivAllyHover.png</path>
-                    <pos>-11,-8</pos>
-                    <size>125,55</size>
-                    <zOrder>0</zOrder>
-                </hover>
                 <hp>
                     <bar>
                         <animSpeed>0.1</animSpeed>
@@ -99,9 +80,6 @@
                     <hpYellowColor>#F3F37CFF</hpYellowColor>
                     <pos>37,-12</pos>
                     <snapToRaster>true</snapToRaster>
-                    <text>
-                        <enabled>false</enabled>
-                    </text>
                     <zOrder>2</zOrder>
                 </hp>
                 <jobIcon>
@@ -181,29 +159,22 @@
                     <scale>0.8,0.8</scale>
                     <zOrder>4</zOrder>
                 </leader>
-                <mp>
-                    <enabled>false</enabled>
-                </mp>
-                <range>
-                    <enabled>false</enabled>
-                </range>
-                <text>
-                    <job>
-                        <enabled>false</enabled>
-                    </job>
-                    <name>
-                        <enabled>false</enabled>
-                    </name>
-                    <subJob>
-                        <enabled>false</enabled>
-                    </subJob>
-                    <zone>
-                        <enabled>false</enabled>
-                    </zone>
-                </text>
-                <tp>
-                    <enabled>false</enabled>
-                </tp>
+                <hover>
+                    <color>#FFFFFFAA</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyHover.png</path>
+                    <pos>-11,-8</pos>
+                    <size>125,55</size>
+                    <zOrder>0</zOrder>
+                </hover>
+                <cursor>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <path>assets/XivAllyCursor.png</path>
+                    <pos>-6,-6</pos>
+                    <size>116,53</size>
+                    <zOrder>1</zOrder>
+                </cursor>
             </listItem>
         </partyList>
     </global>

@@ -33,35 +33,6 @@
             </background>
             <listItem>
                 <enabled>true</enabled>
-                <buffIcons>
-                    <alignRight>true</alignRight>
-                    <color>#FFFFFFFF</color>
-                    <enabled>true</enabled>
-                    <numIconsByRow>16,0</numIconsByRow>
-                    <offsetByRow>0,0</offsetByRow>
-                    <path>assets/buffIcons/</path>
-                    <pos>-25,5</pos>
-                    <size>20,20</size>
-                    <spacing>0,1</spacing>
-                    <zOrder>9</zOrder>
-                </buffIcons>
-                <cursor>
-                    <color>#FFFFFFFF</color>
-                    <enabled>true</enabled>
-                    <path>assets/FfxiCursor.png</path>
-                    <pos>-24,7</pos>
-                    <size>37,24</size>
-                    <scale>0.75,0.75</scale>
-                    <zOrder>6</zOrder>
-                </cursor>
-                <hover>
-                    <color>#FFFFFFAA</color>
-                    <enabled>true</enabled>
-                    <path>assets/FfxiAllyHover.png</path>
-                    <pos>18,-6</pos>
-                    <size>156,44</size>
-                    <zOrder>0</zOrder>
-                </hover>
                 <hp>
                     <bar>
                         <animSpeed>0.1</animSpeed>
@@ -110,7 +81,7 @@
                     <hpYellowColor>#F3F37CFF</hpYellowColor>
                     <pos>30,-17</pos>
                     <snapToRaster>true</snapToRaster>
-                    <text>
+                    <txtValue>
                         <alignRight>true</alignRight>
                         <color>#F0FFFFFF</color>
                         <enabled>true</enabled>
@@ -120,7 +91,7 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1.5</strokeWidth>
-                    </text>
+                    </txtValue>
                     <zOrder>2</zOrder>
                 </hp>
                 <mp>
@@ -168,7 +139,7 @@
                     <hideOutsideZone>true</hideOutsideZone>
                     <pos>70,0</pos>
                     <snapToRaster>true</snapToRaster>
-                    <text>
+                    <txtValue>
                         <alignRight>true</alignRight>
                         <color>#F0FFFFFF</color>
                         <enabled>true</enabled>
@@ -178,18 +149,15 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1.5</strokeWidth>
-                    </text>
+                    </txtValue>
                     <zOrder>3</zOrder>
                 </mp>
                 <tp>
-                    <bar>
-                        <enabled>false</enabled>
-                    </bar>
                     <enabled>true</enabled>
                     <hideOutsideZone>true</hideOutsideZone>
                     <pos>0,0</pos>
                     <snapToRaster>true</snapToRaster>
-                    <text>
+                    <txtValue>
                         <alignRight>false</alignRight>
                         <color>#F0FFFFFF</color>
                         <enabled>true</enabled>
@@ -199,7 +167,7 @@
                         <snapToRaster>true</snapToRaster>
                         <stroke>#062D54C8</stroke>
                         <strokeWidth>1.5</strokeWidth>
-                    </text>
+                    </txtValue>
                     <tpFullColor>#50B4FAFF</tpFullColor>
                     <zOrder>4</zOrder>
                 </tp>
@@ -279,42 +247,60 @@
                     <pos>26,21</pos>
                     <zOrder>8</zOrder>
                 </leader>
-                <range>
-                    <enabled>false</enabled>
-                </range>
-                <text>
-                    <job>
-                        <enabled>false</enabled>
-                    </job>
-                    <name>
-                        <color>#F0FFFFFF</color>
-                        <enabled>true</enabled>
-                        <font>Arial</font>
-                        <pos>24,0</pos>
-                        <size>10</size>
-                        <snapToRaster>true</snapToRaster>
-                        <stroke>#062D54C8</stroke>
-                        <strokeWidth>2</strokeWidth>
-                        <maxChars>9</maxChars>
-                        <zOrder>1</zOrder>
-                    </name>
-                    <subJob>
-                        <enabled>false</enabled>
-                    </subJob>
-                    <zone>
-                        <alignRight>true</alignRight>
-                        <color>#F0FFFFFF</color>
-                        <enabled>true</enabled>
-                        <font>Arial</font>
-                        <pos>160,14</pos>
-                        <short>true</short>
-                        <size>10</size>
-                        <snapToRaster>true</snapToRaster>
-                        <stroke>#062D54C8</stroke>
-                        <strokeWidth>2</strokeWidth>
-                        <zOrder>7</zOrder>
-                    </zone>
-                </text>
+                <hover>
+                    <color>#FFFFFFAA</color>
+                    <enabled>true</enabled>
+                    <path>assets/FfxiAllyHover.png</path>
+                    <pos>18,-6</pos>
+                    <size>156,44</size>
+                    <zOrder>0</zOrder>
+                </hover>
+                <cursor>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <path>assets/FfxiCursor.png</path>
+                    <pos>-24,7</pos>
+                    <size>37,24</size>
+                    <scale>0.75,0.75</scale>
+                    <zOrder>6</zOrder>
+                </cursor>
+                <buffIcons>
+                    <alignRight>true</alignRight>
+                    <color>#FFFFFFFF</color>
+                    <enabled>true</enabled>
+                    <numIconsByRow>16,0</numIconsByRow>
+                    <offsetByRow>0,0</offsetByRow>
+                    <path>assets/buffIcons/</path>
+                    <pos>-25,5</pos>
+                    <size>20,20</size>
+                    <spacing>0,1</spacing>
+                    <zOrder>9</zOrder>
+                </buffIcons>
+                <txtName>
+                    <color>#F0FFFFFF</color>
+                    <enabled>true</enabled>
+                    <font>Arial</font>
+                    <pos>24,0</pos>
+                    <size>10</size>
+                    <snapToRaster>true</snapToRaster>
+                    <stroke>#062D54C8</stroke>
+                    <strokeWidth>2</strokeWidth>
+                    <maxChars>9</maxChars>
+                    <zOrder>1</zOrder>
+                </txtName>
+                <txtZone>
+                    <alignRight>true</alignRight>
+                    <color>#F0FFFFFF</color>
+                    <enabled>true</enabled>
+                    <font>Arial</font>
+                    <pos>160,14</pos>
+                    <short>true</short>
+                    <size>10</size>
+                    <snapToRaster>true</snapToRaster>
+                    <stroke>#062D54C8</stroke>
+                    <strokeWidth>2</strokeWidth>
+                    <zOrder>7</zOrder>
+                </txtZone>
             </listItem>
         </partyList>
     </global>

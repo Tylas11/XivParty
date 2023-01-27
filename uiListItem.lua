@@ -44,6 +44,8 @@ local const = require('const')
 -- create the class, derive from uiContainer
 local uiListItem = classes.class(uiContainer)
 
+local isDebug = false
+
 function uiListItem:init(layout, player, isUiLocked, itemWidth, itemHeight)
 	if self.super:init(layout) then
 		self.layout = layout
@@ -75,7 +77,7 @@ function uiListItem:init(layout, player, isUiLocked, itemWidth, itemHeight)
 
 		self.imgMouse = self:addChild(uiImage.create())
 		self.imgMouse:size(math.max(0, itemWidth - 1), math.max(0, itemHeight - 1)) -- reduce size by 1 to prevent hovering over two neighboring items at the same time
-		self.imgMouse:alpha(0)
+		self.imgMouse:alpha(isDebug and 32 or 0)
 
 		self.mouseHandlerId = windower.register_event('mouse', function(type, x, y, delta, blocked)
 			return self:handleWindowerMouse(type, x, y, delta, blocked)

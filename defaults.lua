@@ -26,13 +26,16 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- imports
+local const = require('const')
+
 local defaults = {
-	layout = 'xiv', -- active UI layout, found in XivParty/layouts directory
+	layout = const.defaultLayout, -- active UI layout, found in XivParty/layouts directory
 
 	hideKeyCode = 207, -- DirectInput keyboard (DIK) code for holding down button to temporarily hide UI. set 0 to disable. default: "End" key
 	hideSolo = false, -- hides the party list when you are not in a party
 	hideAlliance = false, -- hides UI for alliance parties
-	hideCutscenes = true, -- hides UI during cutscenes or when talking to NPCs
+	hideCutscene = true, -- hides UI during cutscenes or when talking to NPCs
 	mouseTargeting = true, -- enables targeting party members using the mouse
 
 	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off

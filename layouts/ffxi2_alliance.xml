@@ -11,21 +11,21 @@
                 <imgBottom>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiAllyBgBottom.png</path>
+                    <path>assets/ffxi/AllyBgBottom.png</path>
                     <pos>0,0</pos>
                     <size>160,4</size>
                 </imgBottom>
                 <imgMid>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiAllyBgMid.png</path>
+                    <path>assets/ffxi/AllyBgMid.png</path>
                     <pos>0,6</pos>
                     <size>160,4</size>
                 </imgMid>
                 <imgTop>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiAllyBgTop.png</path>
+                    <path>assets/ffxi/AllyBgTop.png</path>
                     <pos>0,0</pos>
                     <size>160,6</size>
                 </imgTop>
@@ -40,35 +40,35 @@
                         <imgBar>
                             <color>#FF9597FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBar.png</path>
+                            <path>assets/ffxi/Bar.png</path>
                             <pos>13,0</pos>
                             <size>102,64</size>
                         </imgBar>
                         <imgBg>
                             <color>#FF9597FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarBg.png</path>
+                            <path>assets/ffxi/BarBg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgBg>
                         <imgFg>
                             <color>#FF9597FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarFg.png</path>
+                            <path>assets/ffxi/BarFg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgFg>
                         <imgGlow>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFF2F2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlow.png</path>
+                            <path>assets/ffxi/BarGlow.png</path>
                             <pos>13,0</pos>
                             <size>6,64</size>
                         </imgGlow>
                         <imgGlowSides>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFF2F2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlowSides.png</path>
+                            <path>assets/ffxi/BarGlowSides.png</path>
                             <pos>11,0</pos>
                             <size>2,64</size>
                         </imgGlowSides>
@@ -101,35 +101,35 @@
                         <imgBar>
                             <color>#FFFF9CFF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiAllyBarMP.png</path>
+                            <path>assets/ffxi/AllyBarMP.png</path>
                             <pos>27,0</pos>
                             <size>74,64</size>
                         </imgBar>
                         <imgBg>
                             <color>#FFFF9CFF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiAllyBarBgMP.png</path>
+                            <path>assets/ffxi/AllyBarBgMP.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgBg>
                         <imgFg>
                             <color>#FFFF9CFF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiAllyBarFgMP.png</path>
+                            <path>assets/ffxi/AllyBarFgMP.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgFg>
                         <imgGlow>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFFFF2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiAllyBarGlowMP.png</path>
+                            <path>assets/ffxi/AllyBarGlowMP.png</path>
                             <pos>27,0</pos>
                             <size>4,64</size>
                         </imgGlow>
                         <imgGlowSides>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFFFF2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiAllyBarGlowSidesMP.png</path>
+                            <path>assets/ffxi/AllyBarGlowSidesMP.png</path>
                             <pos>25,0</pos>
                             <size>2,64</size>
                         </imgGlowSides>
@@ -226,21 +226,21 @@
                     <imgAlliance>
                         <color>#FFFFFFFF</color>
                         <enabled>true</enabled>
-                        <path>assets/FfxiLeader.png</path>
+                        <path>assets/ffxi/Leader.png</path>
                         <pos>7,0</pos>
                         <size>7,5</size>
                     </imgAlliance>
                     <imgParty>
                         <color>#E6E159FF</color>
                         <enabled>true</enabled>
-                        <path>assets/FfxiLeader.png</path>
+                        <path>assets/ffxi/Leader.png</path>
                         <pos>0,0</pos>
                         <size>7,5</size>
                     </imgParty>
                     <imgQuarterMaster>
                         <color>#66E659FF</color>
                         <enabled>true</enabled>
-                        <path>assets/FfxiLeader.png</path>
+                        <path>assets/ffxi/Leader.png</path>
                         <pos>14,0</pos>
                         <size>7,5</size>
                     </imgQuarterMaster>
@@ -248,9 +248,9 @@
                     <zOrder>8</zOrder>
                 </leader>
                 <hover>
-                    <color>#FFFFFFAA</color>
+                    <color>#9C94E8AA</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiAllyHover.png</path>
+                    <path>assets/ffxi/AllyHover.png</path>
                     <pos>18,-6</pos>
                     <size>156,44</size>
                     <zOrder>0</zOrder>
@@ -258,7 +258,7 @@
                 <cursor>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiCursor.png</path>
+                    <path>assets/ffxi/Cursor.png</path>
                     <pos>-24,7</pos>
                     <size>37,24</size>
                     <scale>0.75,0.75</scale>

@@ -110,7 +110,7 @@ function classes.class(baseclass)
 			else
 				current = nil
 			end
-		until val or current == nil
+		until val ~= nil or current == nil
 	end
 
 	--- Recursively allocates the inheritance tree of the instance.

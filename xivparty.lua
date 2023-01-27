@@ -93,7 +93,7 @@ end)
 
 windower.register_event('status change', function(status)
 	if isInitialized then
-		view:visible(not Settings.hideCutscenes or status ~= 4, const.visCutscene) -- hide UI during cutscenes
+		view:visible(not Settings.hideCutscene or status ~= 4, const.visCutscene) -- hide UI during cutscenes
 	end
 end)
 
@@ -204,7 +204,6 @@ end)
 
 -- commands / help
 
--- TODO: update help with hide alliance, hide cutscenes and possibly more commands
 local function showHelp()
 	log('Commands: //xivparty or //xp')
 	log('filter - hides specified buffs in party list. Use command \"buffs\" to find out IDs.')
@@ -216,7 +215,10 @@ local function showHelp()
 	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
 	log('range <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
 	log('customOrder - toggles custom buff order (customize in bufforder.lua)')
-	log('hideSolo - hides the party list while solo')
+	log('hideSolo - hides the UI while solo')
+	log('hideAlliance - hides alliance party lists')
+	log('hideCutscene - hides the UI during cutscenes')
+	log('mouseTargeting - toggles targeting party members using the mouse')
 	log('alignBottom - expands the party list from bottom to top')
 	log('job - toggles job specific settings for current job')
 	log('setup - move the UI using drag and drop, hold CTRL for grid snap, mouse wheel to scale the UI')
@@ -330,27 +332,38 @@ windower.register_event('addon command', function(...)
 		Settings.hideAlliance = ret
 		Settings:save()
 		view:reload()
-	elseif command == 'hidecutscenes' then
-		local ret = handleCommandOnOff(Settings.hideCutscenes, args[2], 'Party list hiding during cutscenes')
-		Settings.hideCutscenes = ret
+	elseif command == 'hidecutscene' then
+		local ret = handleCommandOnOff(Settings.hideCutscene, args[2], 'Party list hiding during cutscenes')
+		Settings.hideCutscene = ret
 		Settings:save()
 	elseif command == 'mousetargeting' then
 		local ret = handleCommandOnOff(Settings.mouseTargeting, args[2], 'Targeting party members using the mouse')
 		Settings.mouseTargeting = ret
 		Settings:save()
 	elseif command == 'alignbottom' then
-		local ret = handleCommandOnOff(Settings.party.alignBottom, args[2], 'Bottom alignment')
-		-- TODO: maybe we want to set these separately?
-		Settings.party.alignBottom = ret
-		Settings.alliance1.alignBottom = ret
-		Settings.alliance2.alignBottom = ret
-		Settings:save()
+		local partyIndex = tonumber(args[2])
+		if partyIndex ~= nil then
+			if partyIndex < 0 or partyIndex > 2 then
+				error('Invalid party index \'' .. args[2] .. '\'. Valid values are 0 (main party), 1 (alliance 1), 2 (alliance 2).')
+			else
+				local partySettings = Settings:getPartySettings(partyIndex)
+				local ret = handleCommandOnOff(partySettings.alignBottom, args[3], 'Bottom alignment (' .. tostring(partyIndex) .. ')')
+				partySettings.alignBottom = ret
+				Settings:save()
+			end
+		else
+			local ret = handleCommandOnOff(Settings.party.alignBottom, args[2], 'Bottom alignment')
+			Settings.party.alignBottom = ret
+			Settings.alliance1.alignBottom = ret
+			Settings.alliance2.alignBottom = ret
+			Settings:save()
+		end
 	elseif command == 'customorder' then
 		local ret = handleCommandOnOff(Settings.buffs.customOrder, args[2], 'Custom buff order')
 		Settings.buffs.customOrder = ret
 		Settings:save()
 		if setupModel then setupModel:refreshFilteredBuffs() end
-		model:refreshFilteredBuffs() -- TODO: test if this ever worked without this line for party member buffs
+		model:refreshFilteredBuffs()
 	elseif command == 'range' then
 		if args[2] then
 			local range1 = getRange(args[2])
@@ -487,6 +500,9 @@ windower.register_event('addon command', function(...)
 			setupModel:debugSetBarValue(args[3], tonumber(args[4]), tonumber(args[5]), tonumber(args[6]))
 		elseif subCommand == 'addplayer' and setupModel then
 			setupModel:debugAddSetupPlayer(tonumber(args[3]))
+		elseif subCommand == 'testbuffs' then
+			setupModel:debugTestBuffs()
+			setupModel:refreshFilteredBuffs()
 		end
 	else
 		showHelp()

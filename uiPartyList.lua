@@ -38,9 +38,9 @@ local utils = require('utils')
 -- create the class
 local uiPartyList = classes.class(uiContainer)
 
-function uiPartyList:init(layout, partyIndex, model, isUiLocked)
-	-- TODO: validate layout, rows * columns must always equal 6! (is this technically necessary?)
+local isDebug = false
 
+function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 	if self.super:init() then
 		self.layout = layout
 		self.partyIndex = partyIndex
@@ -82,8 +82,7 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 		self.bgPos = utils:coord(layout.background.pos)
 
 		self.imgMouse = self:addChild(uiImage.create())
-		self.imgMouse:alpha(0)
-		self.imgMouse:show()
+		self.imgMouse:alpha(isDebug and 32 or 0)
 		self.dragged = nil
 
 		self.isCtrlDown = false
@@ -156,15 +155,16 @@ function uiPartyList:update()
 	self.background:visible(count > 0, const.visFeature)
 	self.imgMouse:size(self.layout.columns * self.layout.columnWidth, rowCount * self.layout.rowHeight)
 
-	-- update the grid
-	if partySettings.alignBottom then -- TODO: refactor this so we dont need to mess with these image positions
-		self.background:pos(self.bgPos.x, self.bgPos.y - rowCount * self.layout.rowHeight)
-		self.imgMouse:pos(0, -rowCount * self.layout.rowHeight)
-	else
-		self.background:pos(self.bgPos.x, self.bgPos.y)
-		self.imgMouse:pos(0, 0)
+	-- bottom alignment
+	local alignBottomAdjustY = 0
+	if partySettings.alignBottom then
+		alignBottomAdjustY = -rowCount * self.layout.rowHeight
 	end
 
+	self.background:pos(self.bgPos.x, self.bgPos.y + alignBottomAdjustY)
+	self.imgMouse:pos(0, alignBottomAdjustY)
+
+	-- update the grid
 	for i = 0, 5 do
 		local item = self.listItems[i]
 		if item then
@@ -173,11 +173,8 @@ function uiPartyList:update()
 
 			local x = column * (self.layout.columnWidth + partySettings.itemSpacing)
 			local y = row * (self.layout.rowHeight + partySettings.itemSpacing)
-			if partySettings.alignBottom then
-				y = y - rowCount * self.layout.rowHeight
-			end
 
-			item:pos(x, y)
+			item:pos(x, y + alignBottomAdjustY)
 		end
 	end
 
@@ -207,7 +204,7 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
                 end
 
                 if Settings:getPartySettings(self.partyIndex).alignBottom then
-                    self:pos(posX, posY + self.imgMouse.height) -- TODO: re-test this
+                    self:pos(posX, posY + self.imgMouse.height)
                 else
                     self:pos(posX, posY)
                 end

@@ -119,8 +119,10 @@ local function setPath(image, path)
 	image.wrappedImage:path(windower.addon_path .. path)
 
 	-- this is a workaround for image primitives showing up before their texture is loaded
-	-- only needed on the first texture load, not on later changes
-	if not private[image].initShown then
+	-- only needed when switching from no texture to texture
+	if not path or path == '' then
+		private[image].initShown = false
+	elseif not private[image].initShown then
 		image:hide(const.visInit)
 		private[image].initFrames = 2 -- delay showing for 2 frames
 	end

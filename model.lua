@@ -234,4 +234,19 @@ function model:debugAddSetupPlayer(partyIndex)
 	setupParty[i] = setupPlayer
 end
 
+function model:debugTestBuffs()
+	for p = 0, 5 do
+		local setupParty = self.parties[0]
+
+		local cutoff = math.random(1, 32)
+		for i = 1, 32 do
+			local buff = nil
+			if i < cutoff then
+				buff = math.random(1, 631)
+			end
+			setupParty[p].buffs[i] = buff
+		end
+	end
+end
+
 return model

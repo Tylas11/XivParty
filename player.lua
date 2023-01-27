@@ -238,7 +238,7 @@ function player:createSetupData(job, subJob, isMainParty)
 
 	self.isSelected = false
 	self.isSubTarget = false
-	self.distance = math.random(0, 400)
+	self.distance = math.random(0, 500)
 	self.isInCastingRange = self.distance:sqrt() < 20.79
 	self.isInTargetingRange = self.distance:sqrt() < 50
 	self.isTrust = false

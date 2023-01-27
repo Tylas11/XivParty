@@ -44,20 +44,24 @@ function uiBackground:init(layout, contentHeight)
 		if not contentHeight then contentHeight = 0 end
 		self.contentHeight = contentHeight
 
-		self.top = self:addChild(uiImage.new(layout.imgTop))
-		self.mid = self:addChild(uiImage.new(layout.imgMid))
-		self.bottom = self:addChild(uiImage.new(layout.imgBottom))
+		self.imgTop = self:addChild(uiImage.new(layout.imgTop))
+		self.imgMid = self:addChild(uiImage.new(layout.imgMid))
+		self.imgBottom = self:addChild(uiImage.new(layout.imgBottom))
 
 		self.sizeMid = utils:coord(layout.imgMid.size)
 
 		if isDebug then -- debug background
-			self.top:path('')
-			self.mid:path('')
-			self.bottom:path('')
+			self.imgTop:path('')
+			self.imgMid:path('')
+			self.imgBottom:path('')
 
-			self.top:color(255,0,0)
-			self.mid:color(0,255,0)
-			self.bottom:color(0,0,255)
+			self.imgTop:color(255,0,0)
+			self.imgMid:color(0,255,0)
+			self.imgBottom:color(0,0,255)
+
+			self.imgTop:alpha(32)
+			self.imgMid:alpha(32)
+			self.imgBottom:alpha(32)
 		end
 	end
 end
@@ -72,9 +76,9 @@ function uiBackground:update()
 
 	local contentHeight = self.contentHeight / self.scaleY -- negate vertical scaling, we want to set the height directly
 
-	self.mid:size(self.sizeMid.x, contentHeight)
-	self.mid:repeat_xy(1, math.floor(contentHeight / self.sizeMid.y))
-	self.bottom:pos(self.bottom.posX, self.mid.posY + contentHeight)
+	self.imgMid:size(self.sizeMid.x, contentHeight)
+	self.imgMid:repeat_xy(1, math.floor(contentHeight / self.sizeMid.y))
+	self.imgBottom:pos(self.imgBottom.posX, self.imgMid.posY + contentHeight)
 
 	self.super:update()
 end

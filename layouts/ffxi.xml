@@ -11,21 +11,21 @@
                 <imgBottom>
                     <color>#FFFFFFDD</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiBgBottom.png</path>
+                    <path>assets/ffxi/BgBottom.png</path>
                     <pos>0,0</pos>
                     <size>420,8</size>
                 </imgBottom>
                 <imgMid>
                     <color>#FFFFFFDD</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiBgMid.png</path>
+                    <path>assets/ffxi/BgMid.png</path>
                     <pos>0,10</pos>
                     <size>420,4</size>
                 </imgMid>
                 <imgTop>
                     <color>#FFFFFFDD</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiBgTop.png</path>
+                    <path>assets/ffxi/BgTop.png</path>
                     <pos>0,0</pos>
                     <size>420,10</size>
                 </imgTop>
@@ -40,35 +40,35 @@
                         <imgBar>
                             <color>#FF9597FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBar.png</path>
+                            <path>assets/ffxi/Bar.png</path>
                             <pos>13,0</pos>
                             <size>102,64</size>
                         </imgBar>
                         <imgBg>
                             <color>#FF9597FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarBg.png</path>
+                            <path>assets/ffxi/BarBg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgBg>
                         <imgFg>
                             <color>#FF9597FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarFg.png</path>
+                            <path>assets/ffxi/BarFg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgFg>
                         <imgGlow>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFF2F2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlow.png</path>
+                            <path>assets/ffxi/BarGlow.png</path>
                             <pos>13,0</pos>
                             <size>6,64</size>
                         </imgGlow>
                         <imgGlowSides>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFF2F2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlowSides.png</path>
+                            <path>assets/ffxi/BarGlowSides.png</path>
                             <pos>11,0</pos>
                             <size>2,64</size>
                         </imgGlowSides>
@@ -100,35 +100,35 @@
                         <imgBar>
                             <color>#FFFF9CFF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBar.png</path>
+                            <path>assets/ffxi/Bar.png</path>
                             <pos>13,0</pos>
                             <size>102,64</size>
                         </imgBar>
                         <imgBg>
                             <color>#FFFF9CFF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarBg.png</path>
+                            <path>assets/ffxi/BarBg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgBg>
                         <imgFg>
                             <color>#FFFF9CFF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarFg.png</path>
+                            <path>assets/ffxi/BarFg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgFg>
                         <imgGlow>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFFFF2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlow.png</path>
+                            <path>assets/ffxi/BarGlow.png</path>
                             <pos>13,0</pos>
                             <size>6,64</size>
                         </imgGlow>
                         <imgGlowSides>
-                            <color>#FFFFFFFF</color>
+                            <color>#FFFFF2FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlowSides.png</path>
+                            <path>assets/ffxi/BarGlowSides.png</path>
                             <pos>11,0</pos>
                             <size>2,64</size>
                         </imgGlowSides>
@@ -157,35 +157,35 @@
                         <imgBar>
                             <color>#8EB4F9FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBar.png</path>
+                            <path>assets/ffxi/Bar.png</path>
                             <pos>13,0</pos>
                             <size>102,64</size>
                         </imgBar>
                         <imgBg>
                             <color>#8EB4F9FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarBg.png</path>
+                            <path>assets/ffxi/BarBg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgBg>
                         <imgFg>
                             <color>#8EB4F9FF</color>
                             <enabled>true</enabled>
-                            <path>assets/FfxiBarFg.png</path>
+                            <path>assets/ffxi/BarFg.png</path>
                             <pos>0,0</pos>
                             <size>128,64</size>
                         </imgFg>
                         <imgGlow>
-                            <color>#FFFFFFFF</color>
+                            <color>#EDF1F9FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlow.png</path>
+                            <path>assets/ffxi/BarGlow.png</path>
                             <pos>13,0</pos>
                             <size>6,64</size>
                         </imgGlow>
                         <imgGlowSides>
-                            <color>#FFFFFFFF</color>
+                            <color>#EDF1F9FF</color>
                             <enabled>true</enabled>
-                            <path>assets/XivBarGlowSides.png</path>
+                            <path>assets/ffxi/BarGlowSides.png</path>
                             <pos>11,0</pos>
                             <size>2,64</size>
                         </imgGlowSides>
@@ -263,21 +263,21 @@
                     <imgAlliance>
                         <color>#FFFFFFFF</color>
                         <enabled>true</enabled>
-                        <path>assets/FfxiLeader.png</path>
+                        <path>assets/ffxi/Leader.png</path>
                         <pos>0,5</pos>
                         <size>7,5</size>
                     </imgAlliance>
                     <imgParty>
                         <color>#E6E159FF</color>
                         <enabled>true</enabled>
-                        <path>assets/FfxiLeader.png</path>
+                        <path>assets/ffxi/Leader.png</path>
                         <pos>0,10</pos>
                         <size>7,5</size>
                     </imgParty>
                     <imgQuarterMaster>
                         <color>#66E659FF</color>
                         <enabled>true</enabled>
-                        <path>assets/FfxiLeader.png</path>
+                        <path>assets/ffxi/Leader.png</path>
                         <pos>0,0</pos>
                         <size>7,5</size>
                     </imgQuarterMaster>
@@ -290,14 +290,14 @@
                     <imgFar>
                         <color>#FFFFFFFF</color>
                         <enabled>true</enabled>
-                        <path>assets/RangeIndicatorFar.png</path>
+                        <path>assets/ffxi/RangeFar.png</path>
                         <pos>0,0</pos>
                         <size>10,10</size>
                     </imgFar>
                     <imgNear>
                         <color>#FFFFFFFF</color>
                         <enabled>true</enabled>
-                        <path>assets/RangeIndicator.png</path>
+                        <path>assets/ffxi/Range.png</path>
                         <pos>0,0</pos>
                         <size>10,10</size>
                     </imgNear>
@@ -305,9 +305,9 @@
                     <zOrder>11</zOrder>
                 </range>
                 <hover>
-                    <color>#FFFFFFAA</color>
+                    <color>#9C94E8AA</color>
                     <enabled>true</enabled>
-                    <path>assets/XivHover.png</path>
+                    <path>assets/ffxi/Hover.png</path>
                     <pos>20,-8</pos>
                     <size>390,60</size>
                     <zOrder>0</zOrder>
@@ -315,7 +315,7 @@
                 <cursor>
                     <color>#FFFFFFFF</color>
                     <enabled>true</enabled>
-                    <path>assets/FfxiCursor.png</path>
+                    <path>assets/ffxi/Cursor.png</path>
                     <pos>-38,4</pos>
                     <size>37,24</size>
                     <zOrder>5</zOrder>

@@ -33,8 +33,10 @@
 -- Scale affects all positions and sizes, snapToRaster only affects positions.
 -- Due to a windower limitation, z-orders only work between the same type of element (image, text). Texts will always be placed above images!
 
+-- windower library imports
 require('tables')
 
+-- helper functions
 local function element(values)
 	local ret = {
 		enabled = false,
@@ -95,19 +97,19 @@ local layout = {
 			pos = L{ 0, -21 },
 			imgTop = image({
 				pos = L{ 0, 0 },
-				path = 'assets/XivBgTop.png',
+				path = 'assets/xiv/BgTop.png',
 				size = L{ 377, 21 },
 				color = '#FFFFFFDD'
 			}),
 			imgMid = image({
 				pos = L{ 0, 21 },
-				path = 'assets/XivBgMid.png', -- this texture is repeated vertically when the list resizes
+				path = 'assets/xiv/BgMid.png', -- this texture is repeated vertically when the list resizes
 				size = L{ 377, 12 }, -- Y size will be overwritten in code, value here still required as a base
 				color = '#FFFFFFDD'
 			}),
 			imgBottom = image({
 				pos = L{ 0, 0 }, -- Y pos will be overwritten in code, value here irrelevant
-				path = 'assets/XivBgBottom.png',
+				path = 'assets/xiv/BgBottom.png',
 				size = L{ 377, 21 },
 				color = '#FFFFFFDD'
 			})
@@ -144,27 +146,27 @@ local layout = {
 
 					imgBg = image({
 						pos = L{ 0, 0 },
-						path = 'assets/XivBarBG.png',
+						path = 'assets/xiv/BarBG.png',
 						size = L{ 128, 64 }
 					}),
 					imgBar = image({
 						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
-						path = 'assets/XivBar.png',
+						path = 'assets/xiv/Bar.png',
 						size = L{ 102, 64 }
 					}),
 					imgFg = image({
 						pos = L{ 0, 0 },
-						path = 'assets/XivBarFG.png',
+						path = 'assets/xiv/BarFG.png',
 						size = L{ 128, 64 }
 					}),
 					imgGlow = image({
 						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
-						path = 'assets/XivBarGlow.png',
+						path = 'assets/xiv/BarGlow.png',
 						size = L{ 6, 64 }
 					}),
 					imgGlowSides = image({
 						pos = L{ 11, 0 }, -- x position set in code
-						path = 'assets/XivBarGlowSides.png',
+						path = 'assets/xiv/BarGlowSides.png',
 						size = L{ 2, 64 }
 					})
 				})
@@ -193,27 +195,27 @@ local layout = {
 
 					imgBg = image({
 						pos = L{ 0, 0 },
-						path = 'assets/XivBarBG.png',
+						path = 'assets/xiv/BarBG.png',
 						size = L{ 128, 64 }
 					}),
 					imgBar = image({
 						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
-						path = 'assets/XivBar.png',
+						path = 'assets/xiv/Bar.png',
 						size = L{ 102, 64 }
 					}),
 					imgFg = image({
 						pos = L{ 0, 0 },
-						path = 'assets/XivBarFG.png',
+						path = 'assets/xiv/BarFG.png',
 						size = L{ 128, 64 }
 					}),
 					imgGlow = image({
 						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
-						path = 'assets/XivBarGlow.png',
+						path = 'assets/xiv/BarGlow.png',
 						size = L{ 6, 64 }
 					}),
 					imgGlowSides = image({
 						pos = L{ 11, 0 }, -- x position set in code
-						path = 'assets/XivBarGlowSides.png',
+						path = 'assets/xiv/BarGlowSides.png',
 						size = L{ 2, 64 }
 					})
 				})
@@ -243,27 +245,27 @@ local layout = {
 
 					imgBg = image({
 						pos = L{ 0, 0 },
-						path = 'assets/XivBarBG.png',
+						path = 'assets/xiv/BarBG.png',
 						size = L{ 128, 64 }
 					}),
 					imgBar = image({
 						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
-						path = 'assets/XivBar.png',
+						path = 'assets/xiv/Bar.png',
 						size = L{ 102, 64 }
 					}),
 					imgFg = image({
 						pos = L{ 0, 0 },
-						path = 'assets/XivBarFG.png',
+						path = 'assets/xiv/BarFG.png',
 						size = L{ 128, 64 }
 					}),
 					imgGlow = image({
 						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
-						path = 'assets/XivBarGlow.png',
+						path = 'assets/xiv/BarGlow.png',
 						size = L{ 6, 64 }
 					}),
 					imgGlowSides = image({
 						pos = L{ 11, 0 }, -- x position set in code
-						path = 'assets/XivBarGlowSides.png',
+						path = 'assets/xiv/BarGlowSides.png',
 						size = L{ 2, 64 }
 					})
 				})
@@ -318,40 +320,40 @@ local layout = {
 
 				imgParty = image({
 					pos = L{ 0, 0 },
-					path = 'assets/XivLeader.png',
+					path = 'assets/xiv/Leader.png',
 					size = L{ 22, 22 }
 				}),
 				imgAlliance = image({
 					pos = L{ 0, 11 },
-					path = 'assets/XivAllianceLeader.png',
+					path = 'assets/xiv/AllianceLeader.png',
 					size = L{ 22, 22 }
 				}),
 				imgQuarterMaster = image({
 					pos = L{ 0, 22 },
-					path = 'assets/XivQuarterMaster.png',
+					path = 'assets/xiv/QuarterMaster.png',
 					size = L{ 22, 22 }
 				})
 			}),
 			-- range indicator
 			range = element({
-				pos = L{ 30, 30 },
+				pos = L{ 30, 28.5 },
 				zOrder = 11,
 
 				imgNear = image({
 					pos = L { 0, 0 },
-					path = 'assets/RangeIndicator.png',
-					size = L{ 10, 10 }
+					path = 'assets/xiv/Range.png',
+					size = L{ 14, 12 }
 				}),
 				imgFar = image({
 					pos = L { 0, 0 },
-					path = 'assets/RangeIndicatorFar.png',
-					size = L{ 10, 10 }
+					path = 'assets/xiv/RangeFar.png',
+					size = L{ 14, 12 }
 				})
 			}),
 			-- mouse hover image
 			hover = image({
 				pos = L{ 20, -8 },
-				path = 'assets/XivHover.png',
+				path = 'assets/xiv/Hover.png',
 				size = L{ 390, 60 },
 				color = '#FFFFFFAA',
 				zOrder = 0
@@ -359,7 +361,7 @@ local layout = {
 			-- cursor image
 			cursor = image({
 				pos = L{ 20, -8 },
-				path = 'assets/XivCursor.png',
+				path = 'assets/xiv/Cursor.png',
 				size = L{ 390, 60 },
 				zOrder = 1
 			}),

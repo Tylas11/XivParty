@@ -42,19 +42,19 @@ local defaults = {
 	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
 
 	party = {
-		pos = L{ 40, 690 },
+		pos = L{ 0.015625, 0.4791666 }, -- relative coordinates, resolution independent (range 0.0 to 1.0)
 		scale = L{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
 		itemSpacing = 0, -- distance between party list items
 		alignBottom = false -- expands the party list from bottom to top
 	},
 	alliance1 = {
-		pos = L{ 2220, 760 },
+		pos = L{ 0.8671875, 0.5277777 },
 		scale = L{ 0, 0 },
 		itemSpacing = 0,
 		alignBottom = false
 	},
 	alliance2 = {
-		pos = L{ 2220, 860 },
+		pos = L{ 0.8671875, 0.5972222 },
 		scale = L{ 0, 0 },
 		itemSpacing = 0,
 		alignBottom = false

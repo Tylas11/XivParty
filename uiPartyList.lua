@@ -40,6 +40,9 @@ local uiPartyList = classes.class(uiContainer)
 
 local isDebug = false
 
+local resX = windower.get_windower_settings().ui_x_res
+local resY = windower.get_windower_settings().ui_y_res
+
 function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 	if self.super:init() then
 		self.layout = layout
@@ -49,27 +52,44 @@ function uiPartyList:init(layout, partyIndex, model, isUiLocked)
 
 		self.listItems = T{} -- ordered list by party list position, index range 0..5
 
+		local scale = Settings:getUiScale(self.partyIndex)
+		local pos = Settings:getUiPosition(self.partyIndex)
+
+		local saveSettings = false
 		local isMainParty = partyIndex == 0
-		local partySettings = Settings:getPartySettings(self.partyIndex)
 
-		local scale = utils:coord(partySettings.scale)
-		local pos = utils:coord(partySettings.pos)
-
-		-- initialize the UI position and scale based on the screen resolution
+		-- initialize the UI scale based on the screen resolution
 		if scale.x == 0 and scale.y == 0 then
-			local resY = windower.get_windower_settings().ui_y_res
 			scale.x = utils:round(resY / const.baseResY, 2)
 			scale.y = scale.x
-
-			pos.x = pos.x * scale.x
-			pos.y = pos.y * scale.y
 
 			if isMainParty then
 				log('Initializing UI scale: ' .. scale.x)
 				log('Type "//xp setup" to change UI position and scale using drag & drop and the mouse wheel.')
 			end
 
-			partySettings.scale = L{ scale.x, scale.y }
+			Settings:setUiScale(scale.x, scale.y, self.partyIndex)
+			saveSettings = true
+		end
+
+		-- UI out of bounds check
+		if pos.x >= resX then
+			pos.x = resX - layout.columns * layout.columnWidth * scale.x
+
+			log('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' X position to ' .. tostring(pos.x))
+			Settings:setUiPosition(pos.x, pos.y, self.partyIndex)
+			saveSettings = true
+		end
+
+		if pos.y >= resY then
+			pos.y = resY - layout.rows * layout.rowHeight * scale.y
+
+			log('UI out of bounds! Adjusting \'' .. Settings:partyIndexToName(self.partyIndex) .. '\' Y position to ' .. tostring(pos.y))
+			Settings:setUiPosition(pos.x, pos.y, self.partyIndex)
+			saveSettings = true
+		end
+
+		if saveSettings then
 			Settings:save()
 		end
 
@@ -221,9 +241,9 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
         -- mouse left release
         elseif type == 2 then
             if self.dragged then
-                Settings:getPartySettings(self.partyIndex).pos = L{ self.posX, self.posY }
+				Settings:setUiPosition(self.posX, self.posY, self.partyIndex)
 
-                log('Position: ' .. self.posX .. ', ' .. self.posY)
+                log('\'' .. Settings:partyIndexToName(self.partyIndex) .. '\' position: ' .. self.posX .. ', ' .. self.posY)
                 Settings:save()
 
                 self.dragged = nil
@@ -237,9 +257,9 @@ function uiPartyList:handleWindowerMouse(type, x, y, delta, blocked)
 				local sy = math.max(0.25, self.scaleY + delta / 100)
 				self:scale(sx, sy)
 
-				Settings:getPartySettings(self.partyIndex).scale = L{ sx, sy }
+				Settings:setUiScale(sx, sy, self.partyIndex)
 
-				log('Scale: ' .. sx .. ', ' .. sy)
+				log('\'' .. Settings:partyIndexToName(self.partyIndex) .. '\' scale: ' .. sx .. ', ' .. sy)
                 Settings:save()
 
 				return true

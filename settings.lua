@@ -34,10 +34,14 @@ require('strings')
 local classes = require('classes')
 local defaults = require('defaults')
 local jobDefaults = require('jobdefaults')
+local utils = require('utils')
 local const = require('const')
 
 -- create the class
 local settings = classes.class()
+
+local resX = windower.get_windower_settings().ui_x_res
+local resY = windower.get_windower_settings().ui_y_res
 
 function settings:init(model)
 	self.model = model
@@ -167,6 +171,49 @@ function settings:getPartySettings(partyIndex)
 	if partyIndex == 0 then return self.party end
 	if partyIndex == 1 then return self.alliance1 end
 	if partyIndex == 2 then return self.alliance2 end
+end
+
+function settings:partyIndexToName(partyIndex)
+	if partyIndex == 0 then return 'main party' end
+	if partyIndex == 1 then return 'alliance 1' end
+	if partyIndex == 2 then return 'alliance 2' end
+end
+
+-- gets the UI position in screen coordinates
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function settings:getUiPosition(partyIndex)
+	local partySettings = self:getPartySettings(partyIndex)
+
+	local pos = utils:coord(partySettings.pos)
+	return { x = utils:round(pos.x * resX), y = utils:round(pos.y * resY) }
+end
+
+-- sets the UI position and stores them as relative coordinates
+-- @param posX horizontal position in screen coordinates
+-- @param posY vertical position in screen coordinates
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function settings:setUiPosition(posX, posY, partyIndex)
+	local partySettings = self:getPartySettings(partyIndex)
+
+	partySettings.pos = L{ posX / resX, posY / resY }
+end
+
+-- gets the UI scale
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function settings:getUiScale(partyIndex)
+	local partySettings = self:getPartySettings(partyIndex)
+
+	return utils:coord(partySettings.scale)
+end
+
+-- sets the UI scale
+-- @param scaleX horizontal scale
+-- @param scaleY vertical scale
+-- @param partyIndex 0 = main party, 1 = alliance1, 2 = alliance2
+function settings:setUiScale(scaleX, scaleY, partyIndex)
+	local partySettings = self:getPartySettings(partyIndex)
+
+	partySettings.scale = L{ scaleX, scaleY }
 end
 
 return settings

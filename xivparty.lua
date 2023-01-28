@@ -347,7 +347,7 @@ windower.register_event('addon command', function(...)
 				error('Invalid party index \'' .. args[2] .. '\'. Valid values are 0 (main party), 1 (alliance 1), 2 (alliance 2).')
 			else
 				local partySettings = Settings:getPartySettings(partyIndex)
-				local ret = handleCommandOnOff(partySettings.alignBottom, args[3], 'Bottom alignment (' .. tostring(partyIndex) .. ')')
+				local ret = handleCommandOnOff(partySettings.alignBottom, args[3], 'Bottom alignment (' .. Settings:partyIndexToName(partyIndex) .. ')')
 				partySettings.alignBottom = ret
 				Settings:save()
 			end

@@ -236,7 +236,7 @@
                     <color>#F0FFFFFF</color>
                     <enabled>true</enabled>
                     <font>Arial</font>
-                    <pos>5,18</pos>
+                    <pos>8,18</pos>
                     <short>true</short>
                     <size>9</size>
                     <snapToRaster>true</snapToRaster>

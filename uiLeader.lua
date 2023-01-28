@@ -26,17 +26,42 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local jobDefaults = {
-	jobEnabled = false, -- when set to false, job specific settings will be ignored and globals used instead
+-- imports
+local classes = require('classes')
+local uiContainer = require('uiContainer')
+local uiImage = require('uiImage')
+local const = require('const')
 
-	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
-	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
+-- create the class, derive from uiContainer
+local uiLeader = classes.class(uiContainer)
 
-	buffs = {
-		filters = '', -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
-		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
-	}
-}
+function uiLeader:init(layout, player)
+	if self.super:init(layout) then
+		self.player = player
 
-return jobDefaults
+		self.imgParty = self:addChild(uiImage.new(layout.imgParty))
+		self.imgParty:hide(const.visFeature)
+
+		self.imgAlliance = self:addChild(uiImage.new(layout.imgAlliance))
+		self.imgAlliance:hide(const.visFeature)
+
+        self.imgQuarterMaster = self:addChild(uiImage.new(layout.imgQuarterMaster))
+		self.imgQuarterMaster:hide(const.visFeature)
+	end
+end
+
+function uiLeader:setPlayer(player)
+	self.player = player
+end
+
+function uiLeader:update()
+	if not self.isEnabled then return end
+
+	self.imgParty:visible(self.player.isLeader, const.visFeature)
+	self.imgAlliance:visible(self.player.isAllianceLeader, const.visFeature)
+	self.imgQuarterMaster:visible(self.player.isQuarterMaster, const.visFeature)
+
+	self.super:update()
+end
+
+return uiLeader

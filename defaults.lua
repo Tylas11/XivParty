@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,23 +26,45 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local defaults = {}
+-- imports
+local const = require('const')
 
-defaults.layout = 'auto' -- active UI layout, found in XivParty/layouts directory. use 'auto' for automatic resolution based selection
+local defaults = {
+	layout = const.defaultLayout, -- active UI layout, found in XivParty/layouts directory
 
-defaults.posX = 70 -- x screen position of the party list
-defaults.posY = 400 -- y screen position of the party list
-defaults.itemSpacing = 0 -- distance between party list items
+	hideKeyCode = 207, -- DirectInput keyboard (DIK) code for holding down button to temporarily hide UI. set 0 to disable. default: "End" key
+	hideSolo = false, -- hides the party list when you are not in a party
+	hideAlliance = false, -- hides UI for alliance parties
+	hideCutscene = true, -- hides UI during cutscenes or when talking to NPCs
+	mouseTargeting = true, -- enables targeting party members using the mouse
 
-defaults.alignBottom = false -- expands the party list from bottom to top
-defaults.hideSolo = false -- hides the party list when you are not in a party
+	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
+	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
 
-defaults.rangeIndicator = 0 -- if party members are closer than this distance, they will be marked. 0 = off
-defaults.rangeIndicatorFar = 0 -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
+	party = {
+		pos = L{ 0.015625, 0.4791666 }, -- relative coordinates, resolution independent (range 0.0 to 1.0)
+		scale = L{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
+		itemSpacing = 0, -- distance between party list items
+		alignBottom = false -- expands the party list from bottom to top
+	},
+	alliance1 = {
+		pos = L{ 0.8671875, 0.5277777 },
+		scale = L{ 0, 0 },
+		itemSpacing = 0,
+		alignBottom = false
+	},
+	alliance2 = {
+		pos = L{ 0.8671875, 0.5972222 },
+		scale = L{ 0, 0 },
+		itemSpacing = 0,
+		alignBottom = false
+	},
 
-defaults.buffs = {}
-defaults.buffs.filters = '' -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-defaults.buffs.filterMode = 'blacklist' -- 'blacklist' or 'whitelist', both use the same filter list
-defaults.buffs.customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+	buffs = {
+		filters = '', -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
+		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
+		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
+	}
+}
 
 return defaults

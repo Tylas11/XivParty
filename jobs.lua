@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,10 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
 require('lists')
+
+-- imports
 local utils = require('utils')
 
 local jobs = {}
@@ -210,7 +213,7 @@ function jobs:getRoleColor(job, jobIconColors)
 			hexColor = roleColor
 		end
 	end
-	
+
 	return utils:colorFromHex(hexColor)
 end
 
@@ -220,7 +223,7 @@ function jobs:getTrustInfo(trustName, trustModel)
 			return t
 		end
 	end
-	
+
 	return nil
 end
 

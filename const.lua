@@ -26,17 +26,29 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local jobDefaults = {
-	jobEnabled = false, -- when set to false, job specific settings will be ignored and globals used instead
+local const = {
+    barTypeHp = 'barTypeHp',
+    barTypeMp = 'barTypeMp',
+    barTypeTp = 'barTypeTp',
 
-	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
-	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
+	xmlExtension = '.xml',
+	dataDir = 'data/',
+    layoutDir = 'layouts/',
+    layoutAllianceSuffix = '_alliance',
+	defaultLayout = 'xiv',
 
-	buffs = {
-		filters = '', -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
-		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
-	}
+	maxBuffs = 32,
+	baseResY = 1440, -- default positions and scales are based on a 1440p screen
+
+	-- visibility flag IDs
+	visDefault = 1, -- the default flag to use when no flag is specified
+	visOutsideZone = 2, -- hide elements based on the player being outside the current zone
+	visFeature = 3, -- for general UI features like icons that show up, etc.
+	visKeyboard = 4, -- temporarily hide UI by holding down a key
+	visInit = 5, -- for delayed showing of newly loaded images
+	visCutscene = 6, -- hide UI during cutscenes
+	visSolo = 7, -- hide UI while solo
+	visZoning = 8 -- hide UI while zoning
 }
 
-return jobDefaults
+return const

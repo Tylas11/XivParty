@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,202 +26,403 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local layout = {}
+-- DO NOT EDIT VALUES IN THIS FILE if you want to customize a layout, edit the XML files in the layouts directory instead.
+-- This file only contains default values and changes wont have any effect!
 
-layout.scale = 1 -- image scale factor. does not affect offsets, spacings or font sizes. intended for easier creation of multi resolution layouts
+-- All positions, scales and z-orders are relative to an element's parent.
+-- Scale affects all positions and sizes, snapToRaster only affects positions.
+-- Due to a windower limitation, z-orders only work between the same type of element (image, text). Texts will always be placed above images!
 
-layout.list = {}
-layout.list.itemHeight = 46 -- overall height of a party list item (top to bottom, including all texts, images). not affected by scale
-layout.list.offset = L{ 30, 0 } -- distance between edge of the mid background part and party list items
+-- windower library imports
+require('tables')
 
-layout.bg = {}
-layout.bg.imgTop = {}
-layout.bg.imgTop.path = 'assets/BgTop.png'
-layout.bg.imgTop.size = L{ 377, 21 }
-layout.bg.imgTop.color = '#FFFFFFDD'
+-- helper functions
+local function element(values)
+	local ret = {
+		enabled = false,
+		pos = L{ 0, 0 },
+		scale = L{ 1, 1 },
+		zOrder = 0,
+		snapToRaster = false
+	}
 
-layout.bg.imgMid = {}
-layout.bg.imgMid.path = 'assets/BgMid.png' -- this texture is repeated vertically when the list resizes
-layout.bg.imgMid.size = L{ 377, 12 }
-layout.bg.imgMid.color = '#FFFFFFDD'
+	if values ~= nil then
+		table.update(ret, values)
+	end
 
-layout.bg.imgBottom = {}
-layout.bg.imgBottom.path = 'assets/BgBottom.png'
-layout.bg.imgBottom.size = L{ 377, 21 }
-layout.bg.imgBottom.color = '#FFFFFFDD'
+	return ret
+end
 
-layout.bar = {}
-layout.bar.offset = L{ 0, 20 }
-layout.bar.spacingX = 24 -- distance between hp, mp and tp bars
-layout.bar.animSpeed = 0.1 -- speed of the bar animation in percent per frame (higher is faster)
+local function image(values)
+	local ret = table.update(element(), {
+		path = '',
+		size = L{ 0, 0 },
+		color = '#FFFFFFFF'
+	})
 
--- glow colors are taken from the respective bar foreground colors
-layout.bar.imgGlowMid = {}
-layout.bar.imgGlowMid.path = 'assets/BarGlowMid.png'
-layout.bar.imgGlowMid.size = L{ 6, 32 }
+	if values ~= nil then
+		table.update(ret, values)
+	end
 
-layout.bar.imgGlowSides = {}
-layout.bar.imgGlowSides.path = 'assets/BarGlowSides.png'
-layout.bar.imgGlowSides.size = L{ 3, 32 }
+	return ret
+end
 
-layout.bar.hp = {}
-layout.bar.hp.glowColor = '#FFFFFFFF'
-layout.bar.hp.imgBg = {}
-layout.bar.hp.imgBg.path = 'assets/BarBG.png'
-layout.bar.hp.imgBg.size = L{ 107, 10 }
-layout.bar.hp.imgBg.color = '#FFFFFFFF'
-layout.bar.hp.imgFg = {}
-layout.bar.hp.imgFg.path = 'assets/BarFG.png'
-layout.bar.hp.imgFg.size = L{ 103, 6 }
-layout.bar.hp.imgFg.color = '#FFFFFFFF'
+local function text(values)
+	local ret = table.update(element(), {
+		font = 'Arial',
+		size = 12,
+		color = '#FFFFFFFF',
+		stroke = '#000000FF',
+		strokeWidth = 1,
+		alignRight = false,
+		maxChars = 0
+	})
 
-layout.bar.mp = {}
-layout.bar.mp.glowColor = '#FFFFFFFF'
-layout.bar.mp.imgBg = {}
-layout.bar.mp.imgBg.path = 'assets/BarBG.png'
-layout.bar.mp.imgBg.size = L{ 107, 10 }
-layout.bar.mp.imgBg.color = '#FFFFFFFF'
-layout.bar.mp.imgFg = {}
-layout.bar.mp.imgFg.path = 'assets/BarFG.png'
-layout.bar.mp.imgFg.size = L{ 103, 6 }
-layout.bar.mp.imgFg.color = '#FFFFFFFF'
+	if values ~= nil then
+		table.update(ret, values)
+	end
 
-layout.bar.tp = {}
-layout.bar.tp.glowColor = '#FFFFFFFF'
-layout.bar.tp.imgBg = {}
-layout.bar.tp.imgBg.path = 'assets/BarBG.png'
-layout.bar.tp.imgBg.size = L{ 107, 10 }
-layout.bar.tp.imgBg.color = '#FFFFFFFF'
-layout.bar.tp.imgFg = {}
-layout.bar.tp.imgFg.path = 'assets/BarFG.png'
-layout.bar.tp.imgFg.size = L{ 103, 6 }
-layout.bar.tp.imgFg.color = '#FFFFFFFF'
+	return ret
+end
 
-layout.jobIcon = {}
-layout.jobIcon.offset = L{ -41, -2 } -- offset for the whole component
-layout.jobIcon.path = 'assets/jobIcons/' -- where all job icons are located, named <3 letter job>.png
-layout.jobIcon.colors = {} -- background colors for job roles
-layout.jobIcon.colors.dd = '#663535FF'
-layout.jobIcon.colors.tank = '#364597FF'
-layout.jobIcon.colors.healer = '#3B6529FF'
-layout.jobIcon.colors.support = '#DAB200FF'
-layout.jobIcon.colors.special = '#FFFFFFFF'
+local layout = {
+	partyList = {
+		rows = 6,
+		columns = 1,
+		rowHeight = 46,
+		columnWidth = 410,
 
-layout.jobIcon.imgFrame = {}
-layout.jobIcon.imgFrame.offset = L{ 0, 0 }
-layout.jobIcon.imgFrame.path = 'assets/jobIcons/frame.png'
-layout.jobIcon.imgFrame.size = L{ 36, 36 }
-layout.jobIcon.imgFrame.color = '#FFFFFFFF'
+		-- Background
+		background = element({
+			pos = L{ 0, -21 },
+			imgTop = image({
+				pos = L{ 0, 0 },
+				path = 'assets/xiv/BgTop.png',
+				size = L{ 377, 21 },
+				color = '#FFFFFFDD'
+			}),
+			imgMid = image({
+				pos = L{ 0, 21 },
+				path = 'assets/xiv/BgMid.png', -- this texture is repeated vertically when the list resizes
+				size = L{ 377, 12 }, -- Y size will be overwritten in code, value here still required as a base
+				color = '#FFFFFFDD'
+			}),
+			imgBottom = image({
+				pos = L{ 0, 0 }, -- Y pos will be overwritten in code, value here irrelevant
+				path = 'assets/xiv/BgBottom.png',
+				size = L{ 377, 21 },
+				color = '#FFFFFFDD'
+			})
+		}),
 
-layout.jobIcon.imgIcon = {}
-layout.jobIcon.imgIcon.offset = L{ 0, -0.25 } -- slight Y offset to improve aliasing artifacts from scaling
-layout.jobIcon.imgIcon.path = '' -- must remain empty
-layout.jobIcon.imgIcon.size = L{ 36, 36 }
-layout.jobIcon.imgIcon.color = '#FFFFFFFF'
+		-- List item - a container for all UI elements of a party member, position is set in code
+		listItem = element({
+			pos = L{ 0, 0 }, -- overwritten in code
 
-layout.jobIcon.imgGradient = {}
-layout.jobIcon.imgGradient.offset = L{ 0, 0 }
-layout.jobIcon.imgGradient.path = 'assets/jobIcons/gradient.png'
-layout.jobIcon.imgGradient.size = L{ 36, 36 }
-layout.jobIcon.imgGradient.color = '#FFFFFFFF'
+			-- HP bar
+			hp = element({
+				pos = L{ 19, -7 },
+				hideOutsideZone = false,
+				hpYellowColor = '#F3F37CFF', -- HP < 75%
+				hpOrangeColor = '#F8BA80FF', -- HP < 50%
+				hpRedColor = '#FC8182FF', -- HP < 25%
+				snapToRaster = true,
+				zOrder = 2,
 
-layout.jobIcon.imgBg = {}
-layout.jobIcon.imgBg.offset = L{ 0, 0 }
-layout.jobIcon.imgBg.path = 'assets/jobIcons/bg.png'
-layout.jobIcon.imgBg.size = L{ 36, 36 }
-layout.jobIcon.imgBg.color = '#FFFFFFFF' -- will be overwritten with role colors
+				txtValue = text({
+					pos = L{ 120, 35 },
+					font = 'Grammara',
+					size = 11,
+					color = '#F0FFFFFF',
+					stroke = '#062D54C8',
+					strokeWidth = 2,
+					alignRight = true,
+					snapToRaster = true
+				}),
 
-layout.jobIcon.imgHighlight = {}
-layout.jobIcon.imgHighlight.offset = L{ -13, -13 } -- relative to the whole job icon component position
-layout.jobIcon.imgHighlight.path = 'assets/jobIcons/highlight.png'
-layout.jobIcon.imgHighlight.size = L{ 62, 62 }
-layout.jobIcon.imgHighlight.color = '#FFFFFFFF'
+				bar = element({
+					pos = L{ 0, 0 },
+					animSpeed = 0.1, -- speed of the bar animation in percent per frame (higher is faster)
 
-layout.leader = {}
-layout.leader.offset = L{ 58, 15 }
-layout.leader.img = {}
-layout.leader.img.path = 'assets/Leader.png'
-layout.leader.img.size = L{ 7, 5 }
-layout.leader.img.color = '#E6E159FF' -- party leader color
-layout.leader.allianceColor = '#FFFFFFFF'
-layout.leader.quarterMasterColor = '#66E659FF'
+					imgBg = image({
+						pos = L{ 0, 0 },
+						path = 'assets/xiv/BarBG.png',
+						size = L{ 128, 64 }
+					}),
+					imgBar = image({
+						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
+						path = 'assets/xiv/Bar.png',
+						size = L{ 102, 64 }
+					}),
+					imgFg = image({
+						pos = L{ 0, 0 },
+						path = 'assets/xiv/BarFG.png',
+						size = L{ 128, 64 }
+					}),
+					imgGlow = image({
+						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+						path = 'assets/xiv/BarGlow.png',
+						size = L{ 6, 64 }
+					}),
+					imgGlowSides = image({
+						pos = L{ 11, 0 }, -- x position set in code
+						path = 'assets/xiv/BarGlowSides.png',
+						size = L{ 2, 64 }
+					})
+				})
+			}),
+			-- MP bar
+			mp = element({
+				pos = L{ 150, -7 },
+				hideOutsideZone = false,
+				snapToRaster = true,
+				zOrder = 3,
 
-layout.range = {}
-layout.range.offset = L{ 0, 30 }
-layout.range.img = {}
-layout.range.img.path = 'assets/RangeIndicator.png'
-layout.range.img.size = L{ 10, 10 }
-layout.range.img.color = '#FFFFFFFF'
+				txtValue = text({
+					pos = L{ 120, 35 },
+					font = 'Grammara',
+					size = 11,
+					color = '#F0FFFFFF',
+					stroke = '#062D54C8',
+					strokeWidth = 2,
+					alignRight = true,
+					snapToRaster = true
+				}),
 
-layout.rangeFar = {}
-layout.rangeFar.offset = L{ 0, 30 }
-layout.rangeFar.img = {}
-layout.rangeFar.img.path = 'assets/RangeIndicator_far.png'
-layout.rangeFar.img.size = L{ 10, 10 }
-layout.rangeFar.img.color = '#FFFFFFFF'
+				bar = element({
+					pos = L{ 0, 0 },
+					animSpeed = 0.1, -- speed of the bar animation in percent per frame (higher is faster)
 
-layout.cursor = {}
-layout.cursor.offset = L{ -50, 0 }
-layout.cursor.img = {}
-layout.cursor.img.path = 'assets/Cursor.png'
-layout.cursor.img.size = L{ 46, 36 }
-layout.cursor.img.color = '#FFFFFFFF'
+					imgBg = image({
+						pos = L{ 0, 0 },
+						path = 'assets/xiv/BarBG.png',
+						size = L{ 128, 64 }
+					}),
+					imgBar = image({
+						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
+						path = 'assets/xiv/Bar.png',
+						size = L{ 102, 64 }
+					}),
+					imgFg = image({
+						pos = L{ 0, 0 },
+						path = 'assets/xiv/BarFG.png',
+						size = L{ 128, 64 }
+					}),
+					imgGlow = image({
+						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+						path = 'assets/xiv/BarGlow.png',
+						size = L{ 6, 64 }
+					}),
+					imgGlowSides = image({
+						pos = L{ 11, 0 }, -- x position set in code
+						path = 'assets/xiv/BarGlowSides.png',
+						size = L{ 2, 64 }
+					})
+				})
+			}),
+			-- TP bar
+			tp = element({
+				pos = L{ 281, -7 },
+				tpFullColor = '#50B4FAFF', -- TP > 1000
+				hideOutsideZone = false,
+				snapToRaster = true,
+				zOrder = 4,
 
-layout.buffIcons = {}
-layout.buffIcons.path = 'assets/buffIcons/'
-layout.buffIcons.size = L{ 20, 20 }
-layout.buffIcons.offset = L{ 1, 0 } -- icons are aligned to the left side of the TP bar
-layout.buffIcons.spacing = L{ 0, 1 } -- Y coordinate is only used when buffs wrap around to a second row
-layout.buffIcons.wrap = 19 -- wrap buff icons to a second row after this many icons (max 32 icons displayed)
-layout.buffIcons.wrapOffset = 6 -- offset the second buff icon row by this many icons to the right
-layout.buffIcons.alignRight = false -- icons will extend from right to left (still aligned to left side of TP bar, use offset!)
+				txtValue = text({
+					pos = L{ 120, 35 },
+					font = 'Grammara',
+					size = 11,
+					color = '#F0FFFFFF',
+					stroke = '#062D54C8',
+					strokeWidth = 2,
+					alignRight = true,
+					snapToRaster = true
+				}),
 
-layout.text = {}
-layout.text.tpFullColor = '#50B4FAFF'
-layout.text.hpYellowColor = '#F3F37CFF'
-layout.text.hpOrangeColor = '#F8BA80FF'
-layout.text.hpRedColor = '#FC8182FF'
+				bar = element({
+					pos = L{ 0, 0 },
+					animSpeed = 0.1, -- speed of the bar animation in percent per frame (higher is faster)
 
-layout.text.numbers = {}
-layout.text.numbers.font = 'Grammara'
-layout.text.numbers.size = 11
-layout.text.numbers.color = '#F0FFFFFF'
-layout.text.numbers.stroke = '#062D54C8'
-layout.text.numbers.strokeWidth = 2
-layout.text.numbers.offset = L{ 2, 28 }
+					imgBg = image({
+						pos = L{ 0, 0 },
+						path = 'assets/xiv/BarBG.png',
+						size = L{ 128, 64 }
+					}),
+					imgBar = image({
+						pos = L{ 13, 0 }, -- centered inside the foreground image = fg.pos + (fg.size - bar.size) / 2
+						path = 'assets/xiv/Bar.png',
+						size = L{ 102, 64 }
+					}),
+					imgFg = image({
+						pos = L{ 0, 0 },
+						path = 'assets/xiv/BarFG.png',
+						size = L{ 128, 64 }
+					}),
+					imgGlow = image({
+						pos = L{ 13, 0 }, -- centered inside foreground image = bar.pos.y + (bar.size.y - glow.size.y ) / 2, x position set in code
+						path = 'assets/xiv/BarGlow.png',
+						size = L{ 6, 64 }
+					}),
+					imgGlowSides = image({
+						pos = L{ 11, 0 }, -- x position set in code
+						path = 'assets/xiv/BarGlowSides.png',
+						size = L{ 2, 64 }
+					})
+				})
+			}),
+			-- job icon
+			jobIcon = element({
+				pos = L{ -11, -2 },
+				path = 'assets/jobIcons/', -- where all job icons are located, named <3 letter job>.png
+				snapToRaster = true,
+				zOrder = 5,
 
-layout.text.name = {}
-layout.text.name.font = 'Arial'
-layout.text.name.size = 15
-layout.text.name.color = '#F0FFFFFF'
-layout.text.name.stroke = '#062D54C8'
-layout.text.name.strokeWidth = 2
-layout.text.name.offset = L{ 65, 1 }
+				-- background colors for job roles
+				colors = {
+					dd = '#663535FF',
+					tank = '#364597FF',
+					healer = '#3B6529FF',
+					support = '#DAB200FF',
+					special = '#FF9700FF'
+				},
 
-layout.text.zone = {}
-layout.text.zone.font = 'Arial'
-layout.text.zone.size = 13
-layout.text.zone.color = '#F0FFFFFF'
-layout.text.zone.stroke = '#062D54C8'
-layout.text.zone.strokeWidth = 2
-layout.text.zone.offset = L{ 0, 1 }
-layout.text.zone.short = false -- display short zone name
-layout.text.zone.alignRight = false -- right align the text to the right end of the TP bar (use short zone names or text might overlap with player name)
+				imgFrame = image({
+					pos = L{ 0, 0 },
+					path = 'assets/jobIcons/frame.png',
+					size = L{ 36, 36 }
+				}),
+				imgIcon = image({
+					pos = L{ 0, 0 },
+					path = '', -- must remain empty, set in code
+					size = L{ 36, 36 }
+				}),
+				imgGradient = image({
+					pos = L{ 0, 0 },
+					path = 'assets/jobIcons/gradient.png',
+					size = L{ 36, 36 }
+				}),
+				imgBg = image({
+					pos = L{ 0, 0 },
+					path = 'assets/jobIcons/bg.png',
+					size = L{ 36, 36 },
+					color = '#FFFFFFFF' -- will be overwritten with role colors
+				}),
+				imgHighlight = image({
+					pos = L{ -13, -13 },
+					path = 'assets/jobIcons/highlight.png',
+					size = L{ 62, 62 }
+				})
+			}),
+			-- leader icons
+			leader = element({
+				pos = L{ -23, -6 },
+				zOrder = 10,
 
-layout.text.job = {}
-layout.text.job.font = 'Arial'
-layout.text.job.size = 8
-layout.text.job.color = '#F0FFFFFF'
-layout.text.job.stroke = '#062D54C8'
-layout.text.job.strokeWidth = 2
-layout.text.job.offset = L{ 0, 0 }
+				imgParty = image({
+					pos = L{ 0, 0 },
+					path = 'assets/xiv/Leader.png',
+					size = L{ 22, 22 }
+				}),
+				imgAlliance = image({
+					pos = L{ 0, 11 },
+					path = 'assets/xiv/AllianceLeader.png',
+					size = L{ 22, 22 }
+				}),
+				imgQuarterMaster = image({
+					pos = L{ 0, 22 },
+					path = 'assets/xiv/QuarterMaster.png',
+					size = L{ 22, 22 }
+				})
+			}),
+			-- range indicator
+			range = element({
+				pos = L{ 30, 28.5 },
+				zOrder = 11,
 
-layout.text.subJob = {}
-layout.text.subJob.font = 'Arial'
-layout.text.subJob.size = 8
-layout.text.subJob.color = '#F0FFFFFF'
-layout.text.subJob.stroke = '#062D54C8'
-layout.text.subJob.strokeWidth = 2
-layout.text.subJob.offset = L{ 9, 9 }
+				imgNear = image({
+					pos = L { 0, 0 },
+					path = 'assets/xiv/Range.png',
+					size = L{ 14, 12 }
+				}),
+				imgFar = image({
+					pos = L { 0, 0 },
+					path = 'assets/xiv/RangeFar.png',
+					size = L{ 14, 12 }
+				})
+			}),
+			-- mouse hover image
+			hover = image({
+				pos = L{ 20, -8 },
+				path = 'assets/xiv/Hover.png',
+				size = L{ 390, 60 },
+				color = '#FFFFFFAA',
+				zOrder = 0
+			}),
+			-- cursor image
+			cursor = image({
+				pos = L{ 20, -8 },
+				path = 'assets/xiv/Cursor.png',
+				size = L{ 390, 60 },
+				zOrder = 1
+			}),
+			-- buff icons
+			buffIcons = element({
+				pos = L{ 293, 0 },
+				path = 'assets/buffIcons/', -- directory where buff icons can be found. must follow naming pattern: <buffId>.png
+				size = L{ 20, 20 }, -- size of all buff icon images
+				color = '#FFFFFFFF', -- color of all buff icon images
+				spacing = L{ 0, 1 }, -- spacing between each icon
+				numIconsByRow = L{ 19, 13 }, -- number of icons to display in each row (max 32 in total)
+				offsetByRow = L{ 0, 6 }, -- offset each row by this many icons to the right
+				alignRight = false, -- icons will extend from right to left (adjust pos, x origin will change to the right side!)
+				zOrder = 12
+			}),
+			-- text labels
+			txtName = text({
+				pos = L{ 95, 1 },
+				font = 'Arial',
+				size = 15,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 2,
+				maxChars = 17, -- maximum number of characters to display, longer texts will be cut off by replacing the last allowed char with '...'
+				snapToRaster = true,
+				zOrder = 6
+			}),
+			txtZone = text({
+				pos = L{ 292, 1 },
+				font = 'Arial',
+				size = 13,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 2,
+				short = false, -- display short zone name
+				alignRight = false, -- right align the text to the right end of the TP bar (use short zone names or text might overlap with player name)
+				snapToRaster = true,
+				zOrder = 7
+			}),
+			txtJob = text({
+				pos = L{ 30, 0 },
+				font = 'Arial',
+				size = 8,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 1,
+				snapToRaster = true,
+				zOrder = 8
+			}),
+			txtSubJob = text({
+				pos = L{ 39, 9 },
+				font = 'Arial',
+				size = 8,
+				color = '#F0FFFFFF',
+				stroke = '#062D54C8',
+				strokeWidth = 1,
+				snapToRaster = true,
+				zOrder = 9
+			})
+		})
+	}
+}
 
 return layout

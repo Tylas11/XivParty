@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
 require('lists')
 
 -- the order of entires in this list defines the sort order of buffs for all party members
@@ -70,13 +71,13 @@ local buffOrder = L{
 	{id=21,en="addle",ja="アドル",enl="addled",jal="アドル"},
 	{id=22,en="intimidate",ja="ひるみ",enl="intimidated",jal="ひるみ"},
 	{id=30,en="bane",ja="呪詛",enl="baned",jal="呪詛"},
-	
+
 	-- misc debuffs
 	{id=299,en="Overload",ja="オーバーロード",enl="overloaded",jal="オーバーロード"},
 	{id=473,en="muddle",ja="アイテム使用不可",enl="muddled",jal="アイテム使用不可"},
 	{id=575,en="gestation",ja="出現準備期間",enl="gestating",jal="出現準備期間"},
 	{id=576,en="Doubt",ja="減退中",enl="afflicted with Doubt",jal="減退中"},
-	
+
 	-- dots
 	{id=128,en="Burn",ja="バーン",enl="afflicted with Burn",jal="バーン"},
 	{id=129,en="Frost",ja="フロスト",enl="afflicted with Frost",jal="フロスト"},
@@ -88,13 +89,13 @@ local buffOrder = L{
 	{id=135,en="Bio",ja="バイオ",enl="afflicted with Bio",jal="バイオ"},
 	{id=186,en="Helix",ja="計略",enl="Helix",jal="計略"},
 	{id=23,en="Kaustra",ja="メルトン",enl="afflicted with Kaustra",jal="メルトン"},
-	
+
 	-- song debuffs
 	{id=192,en="Requiem",ja="レクイエム",enl="Requiem",jal="レクイエム"},
 	{id=193,en="Lullaby",ja="ララバイ",enl="Lullaby",jal="ララバイ"},
 	{id=194,en="Elegy",ja="エレジー",enl="Elegy",jal="エレジー"},
 	{id=217,en="Threnody",ja="スレノディ",enl="Threnody",jal="スレノディ"},
-	
+
 	-- downs
 	{id=146,en="Accuracy Down",ja="命中率ダウン",enl="afflicted with Accuracy Down",jal="命中率ダウン"},
 	{id=561,en="Accuracy Down",ja="命中率ダウン",enl="afflicted with Accuracy Down",jal="命中率ダウン"},
@@ -104,7 +105,7 @@ local buffOrder = L{
 	{id=562,en="Evasion Down",ja="回避率ダウン",enl="afflicted with Evasion Down",jal="回避率ダウン"},
 	{id=149,en="Defense Down",ja="防御力ダウン",enl="afflicted with Defense Down",jal="防御力ダウン"},
 	{id=558,en="Defense Down",ja="防御力ダウン",enl="afflicted with Defense Down",jal="防御力ダウン"},
-	
+
 	{id=174,en="Magic Acc. Down",ja="魔法命中率ダウン",enl="Magic Acc. Down",jal="魔法命中率ダウン"},
 	{id=563,en="Magic Acc. Down",ja="魔法命中率ダウン",enl="afflicted with Magic Acc. Down",jal="魔法命中率ダウン"},
 	{id=175,en="Magic Atk. Down",ja="魔法攻撃力ダウン",enl="Magic Atk. Down",jal="魔法攻撃力ダウン"},
@@ -113,14 +114,14 @@ local buffOrder = L{
 	{id=564,en="Magic Evasion Down",ja="魔法回避率ダウン",enl="afflicted with Magic Evasion Down",jal="魔法回避率ダウン"},
 	{id=167,en="Magic Def. Down",ja="魔法防御力ダウン",enl="Magic Def. Down",jal="魔法防御力ダウン"},
 	{id=560,en="Magic Def. Down",ja="魔法防御力ダウン",enl="afflicted with Magic Adef. Down",jal="魔法防御力ダウン"},
-	
+
 	{id=298,en="critical hit evasion down",ja="被クリティカルヒット率アップ",enl="critical hit evasion down",jal="被クリティカルヒット率アップ"},
 	{id=572,en="Avoidance Down",ja="回避能力ダウン",enl="afflicted with Avoidance Down",jal="回避能力ダウン"},
 	{id=144,en="Max HP Down",ja="HPmaxダウン",enl="afflicted with Max HP Down",jal="HPmaxダウン"},
 	{id=145,en="Max MP Down",ja="MPmaxダウン",enl="afflicted with Max MP Down",jal="MPmaxダウン"},
 	{id=189,en="Max TP Down",ja="TPmaxダウン",enl="Max TP Down",jal="TPmaxダウン"},
 	{id=168,en="Inhibit TP",ja="インヒビットTP",enl="TP-inhibited",jal="インヒビットTP"},
-	
+
 	-- attribute downs
 	{id=136,en="STR Down",ja="STRダウン",enl="afflicted with STR Down",jal="STRダウン"},
 	{id=137,en="DEX Down",ja="DEXダウン",enl="afflicted with DEX Down",jal="DEXダウン"},
@@ -129,7 +130,7 @@ local buffOrder = L{
 	{id=140,en="INT Down",ja="INTダウン",enl="afflicted with INT Down",jal="INTダウン"},
 	{id=141,en="MND Down",ja="MNDダウン",enl="afflicted with MND Down",jal="MNDダウン"},
 	{id=142,en="CHR Down",ja="CHRダウン",enl="afflicted with CHR Down",jal="CHRダウン"},
-	
+
 	-- pathos?
 	{id=258,en="Illusion",ja="イリュージョン",enl="Illusion",jal="イリュージョン"},
 	{id=259,en="encumbrance",ja="エンカンバー",enl="encumbered",jal="エンカンバー"},
@@ -138,9 +139,9 @@ local buffOrder = L{
 	{id=262,en="Omerta",ja="オメルタ",enl="Omerta",jal="オメルタ"},
 	{id=263,en="debilitation",ja="デビリテート",enl="debilitated",jal="デビリテート"},
 	{id=264,en="Pathos",ja="パトス",enl="Pathos",jal="パトス"},
-	
+
 	--------------------------------- buffs / positive effects ----------------------------------
-	
+
 	-- 2hrs / 1hrs / SPs
 	{id=44,en="Mighty Strikes",ja="マイティストライク",enl="Mighty Strikes",jal="マイティストライク"},
 	{id=46,en="Hundred Fists",ja="百烈拳",enl="Hundred Fists",jal="百烈拳"},
@@ -178,13 +179,13 @@ local buffOrder = L{
 	{id=508,en="Widened Compass",ja="ワイデンコンパス",enl="Widened Compass",jal="ワイデンコンパス"},
 	{id=509,en="Odyllic Subterfuge",ja="オディリックサブタ",enl="Odyllic Subterfuge",jal="オディリックサブタ"},
 	{id=522,en="Elemental Sforzo",ja="E.スフォルツォ",enl="Elemental Sforzo",jal="E.スフォルツォ"},
-	
+
 	-- copy image
 	{id=66,en="Copy Image",ja="分身",enl="Copy Image",jal="分身"},
 	{id=444,en="Copy Image (2)",ja="分身(2)",enl="Copy Image (2)",jal="分身(2)"},
 	{id=445,en="Copy Image (3)",ja="分身(3)",enl="Copy Image (3)",jal="分身(3)"},
 	{id=446,en="Copy Image (4+)",ja="分身(4+)",enl="Copy Image (4+)",jal="分身(4+)"},
-	
+
 	-- common buffs
 	{id=33,en="Haste",ja="ヘイスト",enl="hastened",jal="ヘイスト"},
 	{id=580,en="Haste",ja="ヘイスト",enl="hastened",jal="ヘイスト"}, -- geo haste
@@ -204,7 +205,7 @@ local buffOrder = L{
 	{id=69,en="Invisible",ja="インビジ",enl="Invisible",jal="インビジ"},
 	{id=70,en="Deodorize",ja="デオード",enl="Deodorize",jal="デオード"},
 	{id=71,en="Sneak",ja="スニーク",enl="Sneak",jal="スニーク"},
-	
+
 	-- barspells
 	{id=100,en="Barfire",ja="バファイ",enl="Barfire",jal="バファイ"},
 	{id=101,en="Barblizzard",ja="バブリザ",enl="Barblizzard",jal="バブリザ"},
@@ -220,7 +221,7 @@ local buffOrder = L{
 	{id=111,en="Barpetrify",ja="バブレイク",enl="Barpetrify",jal="バブレイク"},
 	{id=112,en="Barvirus",ja="バウィルス",enl="Barvirus",jal="バウィルス"},
 	{id=286,en="Baramnesia",ja="バアムネジア",enl="Baramnesia",jal="バアムネジア"},
-	
+
 	-- spikes
 	{id=34,en="Blaze Spikes",ja="ブレイズスパイク",enl="Blaze Spikes",jal="ブレイズスパイク"},
 	{id=35,en="Ice Spikes",ja="アイススパイク",enl="Ice Spikes",jal="アイススパイク"},
@@ -231,7 +232,7 @@ local buffOrder = L{
 	{id=605,en="Gale Spikes",ja="ゲイルスパイク",enl="Gale Spikes",jal="ゲイルスパイク"},
 	{id=606,en="Clod Spikes",ja="クロッドスパイク",enl="Clod Spikes",jal="クロッドスパイク"},
 	{id=607,en="Glint Spikes",ja="グリントスパイク",enl="Glint Spikes",jal="グリントスパイク"},
-	
+
 	-- enspells
 	{id=94,en="Enfire",ja="エンファイア",enl="Enfire",jal="エンファイア"},
 	{id=95,en="Enblizzard",ja="エンブリザド",enl="Enblizzard",jal="エンブリザド"},
@@ -250,7 +251,7 @@ local buffOrder = L{
 	{id=487,en="Endrain",ja="エンドレイン",enl="Endrain",jal="エンドレイン"},
 	{id=488,en="Enaspir",ja="エンアスピル",enl="Enaspir",jal="エンアスピル"},
 	{id=275,en="Auspice",ja="オースピス",enl="Auspice",jal="オースピス"},
-	
+
 	-- scholar spells
 	{id=228,en="Embrava",ja="オーラ",enl="Embrava",jal="オーラ"},
 	{id=407,en="Klimaform",ja="虚誘掩殺の策",enl="Klimaform",jal="虚誘掩殺の策"},
@@ -270,13 +271,13 @@ local buffOrder = L{
 	{id=594,en="Rainstorm",ja="豪雨の陣II",enl="Rainstorm",jal="豪雨の陣II"},
 	{id=595,en="Aurorastorm",ja="極光の陣II",enl="Aurorastorm",jal="極光の陣II"},
 	{id=596,en="Voidstorm",ja="妖霧の陣II",enl="Voidstorm",jal="妖霧の陣II"},
-	
+
 	-- avatar buffs
 	{id=154,en="Shining Ruby",ja="ルビーの輝き",enl="Shining Ruby",jal="ルビーの輝き"},
 	{id=458,en="Earthen Armor",ja="大地の鎧",enl="Earthen Armor",jal="大地の鎧"},
 	{id=624,en="Wind's Blessing",ja="風の守り",enl="Wind's Blessing",jal="風の守り"},
 	{id=283,en="Perfect Defense",ja="絶対防御",enl="Perfect Defense",jal="絶対防御"},
-	
+
 	-- other spell buffs
 	{id=169,en="Potency",ja="ポテンシー",enl="Potency",jal="ポテンシー"},
 	{id=170,en="Regain",ja="リゲイン",enl="Regain",jal="リゲイン"},
@@ -288,7 +289,7 @@ local buffOrder = L{
 	{id=289,en="Enmity Boost",ja="敵対心アップ",enl="Enmity Boost",jal="敵対心アップ"},
 	{id=290,en="Subtle Blow Plus",ja="モクシャアップ",enl="Subtle Blow Plus",jal="モクシャアップ"},
 	{id=291,en="Enmity Down",ja="敵対心ダウン",enl="Enmity Down",jal="敵対心ダウン"},
-	
+
 	-- songs
 	{id=195,en="Paeon",ja="ピーアン",enl="Paeon",jal="ピーアン"},
 	{id=196,en="Ballad",ja="バラード",enl="Ballad",jal="バラード"},
@@ -319,7 +320,7 @@ local buffOrder = L{
 	{id=222,en="Scherzo",ja="スケルツォ",enl="Scherzo",jal="スケルツォ"},
 	{id=223,en="Nocturne",ja="ノクターン",enl="Nocturne",jal="ノクターン"},
 	{id=231,en="Marcato",ja="マルカート",enl="Marcato",jal="マルカート"},
-	
+
 	-- corsair / rolls
 	{id=601,en="Crooked Cards",ja="クルケッドカード",enl="Crooked Cards",jal="クルケッドカード"},
 	{id=308,en="Double-Up Chance",ja="ダブルアップチャンス",enl="Double-Up Chance",jal="ダブルアップチャンス"},
@@ -355,7 +356,7 @@ local buffOrder = L{
 	{id=339,en="Naturalist's Roll",ja="ナチュラリストロール",enl="Naturalist's Roll",jal="ナチュラリストロール"},
 	{id=600,en="Runeist's Roll",ja="ルーニストロール",enl="Runeist's Roll",jal="ルーニストロール"},
 	{id=309,en="Bust",ja="バスト",enl="Bust",jal="バスト"},
-	
+
 	-- boosts
 	{id=90,en="Accuracy Boost",ja="命中率アップ",enl="accuracy-boosted",jal="命中率アップ"},
 	{id=553,en="Accuracy Boost",ja="命中率アップ",enl="accuracy-boosted",jal="命中率アップ"},
@@ -374,7 +375,7 @@ local buffOrder = L{
 	{id=552,en="Magic Def. Boost",ja="魔法防御力アップ",enl="Magic Def. Boost",jal="魔法防御力アップ"},
 	{id=88,en="Max HP Boost",ja="HPmaxアップ",enl="Max HP-boosted",jal="HPmaxアップ"},
 	{id=89,en="Max MP Boost",ja="MPmaxアップ",enl="Max MP-boosted",jal="MPmaxアップ"},
-	
+
 	-- attribute boosts
 	{id=80,en="STR Boost",ja="STRアップ",enl="STR-boosted",jal="STRアップ"},
 	{id=81,en="DEX Boost",ja="DEXアップ",enl="DEX-boosted",jal="DEXアップ"},
@@ -390,14 +391,14 @@ local buffOrder = L{
 	{id=123,en="INT Boost",ja="INTアップ",enl="INT-boosted",jal="INTアップ"},
 	{id=124,en="MND Boost",ja="MNDアップ",enl="MND-boosted",jal="MNDアップ"},
 	{id=125,en="CHR Boost",ja="CHRアップ",enl="CHR-boosted",jal="CHRアップ"},
-	{id=542,en="STR Boost",ja="STRアップ",enl="STR-boosted",jal="STRアップ"}, -- these seem geo buffs
+	{id=542,en="STR Boost",ja="STRアップ",enl="STR-boosted",jal="STRアップ"}, -- these seem to be geo buffs
 	{id=543,en="DEX Boost",ja="DEXアップ",enl="DEX-boosted",jal="DEXアップ"},
 	{id=544,en="VIT Boost",ja="VITアップ",enl="VIT-boosted",jal="VITアップ"},
 	{id=545,en="AGI Boost",ja="AGIアップ",enl="AGI-boosted",jal="AGIアップ"},
 	{id=546,en="INT Boost",ja="INTアップ",enl="INT-boosted",jal="INTアップ"},
 	{id=547,en="MND Boost",ja="MNDアップ",enl="MND-boosted",jal="MNDアップ"},
 	{id=548,en="CHR Boost",ja="CHRアップ",enl="CHR-boosted",jal="CHRアップ"},
-	
+
 	-- abilities
 	{id=45,en="Boost",ja="ためる",enl="Boost",jal="ためる"},
 	{id=56,en="Berserk",ja="バーサク",enl="Berserk",jal="バーサク"},
@@ -506,7 +507,7 @@ local buffOrder = L{
 	{id=622,en="Guarding Rate Boost",ja="ガード率アップ",enl="Guarding Rate Boost",jal="ガード率アップ"},
 	{id=623,en="Rampart",ja="ランパート",enl="Rampart",jal="ランパート"},
 	{id=628,en="Hover Shot",ja="ホバーショット",enl="Hover Shot",jal="ホバーショット"},
-	
+
 	-- dancer
 	{id=368,en="Drain Samba",ja="ドレインサンバ",enl="Drain Samba",jal="ドレインサンバ"},
 	{id=369,en="Aspir Samba",ja="アスピルサンバ",enl="Aspir Samba",jal="アスピルサンバ"},
@@ -547,7 +548,7 @@ local buffOrder = L{
 	{id=410,en="Saber Dance",ja="剣の舞い",enl="Saber Dance",jal="剣の舞い"},
 	{id=411,en="Fan Dance",ja="扇の舞い",enl="Fan Dance",jal="扇の舞い"},
 	{id=442,en="Presto",ja="プレスト",enl="Presto",jal="プレスト"},
-	
+
 	-- scholar abilities
 	{id=187,en="Sublimation: Activated",ja="机上演習:蓄積中",enl="Sublimation: Activated",jal="机上演習:蓄積中"},
 	{id=188,en="Sublimation: Complete",ja="机上演習:蓄積完了",enl="Sublimation: Complete",jal="机上演習:蓄積完了"},
@@ -570,13 +571,13 @@ local buffOrder = L{
 	{id=416,en="Enlightenment",ja="大悟徹底",enl="Enlightenment",jal="大悟徹底"},
 	{id=469,en="Perpetuance",ja="令狸執鼠の章",enl="Perpetuance",jal="令狸執鼠の章"},
 	{id=470,en="Immanence",ja="震天動地の章",enl="Immanence",jal="震天動地の章"},
-	
+
 	-- ninja
 	{id=471,en="Migawari",ja="身替",enl="Migawari",jal="身替"},
 	{id=420,en="Yonin",ja="陽忍",enl="Yonin",jal="陽忍"},
 	{id=421,en="Innin",ja="陰忍",enl="Innin",jal="陰忍"},
 	{id=441,en="Futae",ja="二重",enl="Futae",jal="二重"},
-	
+
 	-- geomancer
 	{id=569,en="Blaze of Glory",ja="グローリーブレイズ",enl="Blaze of Glory",jal="グローリーブレイズ"},
 	{id=515,en="Lasting Emanation",ja="エンデュアエマネイト",enl="Lasting Emanation",jal="エンデュアエマネイト"},
@@ -585,7 +586,7 @@ local buffOrder = L{
 	{id=518,en="Dematerialize",ja="デマテリアライズ",enl="Dematerialize",jal="デマテリアライズ"},
 	{id=519,en="Theurgic Focus",ja="タウマテルギフォカス",enl="Theurgic Focus",jal="タウマテルギフォカス"},
 	{id=612,en="Colure Active",ja="コルア展開",enl="Colure Active",jal="コルア展開"},
-	
+
 	-- rune fencer
 	{id=568,en="Foil",ja="特殊攻撃回避率アップ",enl="Foil",jal="特殊攻撃回避率アップ"},
 	{id=532,en="Swordplay",ja="ソードプレイ",enl="Swordplay",jal="ソードプレイ"},
@@ -607,7 +608,7 @@ local buffOrder = L{
 	{id=528,en="Unda",ja="ウンダ",enl="Unda",jal="ウンダ"},
 	{id=529,en="Lux",ja="ルックス",enl="Lux",jal="ルックス"},
 	{id=530,en="Tenebrae",ja="テネブレイ",enl="Tenebrae",jal="テネブレイ"},
-	
+
 	-- pup maneuvers
 	{id=300,en="Fire Maneuver",ja="ファイアマニューバ",enl="Fire Maneuver",jal="ファイアマニューバ"},
 	{id=301,en="Ice Maneuver",ja="アイスマニューバ",enl="Ice Maneuver",jal="アイスマニューバ"},
@@ -617,13 +618,13 @@ local buffOrder = L{
 	{id=305,en="Water Maneuver",ja="ウォータマニューバ",enl="Water Maneuver",jal="ウォータマニューバ"},
 	{id=306,en="Light Maneuver",ja="ライトマニューバ",enl="Light Maneuver",jal="ライトマニューバ"},
 	{id=307,en="Dark Maneuver",ja="ダークマニューバ",enl="Dark Maneuver",jal="ダークマニューバ"},
-	
+
 	-- resistance buffs
 	{id=74,en="Holy Circle",ja="ホーリーサークル",enl="Holy Circle",jal="ホーリーサークル"},
 	{id=75,en="Arcane Circle",ja="アルケインサークル",enl="Arcane Circle",jal="アルケインサークル"},
 	{id=117,en="Warding Circle",ja="護摩の守護円",enl="Warding Circle",jal="護摩の守護円"},
 	{id=118,en="Ancient Circle",ja="エンシェントサークル",enl="Ancient Circle",jal="エンシェントサークル"},
-	
+
 	-- negates
 	{id=293,en="Negate Petrify",ja="ネゲートペトリ",enl="Negate Petrify",jal="ネゲートペトリ"},
 	{id=294,en="Negate Terror",ja="ネゲートテラー",enl="Negate Terror",jal="ネゲートテラー"},
@@ -634,14 +635,14 @@ local buffOrder = L{
 	{id=609,en="Negate Curse",ja="ネゲートカーズ",enl="Negate Curse",jal="ネゲートカーズ"},
 	{id=610,en="Negate Charm",ja="ネゲートチャーム",enl="Negate Charm",jal="ネゲートチャーム"},
 	{id=626,en="Negate Sleep",ja="ネゲートスリープ",enl="Negate Sleep",jal="ネゲートスリープ"},
-	
+
 	-- rema
 	{id=270,en="Aftermath: Lv.1",ja="アフターマス:Lv1",enl="Aftermath: Lv.1",jal="アフターマス:Lv1"},
 	{id=271,en="Aftermath: Lv.2",ja="アフターマス:Lv2",enl="Aftermath: Lv.2",jal="アフターマス:Lv2"},
 	{id=272,en="Aftermath: Lv.3",ja="アフターマス:Lv3",enl="Aftermath: Lv.3",jal="アフターマス:Lv3"},
 	{id=273,en="Aftermath",ja="アフターマス",enl="Aftermath",jal="アフターマス"},
 	{id=489,en="Afterglow",ja="アフターグロウ",enl="Afterglow",jal="アフターグロウ"},
-	
+
 	-- restrictions / costumes
 	{id=284,en="Egg",ja="タマゴ",enl="Egg",jal="タマゴ"},
 	{id=127,en="Costume",ja="コスチューム",enl="Costume",jal="コスチューム"},
@@ -650,14 +651,14 @@ local buffOrder = L{
 	{id=143,en="Level Restriction",ja="レベル制限",enl="level-restricted",jal="レベル制限"},
 	{id=157,en="SJ Restriction",ja="サポートジョブ無効",enl="SJ Restriction",jal="サポートジョブ無効"},
 	{id=269,en="Level Sync",ja="レベルシンク",enl="Level Sync",jal="レベルシンク"},
-	
+
 	-- stances
 	{id=417,en="Afflatus Solace",ja="ハートオブソラス",enl="Afflatus Solace",jal="ハートオブソラス"},
 	{id=418,en="Afflatus Misery",ja="ハートオブミゼリ",enl="Afflatus Misery",jal="ハートオブミゼリ"},
 	{id=353,en="Hasso",ja="八双",enl="Hasso",jal="八双"},
 	{id=354,en="Seigan",ja="星眼",enl="Seigan",jal="星眼"},
 	{id=621,en="Majesty",ja="マジェスティ",enl="Majesty",jal="マジェスティ"},
-	
+
 	-- avatar favors
 	{id=431,en="Avatar's Favor",ja="神獣の加護",enl="Avatar's Favor",jal="神獣の加護"},
 	{id=422,en="Carbuncle's Favor",ja="カーバンクルの加護",enl="Carbuncle's Favor",jal="カーバンクルの加護"},
@@ -671,7 +672,7 @@ local buffOrder = L{
 	{id=430,en="Diabolos's Favor",ja="ディアボロスの加護",enl="Diabolos's Favor",jal="ディアボロスの加護"},
 	{id=577,en="Cait Sith's Favor",ja="ケット・シーの加護",enl="Cait Sith's Favor",jal="ケット・シーの加護"},
 	{id=625,en="Siren's Favor",ja="セイレーンの加護",enl="Siren's Favor",jal="セイレーンの加護"},
-	
+
 	-- crafting / HELM
 	{id=235,en="Fishing Imagery",ja="釣りイメージ",enl="Fishing Imagery",jal="釣りイメージ"},
 	{id=236,en="Woodworking Imagery",ja="木工イメージ",enl="Woodworking Imagery",jal="木工イメージ"},
@@ -683,26 +684,26 @@ local buffOrder = L{
 	{id=242,en="Alchemy Imagery",ja="錬金術イメージ",enl="Alchemy Imagery",jal="錬金術イメージ"},
 	{id=243,en="Cooking Imagery",ja="調理イメージ",enl="Cooking Imagery",jal="調理イメージ"},
 	{id=578,en="Fishy Intuition",ja="釣り師のセンス",enl="Fishy Intuition",jal="釣り師のセンス"},
-	
+
 	-- exp/cp
 	{id=249,en="Dedication",ja="専心",enl="Dedication",jal="専心"},
 	{id=579,en="Commitment",ja="一心",enl="Commitment",jal="一心"},
-	
+
 	-- movement speed
 	{id=32,en="Flee",ja="とんずら",enl="fleeing",jal="とんずら"},
 	{id=176,en="quickening",ja="移動速度アップ",enl="quickened",jal="移動速度アップ"},
-	
+
 	-- food / mount
 	{id=250,en="EF Badge",ja="遠征軍参加資格",enl="EF Badge",jal="遠征軍参加資格"},
 	{id=251,en="Food",ja="食事",enl="Food",jal="食事"},
 	{id=252,en="Mounted",ja="マウント",enl="Mounted",jal="マウント"},
-	
+
 	-- signets
 	{id=253,en="Signet",ja="シグネット",enl="Signet",jal="シグネット"},
 	{id=256,en="Sanction",ja="サンクション",enl="Sanction",jal="サンクション"},
 	{id=268,en="Sigil",ja="シギル",enl="Sigil",jal="シギル"},
 	{id=512,en="Ionis",ja="イオニス",enl="Ionis",jal="イオニス"},
-	
+
 	-- battlefields / instances
 	{id=254,en="Battlefield",ja="バトルフィールド",enl="Battlefield",jal="バトルフィールド"},
 	{id=257,en="Besieged",ja="ビシージド",enl="Besieged",jal="ビシージド"},
@@ -714,24 +715,24 @@ local buffOrder = L{
 	{id=285,en="Visitant",ja="ビジタント",enl="Visitant",jal="ビジタント"},
 	{id=292,en="Pennant",ja="ペナント",enl="Pennant",jal="ペナント"},
 	{id=627,en="Mobilization",ja="戦闘準備期間",enl="mobilized",jal="戦闘準備期間"},
-	
+
 	-- ballista
 	{id=160,en="preparations",ja="試合復帰準備中",enl="preparing for battle",jal="試合復帰準備中"},
 	{id=158,en="Provoke",ja="挑発",enl="provoked",jal="挑発"},
 	{id=159,en="penalty",ja="ペナルティ",enl="penalized",jal="ペナルティ"},
 	{id=161,en="Sprint",ja="スプリント",enl="Sprint",jal="スプリント"},
 	{id=162,en="enchantment",ja="エンチャント",enl="enchanted",jal="エンチャント"},
-	
+
 	-- zone buffs
 	{id=287,en="Atma",ja="アートマ",enl="Atma",jal="アートマ"},
 	{id=602,en="Vorseal",ja="神符",enl="Vorseal",jal="神符"},
 	{id=603,en="Elvorseal",ja="祈祷神符",enl="Elvorseal",jal="祈祷神符"},
-	
+
 	-- 72hr buffs
 	{id=481,en="Abdhaljs Seal",ja="アブダルスの焼印",enl="Abdhaljs Seal",jal="アブダルスの焼印"},
 	{id=629,en="Moogle Amplifier",ja="モグアンプ",enl="Moogle Amplifier",jal="モグアンプ"},
 	{id=618,en="Emporox's Gift",ja="エンポロックスのツボ",enl="Emporox's Gift",jal="エンポロックスのツボ"},
-	
+
 	-- unused?
 	{id=24,en="ST24",ja="ＳＴ２４",enl="ST24",jal="ＳＴ２４"},
 	{id=25,en="ST25",ja="ＳＴ２５",enl="ST25",jal="ＳＴ２５"},
@@ -743,7 +744,7 @@ local buffOrder = L{
 	{id=232,en="(N/A)",ja="（未使用）",enl="(N/A)",jal="（未使用）"},
 }
 
-function getBuffOrderWithIdKeys(b)
+local function getBuffOrderWithIdKeys(b)
 	local ret = {}
 	local sort = 0
 	for entry in b:it() do
@@ -753,7 +754,7 @@ function getBuffOrderWithIdKeys(b)
 	return ret
 end
 
-return buffOrder
+return getBuffOrderWithIdKeys(buffOrder)
 
 -- CREDITS: based on windower's auto generated buffs.lua
 

@@ -1,5 +1,5 @@
 --[[
-	Copyright © 2021, Tylas
+	Copyright © 2023, Tylas
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,9 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- windower library imports
+require('strings')
+
 local utils = {}
 
 -- log levels:
@@ -36,53 +39,6 @@ local utils = {}
 -- 4 ... error
 utils.level = 3
 
-function utils:createImage(imageInfo, scaleX, scaleY)
-	if not scaleY then
-		scaleY = scaleX
-	end
-	
-	local size = utils:coord(imageInfo.size)
-	local image = img:init(windower.addon_path .. imageInfo.path, size.x, size.y, scaleX, scaleY)
-	
-	if imageInfo.color then
-		local color = utils:colorFromHex(imageInfo.color)
-		image:color(color.r, color.g, color.b)
-		image:alpha(color.a)
-	end
-	
-	return image
-end
-
-function utils:createText(textInfo, right)
-	if right == nil then
-		right = false
-	end
-
-	local textSettings = {
-		flags = {
-			draggable = false,
-			right = right
-		}
-	}
-	
-	local text = texts.new(textSettings)
-	
-	text:font(textInfo.font, 'Arial') -- Arial is the fallback font
-	text:size(textInfo.size)
-	text:bg_visible(false)
-	
-	local color = utils:colorFromHex(textInfo.color)
-	local stroke = utils:colorFromHex(textInfo.stroke)
-	
-	text:color(color.r, color.g, color.b)
-	text:alpha(color.a)
-	text:stroke_color(stroke.r, stroke.g, stroke.b)
-	text:stroke_alpha(stroke.a)
-	text:stroke_width(textInfo.strokeWidth)
-	
-	return text
-end
-
 function utils:colorFromHex(hexString)
 	local length = string.length(hexString)
 
@@ -90,7 +46,7 @@ function utils:colorFromHex(hexString)
 		utils:log('Invalid hexadecimal color code. Expected format #RRGGBB or #RRGGBBAA', 4)
 		return nil
 	end
-	
+
 	local color = {}
 	color.r = tonumber(string.slice(hexString, 2, 3), 16)
 	color.g = tonumber(string.slice(hexString, 4, 5), 16)
@@ -100,21 +56,22 @@ function utils:colorFromHex(hexString)
 	else
 		color.a = 255
 	end
-	
+
 	return color
 end
 
+-- interprets an L{} list with two elements as X,Y coordinates
 function utils:coord(coordList)
 	local coord = {}
-	
+
 	if coordList then
-		coord.x = coordList[1]
-		coord.y = coordList[2]
+		coord.x = tonumber(coordList[1])
+		coord.y = tonumber(coordList[2])
 	end
-	
+
 	if not coord.x then coord.x = 0 end
 	if not coord.y then coord.y = 0 end
-	
+
 	return coord
 end
 
@@ -123,14 +80,59 @@ function utils:round(num, numDecimalPlaces)
 		local mult = 10^numDecimalPlaces
 		return math.floor(num * mult + 0.5) / mult
 	end
-	
+
 	return math.floor(num + 0.5)
+end
+
+-- returns true if the specified function returns true for ALL list values
+function utils:all(list, func)
+	if not func then func = function(x) return x end end
+
+	local result = false
+	local first = true
+	for k, v in pairs(list) do
+		if first then
+			first = false
+			result = func(v)
+		else
+			result = result and func(v)
+		end
+    end
+	return result
+end
+
+-- returns true if the specified function returns true for ANY list value
+function utils:any(list, func)
+	if not func then func = function(x) return x end end
+
+	local result = false
+	for k, v in pairs(list) do
+		result = result or func(v)
+		if result then return result end
+    end
+	return result
+end
+
+-- stable in-place sorting
+-- @param func a comparison function that returns true when a > b
+function utils:insertionSort(array, func)
+    local len = #array
+    for j = 2, len do
+        local key = array[j]
+        local i = j - 1
+        while i > 0 and func(array[i], key) do
+            array[i + 1] = array[i]
+            i = i - 1
+        end
+        array[i + 1] = key
+    end
+    return array
 end
 
 function utils:log(text, level)
 	if level == nil then
-		level = 2
-	end	
+		level = 2 -- default log level: info
+	end
 
 	if self.level <= level and text then
 		windower.add_to_chat(8, text) -- message type "8" can be filtered in-game as "call for help"
@@ -141,7 +143,6 @@ function utils:toString(obj)
 	if obj then
 		return tostring(obj)
 	end
-	
 	return '???'
 end
 
@@ -160,7 +161,7 @@ function utils:logTable(t, depth)
 			if type(value) == 'table' then
 				windower.add_to_chat(8, indent .. key)
 			elseif key ~= '_raw' and key ~= '_data' then
-				windower.add_to_chat(8, indent .. key .. ' = ' .. tostring(value))
+				windower.add_to_chat(8, indent .. key .. ' = ' .. tostring(value) .. '(' .. type(value) .. ')')
 			end
 			utils:logTable(value, depth + 3)
 		end

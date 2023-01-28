@@ -26,17 +26,52 @@
 	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local jobDefaults = {
-	jobEnabled = false, -- when set to false, job specific settings will be ignored and globals used instead
+-- imports
+local classes = require('classes')
+local uiContainer = require('uiContainer')
+local uiImage = require('uiImage')
+local const = require('const')
 
-	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
-	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
+-- create the class, derive from uiContainer
+local uiRange = classes.class(uiContainer)
 
-	buffs = {
-		filters = '', -- semicolon separated list of buff IDs to filter (e.g. '618;123;')
-		filterMode = 'blacklist', -- 'blacklist' or 'whitelist', both use the same filter list
-		customOrder = true -- sort buffs by a custom order defined in buffOrder.lua
-	}
-}
+function uiRange:init(layout, player)
+	if self.super:init(layout) then
+		self.layout = layout
+		self.player = player
 
-return jobDefaults
+		self.imgNear = self:addChild(uiImage.new(layout.imgNear))
+		self.imgNear:hide(const.visFeature)
+
+		self.imgFar = self:addChild(uiImage.new(layout.imgFar))
+		self.imgFar:hide(const.visFeature)
+	end
+end
+
+function uiRange:setPlayer(player)
+	self.player = player
+end
+
+function uiRange:update()
+	if not self.isEnabled then return end
+
+	local visibility = false
+	local visibilityFar = false
+
+	if self.player.distance and not self.player.isOutsideZone then
+		if Settings.rangeIndicator > 0 and self.player.distance:sqrt() <= Settings.rangeIndicator then
+			visibility = true
+			visibilityFar = false
+		elseif Settings.rangeIndicatorFar > 0 and self.player.distance:sqrt() <= Settings.rangeIndicatorFar then
+			visibility = false
+			visibilityFar = true
+		end
+	end
+
+	self.imgNear:visible(visibility, const.visFeature)
+	self.imgFar:visible(visibilityFar, const.visFeature)
+
+	self.super:update()
+end
+
+return uiRange

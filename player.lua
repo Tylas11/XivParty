@@ -117,10 +117,15 @@ function player:update(member, target, subtarget)
 	self.zone = member.zone
 	self.isOutsideZone = self.zone and self.zone ~= windower.ffxi.get_info().zone
 
+	self.distance = nil
+
 	if member.mob then
 		self.id = member.mob.id
-		self.distance = member.mob.distance
 		self.isTrust = member.mob.is_npc
+
+		if member.mob.distance then
+			self.distance = member.mob.distance:sqrt()
+		end
 
 		if self.isTrust and (self.job == nil or self.jobLvl == nil or self.jobLvl == 0) then -- optimization: only update if job/lvl not set
 			local trustInfo = jobs:getTrustInfo(self.name, member.mob.models[1])
@@ -128,7 +133,7 @@ function player:update(member, target, subtarget)
 				self.job = trustInfo.job
 				self.subJob = trustInfo.subJob
 
-				if self.model then 
+				if self.model then
 					local partyLeader = self.model:findPartyLeader() -- get leader of main party
 					if partyLeader and partyLeader.jobLvl then
 						self.jobLvl = partyLeader.jobLvl
@@ -137,15 +142,15 @@ function player:update(member, target, subtarget)
 				end
 			end
 		end
-	else
-		self.distance = 99999 -- no mob means player too far to target
 	end
 
-	self.isInCastingRange = self.distance and self.distance:sqrt() < 20.79
-	self.isInTargetingRange = self.distance and self.distance:sqrt() < 50
+	self.isInCastingRange = self.distance and self.distance < const.castRange
+	self.isInTargetingRange = self.distance and self.distance < const.targetRange
 
 	local mainPlayer = windower.ffxi.get_player()
-	if member.name == mainPlayer.name then -- set buffs and job info for main player
+	self.isMainPlayer = self.name == mainPlayer.name
+
+	if self.isMainPlayer then -- set buffs and job info for main player
 		self:updateBuffs(mainPlayer.buffs)
 		self.job = res.jobs[mainPlayer.main_job_id].ens
 		self.jobLvl = mainPlayer.main_job_level
@@ -238,9 +243,9 @@ function player:createSetupData(job, subJob, isMainParty)
 
 	self.isSelected = false
 	self.isSubTarget = false
-	self.distance = math.random(0, 500)
-	self.isInCastingRange = self.distance:sqrt() < 20.79
-	self.isInTargetingRange = self.distance:sqrt() < 50
+	self.distance = math.random(0, 25)
+	self.isInCastingRange = self.distance < const.castRange
+	self.isInTargetingRange = self.distance < const.targetRange
 	self.isTrust = false
 
 	self.job = job

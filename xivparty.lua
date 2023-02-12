@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '2.0.0'
+_addon.version = '2.1.0'
 _addon.commands = {'xp', 'xivparty'}
 
 -- windower library imports
@@ -213,7 +213,9 @@ local function showHelp()
 	log('   list - shows list of currently set filters')
 	log('   mode - switches between blacklist and whitelist mode (both use same filter list)')
 	log('buffs <name> - shows list of currently active buffs and their IDs for a party member')
-	log('range <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
+	log('range - display party member distances as icons or numeric values')
+	log('   <near> <far> - shows a marker for each party member closer than the set distances (off or 0 to disable)')
+	log('   num - numeric display mode, disables near/far markers.')
 	log('customOrder - toggles custom buff order (customize in bufforder.lua)')
 	log('hideSolo - hides the UI while solo')
 	log('hideAlliance - hides alliance party lists')
@@ -366,26 +368,35 @@ windower.register_event('addon command', function(...)
 		model:refreshFilteredBuffs()
 	elseif command == 'range' then
 		if args[2] then
-			local range1 = getRange(args[2])
-			local range2 = getRange(args[3])
-			if range1 then
-				Settings.rangeIndicator = range1
-				if range2 then
-					Settings.rangeIndicatorFar = range2
-					if Settings.rangeIndicator > Settings.rangeIndicatorFar then
-						Settings.rangeIndicator = range2
-						Settings.rangeIndicatorFar = range1
-					end
-					log('Range indicators set to ' .. tostring(range1) .. ' / ' .. tostring(range2) .. '.')
-				else
-					Settings.rangeIndicatorFar = 0
-					if range1 > 0 then
-						log('Range indicator set to ' .. tostring(range1) .. '.')
-					else
-						log('Range indicator disabled.')
-					end
-				end
+			if args[2] == 'num' or args[2] == 'numeric' then
+				Settings.rangeNumeric = true
+				Settings.rangeIndicator = 0
+				Settings.rangeIndicatorFar = 0
 				Settings:save()
+				log('Range numeric display mode enabled.')
+			else
+				local range1 = getRange(args[2])
+				local range2 = getRange(args[3])
+				if range1 then
+					Settings.rangeNumeric = false
+					Settings.rangeIndicator = range1
+					if range2 then
+						Settings.rangeIndicatorFar = range2
+						if Settings.rangeIndicator > Settings.rangeIndicatorFar then -- fix when swapped
+							Settings.rangeIndicator = range2
+							Settings.rangeIndicatorFar = range1
+						end
+						log('Range indicators set to near ' .. tostring(Settings.rangeIndicator) .. ', far ' .. tostring(Settings.rangeIndicatorFar) .. '.')
+					else
+						Settings.rangeIndicatorFar = 0
+						if range1 > 0 then
+							log('Range indicator set to ' .. tostring(Settings.rangeIndicator) .. '.')
+						else
+							log('Range indicator disabled.')
+						end
+					end
+					Settings:save()
+				end
 			end
 		else
 			showHelp()

@@ -348,6 +348,15 @@ local layout = {
 					pos = L { 0, 0 },
 					path = 'assets/xiv/RangeFar.png',
 					size = L{ 14, 12 }
+				}),
+				txtDistance = text({
+					pos = L{ 0, 1.5 },
+					font = 'Grammara',
+					size = 6,
+					color = '#F0FFFFFF',
+					stroke = '#062D54C8',
+					strokeWidth = 1,
+					snapToRaster = true
 				})
 			}),
 			-- mouse hover image

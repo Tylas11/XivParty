@@ -22,6 +22,7 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 | //xp filter mode        | Switches between blacklist and whitelist filter mode (both use same filter list).              |
 | //xp buffs [name]       | Shows list of currently active buffs (and IDs) for a party member. Omit name to see own buffs. |
 | //xp range [near] [far] | Shows a marker for each party member closer than the set distances. "off" or "0" to disable.   |
+| //xp range num          | Shows distance as numeric values, disables near/far markers.                                   |
 | //xp customOrder        | Toggles custom buff order (customize in bufforder.lua).                                        |
 | //xp hideSolo           | Hides the UI while solo.                                                                       |
 | //xp hideAlliance       | Hides alliance party lists.                                                                    |
@@ -35,7 +36,7 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 ## Range Indication
 The distance to party members is indicated by dimming their HP bars in two stages: out of standard casting range (~20.8) and out of targeting range (50).
 
-There is also a customizable range indicator useful when casting aoe buffs. Set a near and an optional far distance with the "range" command. A filled icon (near) or a hollow icon (far) will appear below the HP bar of any party member in range. The main player will always have the icon displayed when the feature is active. Set the range to "off" or "0" to disable.
+There is also a customizable range indicator useful when casting aoe buffs. Set a near and an optional far distance with the "range" command. A filled icon (near) or a hollow icon (far) will appear below the HP bar of any party member in range. The main player will always have the icon displayed when the feature is active. Set the range to "off" or "0" to disable. Alternatively set "range num" to show party member distances as numeric values. This will disable the near / far markers.
 
 ## Buff Filters
 When the UI gets too cluttered with buff icons, you can set filters to only show or hide certain buffs. Use the command "filter add [ID]" to add a buff to the filter list. The buff IDs can be found in bufforder.lua or in-game using the "buffs" command, which shows the current buff IDs of a party member. The filter list works in "blacklist" mode by default, meaning any added buffs are hidden. You can switch the mode to "whitelist" to only display buffs that are on the filter list instead. Filters can also be set up separately for each job, see below for details.

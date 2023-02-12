@@ -38,6 +38,7 @@ local defaults = {
 	hideCutscene = true, -- hides UI during cutscenes or when talking to NPCs
 	mouseTargeting = true, -- enables targeting party members using the mouse
 
+	rangeNumeric = false, -- enables numeric display of party member distances
 	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
 	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
 

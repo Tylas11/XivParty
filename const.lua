@@ -40,6 +40,9 @@ local const = {
 	maxBuffs = 32,
 	baseResY = 1440, -- default positions and scales are based on a 1440p screen
 
+	castRange = 20.79,
+	targetRange = 50,
+
 	-- visibility flag IDs
 	visDefault = 1, -- the default flag to use when no flag is specified
 	visOutsideZone = 2, -- hide elements based on the player being outside the current zone

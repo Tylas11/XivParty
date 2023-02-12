@@ -69,7 +69,7 @@ function uiBar:init(layout, value)
 end
 
 function uiBar:setValue(value)
-	self.value = value
+	self.value = math.min(math.max(value, 0), 1) -- clamp to 0..1
 end
 
 -- must be called every frame for a smooth animation

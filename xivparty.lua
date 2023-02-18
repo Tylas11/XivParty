@@ -33,6 +33,7 @@ _addon.commands = {'xp', 'xivparty'}
 
 -- windower library imports
 local packets = require('packets')
+local socket = require('socket')
 local res = require('resources')
 require('logger')
 require('strings')
@@ -49,6 +50,7 @@ local settings = require('settings')
 -- local and global variables
 local isInitialized = false
 local isZoning = false
+local lastFrameTimeMsec = 0
 
 local view = nil
 Settings = nil
@@ -65,30 +67,39 @@ RefCountText = 0
 
 -- initialization / events
 
-windower.register_event('load', function()
-	-- settings must only be loaded when logged in, as they are separate for every character
-	if windower.ffxi.get_info().logged_in then
+local function init()
+	if not isInitialized then
 		Settings = settings.new(model)
 		Settings:load()
 		view = uiView.new(model) -- depends on settings, always create view after loading settings
 		isInitialized = true
 	end
-end)
+end
 
-windower.register_event('login', function()
-	if not isInitialized then
-		Settings = settings.new(model)
-		Settings:load()
-		view = uiView.new(model)
-		isInitialized = true
+local function dispose()
+	if isInitialized then
+		if view then
+			view:dispose()
+		end
+		view = nil
+		Settings = nil
+		isInitialized = false
+	end
+end
+
+windower.register_event('load', function()
+	-- settings must only be loaded when logged in, as they are separate for every character
+	if windower.ffxi.get_info().logged_in then
+		init()
 	end
 end)
 
+windower.register_event('login', function()
+	init()
+end)
+
 windower.register_event('logout', function()
-	view:dispose()
-	view = nil
-	Settings = nil
-	isInitialized = false
+	dispose()
 end)
 
 windower.register_event('status change', function(status)
@@ -105,6 +116,10 @@ end
 
 windower.register_event('prerender', function()
 	if isZoning or not isInitialized then return end
+
+	local timeMsec = socket.gettime() * 1000
+	if timeMsec - lastFrameTimeMsec < Settings.updateIntervalMsec then return end
+	lastFrameTimeMsec = timeMsec
 
 	Settings:update()
 	model:updatePlayers()

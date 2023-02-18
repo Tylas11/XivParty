@@ -46,6 +46,10 @@ function uiBar:init(layout, value)
 		self.currentValue = nil -- the current value of the bar animation. subject to rounding, based on exactValue
 
 		self.isDimmed = false
+		self.animSpeed = self.layout.animSpeed
+		if self.animSpeed <= 0 then
+			self.animSpeed = 1
+		end
 
 		self.imgBg = self:addChild(uiImage.new(layout.imgBg))
 		self.imgBar = self:addChild(uiImage.new(layout.imgBar))
@@ -77,7 +81,7 @@ function uiBar:update()
 	if not self.isEnabled then return end
 
 	if self.currentValue ~= self.value then
-		self.exactValue = self.exactValue + (self.value - self.exactValue) * self.layout.animSpeed
+		self.exactValue = self.exactValue + (self.value - self.exactValue) * self.animSpeed
 		self.exactValue = math.min(math.max(self.exactValue, 0), 1) -- clamp to 0..1
 		self.currentValue = utils:round(self.exactValue, 3)
 

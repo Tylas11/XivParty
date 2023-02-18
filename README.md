@@ -108,6 +108,9 @@ Parameters:
 > - **hpRedColor**: HP bar only: color of the text when HP falls below 25%.  
 > - **tpFullColor**: TP bar only: color of the text when TP is at or above 1000.  
 
+Bar parameters:
+> - **animSpeed**: Speed of the bar animation in percent per frame (float, range 0 to 1). This is a multiplicator applied to the remaining distance the bar has to travel. The higher the value, the faster the animation. When set to 1, the bar will move instantly without animation.
+
 ### Buff Icons
 Buff icons are placed in a grid, defined by the **numIconsByRow** parameter (see below). The game supports a fixed maximum of 32 buffs per character.
 

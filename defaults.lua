@@ -42,6 +42,8 @@ local defaults = {
 	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
 	rangeIndicatorFar = 0, -- a second distance for range indication, further away, displaying a hollow icon. 0 = off
 
+	updateIntervalMsec = 30, -- the UI update interval in milliseconds, changing this will affect animation speeds and general performance
+
 	party = {
 		pos = L{ 0.015625, 0.4791666 }, -- relative coordinates, resolution independent (range 0.0 to 1.0)
 		scale = L{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling

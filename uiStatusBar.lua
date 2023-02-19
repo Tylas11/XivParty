@@ -50,8 +50,13 @@ function uiStatusBar:init(layout, barType, player)
 			self.hpYellowColor = utils:colorFromHex(layout.hpYellowColor)
 			self.hpOrangeColor = utils:colorFromHex(layout.hpOrangeColor)
 			self.hpRedColor = utils:colorFromHex(layout.hpRedColor)
+
+			self.hpYellowBarColor = utils:colorFromHex(layout.hpYellowBarColor)
+			self.hpOrangeBarColor = utils:colorFromHex(layout.hpOrangeBarColor)
+			self.hpRedBarColor = utils:colorFromHex(layout.hpRedBarColor)
 		elseif self.barType == const.barTypeTp then
 			self.tpFullColor = utils:colorFromHex(layout.tpFullColor)
+			self.tpFullBarColor = utils:colorFromHex(layout.tpFullBarColor)
 		end
 
 		self.textColor = utils:colorFromHex(layout.txtValue.color)
@@ -97,23 +102,29 @@ function uiStatusBar:update()
 	end
 
 	local color = self.textColor
+	local barColor = nil
 	if self.barType == const.barTypeHp then
 		if val >= 0 then
 			if valPercent < 25 then
 				color = self.hpRedColor
+				barColor = self.hpRedBarColor
 			elseif valPercent < 50 then
 				color = self.hpOrangeColor
+				barColor = self.hpOrangeBarColor
 			elseif valPercent < 75 then
 				color = self.hpYellowColor
+				barColor = self.hpYellowBarColor
 			end
 		end
 	elseif self.barType == const.barTypeTp then
 		if val >= 1000 then
 			color = self.tpFullColor
+			barColor = self.tpFullBarColor
 		end
 	end
 
 	self.txtValue:color(color)
+	self.bar:setColor(barColor)
 
 	-- distance indication
 	if self.player.isInCastingRange then

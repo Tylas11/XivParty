@@ -126,6 +126,9 @@ local layout = {
 				hpYellowColor = '#F3F37CFF', -- HP < 75%
 				hpOrangeColor = '#F8BA80FF', -- HP < 50%
 				hpRedColor = '#FC8182FF', -- HP < 25%
+				hpYellowBarColor = '',
+				hpOrangeBarColor = '',
+				hpRedBarColor = '',
 				snapToRaster = true,
 				zOrder = 2,
 
@@ -224,6 +227,7 @@ local layout = {
 			tp = element({
 				pos = L{ 281, -7 },
 				tpFullColor = '#50B4FAFF', -- TP > 1000
+				tpFullBarColor = '',
 				hideOutsideZone = false,
 				snapToRaster = true,
 				zOrder = 4,

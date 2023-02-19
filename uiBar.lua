@@ -67,6 +67,8 @@ function uiBar:init(layout, value)
 		self.sizeGlow = utils:coord(layout.imgGlow.size)
 		self.sizeGlowSides = utils:coord(layout.imgGlowSides.size)
 
+		self.imgBarColor = utils:colorFromHex(layout.imgBar.color)
+
 		-- flip horizontally, this will move the image origin to the top-right corner
 		self.imgGlowRight:size(-self.sizeGlowSides.x, self.sizeGlowSides.y)
 	end
@@ -74,6 +76,15 @@ end
 
 function uiBar:setValue(value)
 	self.value = math.min(math.max(value, 0), 1) -- clamp to 0..1
+end
+
+-- sets the color of the bar image
+-- @param color the color table (rgba) to set or nil to restore original color
+function uiBar:setColor(color)
+	if not self.isEnabled then return end
+
+	if not color then color = self.imbBarColor end
+	self.imgBar:color(color)
 end
 
 -- must be called every frame for a smooth animation

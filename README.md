@@ -28,7 +28,9 @@ Shows party members' HP/MP/TP, main job, sub job and current buffs. Buffs can be
 | //xp hideAlliance       | Hides alliance party lists.                                                                    |
 | //xp hideCutscene       | Hides the UI during cutscenes.                                                                 |
 | //xp mouseTargeting     | Toggles targeting party members using the mouse. Disabling allows click through.               |
+| //xp swapSingleAlliance | When only one alliance party exists, its members will be shown in the 2nd alliance list. Prevents a gap when party lists are stacked in the same order as the original game UI. |
 | //xp alignBottom        | Expands the party lists from bottom to top.                                                    |
+| //xp showEmptyRows      | Shows empty rows in partially filled parties.                                                  |
 | //xp job                | Toggles job specific settings for current job. Settings changes to range or buffs will only affect this job. |
 | //xp setup              | Toggles setup mode showing a full alliance of fake party members. Move the UI via drag and drop, hold CTRL for grid snap. Use mouse wheel to scale the UI. |
 | //xp layout [file]      | Loads a UI layout file from the XivParty/layouts directory.                                    |
@@ -107,6 +109,8 @@ Parameters:
 > - **hpOrangeColor**: HP bar only: color of the text when HP falls below 50%.  
 > - **hpRedColor**: HP bar only: color of the text when HP falls below 25%.  
 > - **tpFullColor**: TP bar only: color of the text when TP is at or above 1000.  
+
+For the HP/TP based color changes, there are also optional equivalents that change the bar color with a similar naming scheme (e.g. **hpRedBarColor**).
 
 Bar parameters:
 > - **animSpeed**: Speed of the bar animation in percent per frame (float, range 0 to 1). This is a multiplicator applied to the remaining distance the bar has to travel. The higher the value, the faster the animation. When set to 1, the bar will move instantly without animation.

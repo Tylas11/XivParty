@@ -236,7 +236,9 @@ local function showHelp()
 	log('hideAlliance - hides alliance party lists')
 	log('hideCutscene - hides the UI during cutscenes')
 	log('mouseTargeting - toggles targeting party members using the mouse')
+	log('swapSingleAlliance - shows single alliance in the 2nd alliance list')
 	log('alignBottom - expands the party list from bottom to top')
+	log('showEmptyRows - show empty rows in partially filled parties')
 	log('job - toggles job specific settings for current job')
 	log('setup - move the UI using drag and drop, hold CTRL for grid snap, mouse wheel to scale the UI')
 	log('layout <file> - loads a UI layout file')
@@ -278,6 +280,26 @@ local function handleCommandOnOff(currentValue, argsString, text, plural)
 		isNowText = 'are now'
 	end
 	return handleCommand(currentValue, argsString, text, 'on', true, 'off', false, isNowText)
+end
+
+local function handlePartySettingsOnOff(settingsName, argsString1, argsString2, text)
+	local partyIndex = tonumber(argsString1)
+	if partyIndex ~= nil then
+		if partyIndex < 0 or partyIndex > 2 then
+			error('Invalid party index \'' .. argsString1 .. '\'. Valid values are 0 (main party), 1 (alliance 1), 2 (alliance 2).')
+		else
+			local partySettings = Settings:getPartySettings(partyIndex)
+			local ret = handleCommandOnOff(partySettings[settingsName], argsString2, text .. ' (' .. Settings:partyIndexToName(partyIndex) .. ')')
+			partySettings[settingsName] = ret
+			Settings:save()
+		end
+	else
+		local ret = handleCommandOnOff(Settings.party[settingsName], argsString1, text)
+		for i = 0, 2 do
+			Settings:getPartySettings(i)[settingsName] = ret
+		end
+		Settings:save()
+	end
 end
 
 local function checkBuff(buffId)
@@ -357,24 +379,14 @@ windower.register_event('addon command', function(...)
 		local ret = handleCommandOnOff(Settings.mouseTargeting, args[2], 'Targeting party members using the mouse')
 		Settings.mouseTargeting = ret
 		Settings:save()
+	elseif command == 'swapsinglealliance' then
+		local ret = handleCommandOnOff(Settings.swapSingleAlliance, args[2], 'Swapping UI for single alliance')
+		Settings.swapSingleAlliance = ret
+		Settings:save()
 	elseif command == 'alignbottom' then
-		local partyIndex = tonumber(args[2])
-		if partyIndex ~= nil then
-			if partyIndex < 0 or partyIndex > 2 then
-				error('Invalid party index \'' .. args[2] .. '\'. Valid values are 0 (main party), 1 (alliance 1), 2 (alliance 2).')
-			else
-				local partySettings = Settings:getPartySettings(partyIndex)
-				local ret = handleCommandOnOff(partySettings.alignBottom, args[3], 'Bottom alignment (' .. Settings:partyIndexToName(partyIndex) .. ')')
-				partySettings.alignBottom = ret
-				Settings:save()
-			end
-		else
-			local ret = handleCommandOnOff(Settings.party.alignBottom, args[2], 'Bottom alignment')
-			Settings.party.alignBottom = ret
-			Settings.alliance1.alignBottom = ret
-			Settings.alliance2.alignBottom = ret
-			Settings:save()
-		end
+		handlePartySettingsOnOff("alignBottom", args[2], args[3], 'Bottom alignment')
+	elseif command == 'showemptyrows' then
+		handlePartySettingsOnOff("showEmptyRows", args[2], args[3], 'Display of empty rows')
 	elseif command == 'customorder' then
 		local ret = handleCommandOnOff(Settings.buffs.customOrder, args[2], 'Custom buff order')
 		Settings.buffs.customOrder = ret

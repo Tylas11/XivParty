@@ -170,6 +170,10 @@ function model:refreshFilteredBuffs()
 	end
 end
 
+function model:hasAlliance2Members()
+	return self.parties[2]:length() > 0
+end
+
 -- creates dummy parties for setup mode
 function model:createSetupData()
 	for partyIndex = 0, 2 do
@@ -222,7 +226,7 @@ function model:debugAddSetupPlayer(partyIndex)
 	if not partyIndex then partyIndex = 0 end
 
 	local setupParty = self.parties[partyIndex]
-	local i = #setupParty + 1
+	local i = setupParty:length()
 
 	if i > 5 then error('Cannot add setup player, party full!') return end
 

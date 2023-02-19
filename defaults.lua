@@ -37,6 +37,7 @@ local defaults = {
 	hideAlliance = false, -- hides UI for alliance parties
 	hideCutscene = true, -- hides UI during cutscenes or when talking to NPCs
 	mouseTargeting = true, -- enables targeting party members using the mouse
+	swapSingleAlliance = false, -- when only one alliance party exists, show the members in the 2nd alliance list
 
 	rangeNumeric = false, -- enables numeric display of party member distances
 	rangeIndicator = 0, -- if party members are closer than this distance, they will be marked. 0 = off
@@ -48,19 +49,22 @@ local defaults = {
 		pos = L{ 0.015625, 0.4791666 }, -- relative coordinates, resolution independent (range 0.0 to 1.0)
 		scale = L{ 0, 0 }, -- scale 0 will trigger screen resolution based autoscaling
 		itemSpacing = 0, -- distance between party list items
-		alignBottom = false -- expands the party list from bottom to top
+		alignBottom = false, -- expands the party list from bottom to top
+		showEmptyRows = false -- show empty rows in partially full parties
 	},
 	alliance1 = {
 		pos = L{ 0.8671875, 0.5277777 },
 		scale = L{ 0, 0 },
 		itemSpacing = 0,
-		alignBottom = false
+		alignBottom = false,
+		showEmptyRows = false
 	},
 	alliance2 = {
 		pos = L{ 0.8671875, 0.5972222 },
 		scale = L{ 0, 0 },
 		itemSpacing = 0,
-		alignBottom = false
+		alignBottom = false,
+		showEmptyRows = false
 	},
 
 	buffs = {

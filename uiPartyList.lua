@@ -145,9 +145,18 @@ end
 function uiPartyList:update()
 	if not self.isEnabled then return end
 
+	local index = self.partyIndex
+	if self.partyIndex > 0 and Settings.swapSingleAlliance and not self.model:hasAlliance2Members() then
+		if self.partyIndex == 1 then -- swap index 1 and 2
+			index = 2
+		else
+			index = 1
+		end
+	end
+
 	-- update list items
 	for i = 0, 5 do
-		local player = self.model.parties[self.partyIndex][i]
+		local player = self.model.parties[index][i]
 		local item = self.listItems[i]
 
 		if player then
@@ -169,6 +178,9 @@ function uiPartyList:update()
 	-- update the background
 	local count = self.listItems:length()
 	local rowCount = math.floor((count - 1) / self.layout.columns) + 1
+	if partySettings.showEmptyRows then
+		rowCount = self.layout.rows
+	end
 	local contentHeight = rowCount * self.layout.rowHeight + (rowCount - 1) * partySettings.itemSpacing
 
 	self.background:setContentHeight(contentHeight)

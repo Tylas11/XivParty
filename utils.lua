@@ -41,6 +41,7 @@ utils.level = 3
 
 function utils:colorFromHex(hexString)
 	local length = string.length(hexString)
+	if length == 0 then return nil end
 
 	if not string.startswith(hexString, '#') or length < 7 or length > 9 then
 		utils:log('Invalid hexadecimal color code. Expected format #RRGGBB or #RRGGBBAA', 4)

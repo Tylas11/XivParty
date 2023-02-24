@@ -231,6 +231,7 @@ end
 -- @param b blue color value 0..255
 function uiImage:color(r, g, b)
 	if not self.isEnabled then return end
+	if r == nil then utils:log('uiImage:color missing parameter r!', 4) return end
 
 	local a = nil
 
@@ -261,6 +262,7 @@ end
 -- @param a alpha value as integer in range 0 .. 255
 function uiImage:alpha(a)
     if not self.isEnabled then return end
+	if a == nil then utils:log('uiImage:alpha missing parameter a!', 4) return end
 
 	if private[self].color.a ~= a then
 		private[self].color.a = a
@@ -275,6 +277,7 @@ end
 -- @param o opacity value as double in range 0.0 .. 1.0
 function uiImage:opacity(o)
     if not self.isEnabled then return end
+	if o == nil then utils:log('uiImage:opacity missing parameter o!', 4) return end
 
 	if private[self].opacity ~= o then
 		private[self].opacity = o

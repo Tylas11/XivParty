@@ -28,7 +28,7 @@
 
 _addon.name = 'XivParty'
 _addon.author = 'Tylas'
-_addon.version = '2.1.0'
+_addon.version = '2.1.1'
 _addon.commands = {'xp', 'xivparty'}
 
 -- windower library imports

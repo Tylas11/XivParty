@@ -83,7 +83,7 @@ end
 function uiBar:setColor(color)
 	if not self.isEnabled then return end
 
-	if not color then color = self.imbBarColor end
+	if not color then color = self.imgBarColor end
 	self.imgBar:color(color)
 end
 

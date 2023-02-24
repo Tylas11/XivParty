@@ -163,6 +163,7 @@ end
 
 function uiText:color(r,g,b)
     if not self.isEnabled then return end
+    if r == nil then utils:log('uiText:color missing parameter r!', 4) return end
 
     local a = nil
 
@@ -191,6 +192,7 @@ end
 
 function uiText:alpha(a)
     if not self.isEnabled then return end
+    if a == nil then utils:log('uiText:alpha missing parameter a!', 4) return end
 
     if private[self].color.a ~= a then
 	    private[self].color.a = a

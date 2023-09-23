@@ -111,9 +111,6 @@ function player:update(member, target, subtarget)
 	self.mpp = member.mpp
 	self.tpp = math.min(member.tp / 10, 100)
 
-	self.isSelected = target and member.mob and target.id == member.mob.id
-	self.isSubTarget = subtarget and member.mob and subtarget.id == member.mob.id
-
 	self.zone = member.zone
 	self.isOutsideZone = self.zone and self.zone ~= windower.ffxi.get_info().zone
 
@@ -143,6 +140,9 @@ function player:update(member, target, subtarget)
 			end
 		end
 	end
+
+	self.isSelected = target and target.id == self.id
+	self.isSubTarget = subtarget and subtarget.id == self.id
 
 	self.isInCastingRange = self.distance and self.distance < const.castRange
 	self.isInTargetingRange = self.distance and self.distance < const.targetRange

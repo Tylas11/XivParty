@@ -39,6 +39,8 @@ local buffOrder = L{
 	{id=0,en="KO",ja="戦闘不能",enl="KO'd",jal="戦闘不能"},
 	{id=1,en="weakness",ja="衰弱",enl="weakened",jal="衰弱"},
 	{id=15,en="doom",ja="死の宣告",enl="doomed",jal="死の宣告"},
+    {id=632,en="Black Sanctus",ja="ブラックサンクトゥス",enl="Black Sanctus",jal="ブラックサンクトゥス"},
+    {id=633,en="animated",ja="アニメート",enl="animated",jal="アニメート"},
 	{id=14,en="charm",ja="魅了",enl="charmed",jal="魅了"},
 	{id=17,en="charm",ja="魅了",enl="charmed",jal="魅了"},
 	{id=2,en="sleep",ja="睡眠",enl="asleep",jal="睡眠"},

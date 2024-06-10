@@ -1,29 +1,29 @@
 --[[
-	Copyright © 2023, Tylas
-	All rights reserved.
+    Copyright © 2023, Tylas
+    All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
 
-		* Redistributions of source code must retain the above copyright
-		  notice, this list of conditions and the following disclaimer.
-		* Redistributions in binary form must reproduce the above copyright
-		  notice, this list of conditions and the following disclaimer in the
-		  documentation and/or other materials provided with the distribution.
-		* Neither the name of XivParty nor the
-		  names of its contributors may be used to endorse or promote products
-		  derived from this software without specific prior written permission.
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in the
+          documentation and/or other materials provided with the distribution.
+        * Neither the name of XivParty nor the
+          names of its contributors may be used to endorse or promote products
+          derived from this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-	WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-	DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
-	DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-	(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-	ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-	(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+    DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 -- windower library imports
@@ -56,28 +56,28 @@ function uiText:init(layout)
         end
 
         private[self].color = {}
-		private[self].color.r = 255
-		private[self].color.g = 255
-		private[self].color.b = 255
-		private[self].color.a = 255
-		if layout and layout.color then
-			local c = utils:colorFromHex(layout.color)
-			if c then
-				private[self].color = c
-			end
-		end
+        private[self].color.r = 255
+        private[self].color.g = 255
+        private[self].color.b = 255
+        private[self].color.a = 255
+        if layout and layout.color then
+            local c = utils:colorFromHex(layout.color)
+            if c then
+                private[self].color = c
+            end
+        end
 
         private[self].stroke = {}
-		private[self].stroke.r = 255
-		private[self].stroke.g = 255
-		private[self].stroke.b = 255
-		private[self].stroke.a = 255
-		if layout and layout.stroke then
-			local s = utils:colorFromHex(layout.stroke)
-			if s then
-				private[self].stroke = s
-			end
-		end
+        private[self].stroke.r = 255
+        private[self].stroke.g = 255
+        private[self].stroke.b = 255
+        private[self].stroke.a = 255
+        if layout and layout.stroke then
+            local s = utils:colorFromHex(layout.stroke)
+            if s then
+                private[self].stroke = s
+            end
+        end
 
         private[self].font = layout.font
         private[self].fontSize = layout.size
@@ -152,13 +152,13 @@ end
 function uiText:update(text)
     if not self.isEnabled then return end
 
-	if private[self].text ~= text then
-		private[self].text = text
+    if private[self].text ~= text then
+        private[self].text = text
 
         if self.isCreated then
             setTrimmedText(self.wrappedText, private[self].text, private[self].maxChars)
         end
-	end
+    end
 end
 
 function uiText:color(r,g,b)
@@ -195,10 +195,10 @@ function uiText:alpha(a)
     if a == nil then utils:log('uiText:alpha missing parameter a!', 4) return end
 
     if private[self].color.a ~= a then
-	    private[self].color.a = a
+        private[self].color.a = a
 
         if self.isCreated then
-	        self.wrappedText:alpha(a)
+            self.wrappedText:alpha(a)
         end
     end
 end
